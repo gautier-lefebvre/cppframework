@@ -40,7 +40,7 @@ When sending a HTTP request, you can provide a callback method which will be cal
 
 This uses cURL.
 
-### Workers
+### workers
 
 Every event or action (data read from a socket, response received from a HTTP request) is put in a shared queue (FIFO collection).
 
