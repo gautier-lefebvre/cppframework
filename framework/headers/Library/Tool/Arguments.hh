@@ -74,7 +74,7 @@ public:
 		 *	\param nbmin minimum number of values of the argument.
 		 *	\param nbmax maximal number of values of the argument. Must be >= to \a nbmin or set to \a -1 if no limit.
 		 */
-		Expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory = false, std::function<bool (const std::string&)> typechecker = nullptr, size_t nbmin = 1, ssize_t nbmax = 1);
+		Expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory = false, const std::function<bool (const std::string&)>& typechecker = nullptr, size_t nbmin = 1, ssize_t nbmax = 1);
 	};
 
 	/**
@@ -154,7 +154,7 @@ public:
 	 *	\param nbmin minimum number of values of the argument.
 	 *	\param nbmax maximal number of values of the argument. Must be >= to \a nbmin or set to \a -1 if no limit.
 	 */
-	void expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory = false, std::function<bool (const std::string&)> typechecker = nullptr, size_t nbmin = 1, ssize_t nbmax = 1);
+	void expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory = false, const std::function<bool (const std::string&)>& typechecker = nullptr, size_t nbmin = 1, ssize_t nbmax = 1);
 
 	/**
 	 *	\brief Adds a list of incompatible flags.

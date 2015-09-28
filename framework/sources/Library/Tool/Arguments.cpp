@@ -24,7 +24,7 @@ const std::string& Arguments::Arg::operator[](size_t idx) const {
 	}
 }
 
-Arguments::Expected::Expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory, std::function<bool (const std::string&)> tc, size_t nbmin, ssize_t nbmax):
+Arguments::Expected::Expected(const std::string& flag, const std::string& type, const std::string& description, bool mandatory, const std::function<bool (const std::string&)>& tc, size_t nbmin, ssize_t nbmax):
 	flag(flag),
 	type(type),
 	description(description),
@@ -77,7 +77,7 @@ void	Arguments::expected(Expected *ex) {
 	this->_expected.push_back(ex);
 }
 
-void	Arguments::expected(const std::string &flag, const std::string &type, const std::string &description, bool mandatory, std::function<bool (const std::string&)> tc, size_t nbmin, ssize_t nbmax) {
+void	Arguments::expected(const std::string &flag, const std::string &type, const std::string &description, bool mandatory, const std::function<bool (const std::string&)>& tc, size_t nbmin, ssize_t nbmax) {
 	this->_expected.push_back(new Arguments::Expected(flag, type, description, mandatory, tc, nbmin, nbmax));
 }
 

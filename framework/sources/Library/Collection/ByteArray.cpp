@@ -4,8 +4,6 @@
 #include	"Library/Tool/Converter.hpp"
 #include	"Library/Tool/Macro.hh"
 
-Factory::Pool<ByteArray>* ByteArray::Pool::_pool = nullptr;
-
 ByteArray::ByteArray(size_t s):
 	Factory::AFactored(),
 	Threading::Lock(),
@@ -199,48 +197,35 @@ void	ByteArrayExtractor::extractString(std::string& data, size_t length) {
 	if (this->_bytearray->getSize() - this->_offset < length) {
 		throw std::out_of_range("ByteArrayExtractor::extract: There are not enough bytes left in ByteArray to extract successfully");
 	} else {
-		ByteArray::Pool::Guard guard(ByteArray::Pool::create(length));
+		ByteArray::Pool::Guard guard(ByteArray::Pool::get().create(length));
 		this->_bytearray->get(guard.bytearray->atStart(), length, this->_offset);
 		data = reinterpret_cast<const char*>(guard.bytearray->getBytes());
 		this->_offset += length;
 	}
 }
 
+/**
+ *	ByteArray pool
+ */
+
+ByteArray::Pool::Pool():
+	Factory::BasicPool<Core::Network::TCP::Socket>()
+{}
+
+ByteArray::Pool::~Pool() {}
+
 void	ByteArray::Pool::init() {
-	if (ByteArray::Pool::_pool == nullptr) {
-		ByteArray::Pool::_pool = new Factory::Pool<ByteArray>(
-			ByteArray::Pool::ORIGINAL_SIZE,
-			ByteArray::Pool::HYDRATE_SIZE,
-			"ByteArray");
-	}
-}
-
-void	ByteArray::Pool::destroy() {
-	if (ByteArray::Pool::_pool != nullptr) {
-		delete ByteArray::Pool::_pool;
-	}
-	ByteArray::Pool::_pool = nullptr;
-}
-
-ByteArray* ByteArray::Pool::create() {
-	return ByteArray::Pool::_pool->get();
+	this->initPool(this->ORIGINAL_SIZE,
+		this->HYDRATE_SIZE,
+		"ByteArray");
 }
 
 ByteArray* ByteArray::Pool::create(size_t size) {
-	ByteArray* bytearray = ByteArray::Pool::_pool->get();
+	ByteArray* bytearray = this->_pool->get();
 	bytearray->resize(size);
 	return bytearray;
 }
 
-void ByteArray::Pool::remove(ByteArray* element) {
-	if (element != nullptr) {
-		if (element->getSizeMax() > ByteArray::Pool::MAX_BUFFER_SIZE) {
-			element->resize(ByteArray::Pool::MAX_BUFFER_SIZE, true, false);
-		}
-		ByteArray::Pool::_pool->push(element);
-	}
-}
-
 ByteArray::Pool::Guard::Guard(ByteArray* bytearray): bytearray(bytearray) {}
 
-ByteArray::Pool::Guard::~Guard() { ByteArray::Pool::remove(this->bytearray); }
+ByteArray::Pool::Guard::~Guard() { ByteArray::Pool::get().remove(this->bytearray); }

@@ -68,3 +68,4 @@ Based on the modules you activate and the number of workers you choose, you will
 I used some code I didn't write myself:
 - the jsoncpp library available [here](https://github.com/open-source-parsers/jsoncpp).
 - the utf8 library available [here](http://sourceforge.net/projects/utfcpp/).
+- reader-writer lock with writer priority, translated from python [here](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/)

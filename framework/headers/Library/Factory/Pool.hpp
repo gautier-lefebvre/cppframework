@@ -75,6 +75,40 @@ namespace	Factory {
 			}
 		}
 	};
+
+	template<class C>
+	class BasicPool {
+	protected:
+		Factory::Pool<C>*	_pool;
+
+	public:
+		BasicPool(): _pool(nullptr) {}
+		virtual ~BasicPool() { this->destroyPool(); }
+
+	public:
+		void	initPool(size_t originalSize, size_t hydrateSize, const std::string& className) {
+			if (_pool == nullptr) {
+				_pool = new Factory::Pool<C>(originalSize, hydrateSize, className);
+			}
+		}
+
+		void	destroyPool() {
+			if (_pool != nullptr) {
+				delete _pool;
+			}
+			_pool = nullptr;
+		}
+
+		C*	create() {
+			return _pool->get();
+		}
+
+		void	remove(C* element) {
+			if (element != nullptr) {
+				_pool->push(element);
+			}
+		}
+	};
 }
 
 #endif		/* __LIBRARY_FACTORY_POOL_HPP__ */

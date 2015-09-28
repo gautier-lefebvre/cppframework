@@ -3,13 +3,35 @@
 
 #include	<sys/select.h>
 
+#include	"Library/DesignPattern/Singleton.hpp"
+#include	"Library/Factory/AFactored.hh"
+#include	"Library/Factory/Pool.hpp"
 #include	"Library/Threading/Lock.hpp"
-#include	"Library/Factory/IFactored.hh"
 
 namespace			Core {
 	namespace		Network {
 		namespace	TCP {
-			class	Socket :public Factory::IFactored, public Threading::Lock {
+			class	Socket :public Factory::AFactored, public Threading::Lock {
+			public:
+				struct	Pool :public Singleton<Core::Network::TCP::Socket::Pool>, public Factory::BasicPool<Core::Network::TCP::Socket> {
+					friend class Singleton<Core::Network::TCP::Socket::Pool>;
+				public:
+					const size_t	ORIGINAL_SIZE = 10;
+					const size_t	HYDRATE_SIZE = 10;
+
+				private:
+					Pool(const Pool&) = delete;
+					Pool(const Pool&&) = delete;
+					Pool& operator=(const Manager&) = delete;
+
+				private:
+					Pool();
+					virtual ~Pool();
+
+				public:
+					void init();
+				};
+
 			protected:
 				int	_fd;
 

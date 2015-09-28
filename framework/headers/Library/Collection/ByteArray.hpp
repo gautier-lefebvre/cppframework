@@ -4,6 +4,7 @@
 #include	<iostream>
 #include	<cstring>
 
+#include	"Library/DesignPattern/Singleton.hpp"
 #include	"Library/Threading/Lock.hpp"
 #include	"Library/Factory/AFactored.hh"
 #include	"Library/Factory/Pool.hpp"
@@ -14,19 +15,27 @@
  */
 class		ByteArray :public Factory::AFactored, public Threading::Lock {
 public:
-	struct	Pool {
-		static Factory::Pool<ByteArray>	*_pool;
+	struct	Pool :public Singleton<ByteArray::Pool>, public Factory::BasicPool<ByteArray> {
+			friend class Singleton<ByteArray::Pool>;
+	public:
+		const size_t	ORIGINAL_SIZE = 100;
+		const size_t	HYDRATE_SIZE = 100;
+		const size_t	MAX_BUFFER_SIZE = 1000;
 
-		static void init();
-		static void destroy();
+	private:
+		Pool(const Pool&) = delete;
+		Pool(const Pool&&) = delete;
+		Pool& operator=(const Manager&) = delete;
 
-		static const size_t	ORIGINAL_SIZE = 100;
-		static const size_t	HYDRATE_SIZE = 100;
-		static const size_t	MAX_BUFFER_SIZE = 1000;
+	private:
+		Pool();
+		virtual ~Pool();
 
-		static ByteArray*	create();
-		static ByteArray*	create(size_t);
-		static void			remove(ByteArray*);
+	public:
+		void init();
+
+	public:
+		ByteArray*	create(size_t);
 
 		/**
 		 *	\class Guard Library/Collection/ByteArray.hpp

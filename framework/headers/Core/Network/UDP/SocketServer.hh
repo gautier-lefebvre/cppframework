@@ -23,7 +23,7 @@ namespace			Core {
 			public:
 				void	socket();
 				void	close();
-				void	bind();
+				void	bind(uint16_t);
 
 			public:
 				void	addToSet(fd_set&, int&) const;
