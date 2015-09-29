@@ -18,7 +18,7 @@ namespace			Core {
 				private:
 					Pool(const Pool&) = delete;
 					Pool(const Pool&&) = delete;
-					Pool& operator=(const Manager&) = delete;
+					Pool& operator=(const Pool&) = delete;
 
 				private:
 					Pool();

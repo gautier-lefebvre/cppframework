@@ -8,7 +8,7 @@
 
 #include	"Core/Network/TCP/Socket.hh"
 #include	"Core/Network/Exception.hh"
-#include	"Library/Macro.hh"
+#include	"Library/Tool/Macro.hh"
 
 Core::Network::TCP::Socket::Socket():
 	Threading::Lock(),
@@ -79,8 +79,7 @@ void	Core::Network::TCP::Socket::listen(int nb) const {
 	}
 }
 
-uint32_t	Core::Network::TCP::Socket::accept(Core::Network::TCP::ISocket* ptr) const {
-	Core::Network::TCP::Socket* socket = reinterpret_cast<Core::Network::TCP::Socket*>(ptr);
+uint32_t	Core::Network::TCP::Socket::accept(Core::Network::TCP::Socket* socket) const {
 	sockaddr_in sin;
 	socklen_t size = sizeof(sockaddr_in);
 

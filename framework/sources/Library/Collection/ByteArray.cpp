@@ -209,15 +209,15 @@ void	ByteArrayExtractor::extractString(std::string& data, size_t length) {
  */
 
 ByteArray::Pool::Pool():
-	Factory::BasicPool<Core::Network::TCP::Socket>()
+	Factory::BasicPool<ByteArray>()
 {}
 
 ByteArray::Pool::~Pool() {}
 
 void	ByteArray::Pool::init() {
 	this->initPool(this->ORIGINAL_SIZE,
-		this->HYDRATE_SIZE,
-		"ByteArray");
+					this->HYDRATE_SIZE,
+					"ByteArray");
 }
 
 ByteArray* ByteArray::Pool::create(size_t size) {
