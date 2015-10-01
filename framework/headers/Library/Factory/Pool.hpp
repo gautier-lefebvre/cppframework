@@ -10,14 +10,26 @@
 #include	"Library/Exception.hh"
 
 namespace	Factory {
+	/**
+	 *	\class Pool Library/Factory/Pool.hpp
+	 *	\brief a templated pool to store objects without having to dynamically create them.
+	 */
 	template<class C>
 	class	Pool :public Threading::Lock {
 	private:
-		std::queue<C*>	_pool;
-		size_t			_hydrate;
-		std::string		_name;
+		std::queue<C*>	_pool; /*!< the collection of objects. */
+		size_t			_hydrate; /*!< the number of objects to create when the pool is empty. */
+		std::string		_name; /*!< the stored objects' class name. */
 
 	public:
+		/**
+		 *	\brief Constructor of Pool.
+		 *	\throw Exception size and hydrate must be greater than 0, or the memory is exhausted.
+		 *	Will create a first batch of objects.
+		 *	\param size the number of objects to create now.
+		 *	\param hydrate the number of objects to create when the pool is empty.
+		 *	\param classname the stored objects' classname.
+		 */
 		Pool(size_t size, size_t hydrate, const std::string &classname):
 			Threading::Lock::Lock(),
 			_pool(),
@@ -32,6 +44,11 @@ namespace	Factory {
 			}
 		}
 
+		/**
+		 *	\brief Destructor of Pool.
+		 *
+		 *	Deletes every object still inside the pool.
+		 */
 		virtual ~Pool() {
 			SCOPELOCK(this);
 			while (!(this->_pool.empty())) {
@@ -40,6 +57,13 @@ namespace	Factory {
 			}
 		}
 
+		/**
+		 *	\brief Pops an object from the pool.
+		 *	\throw Exception the pool is empty and the memory is exhausted.
+		 *	If the pool is empty, will create the number of objects asked at creation.
+		 *	Will set the object's validity to true and its last out of pool time point to current time.
+		 *	\return the object popped from the pool.
+		 */
 		C* get() {
 			SCOPELOCK(this);
 			if (this->_pool.empty()) {
@@ -52,6 +76,12 @@ namespace	Factory {
 			return element;
 		}
 
+		/**
+		 *	\brief Puts an object back into the pool.
+		 *	Will reinit the object and set its validity to false.
+		 *	If the \a element is nullptr, does nothing.
+		 *	\param element the object to put back into the pool.
+		 */
 		void	push(C* element) {
 			if (element != nullptr) {
 				element->reinit();
@@ -64,11 +94,17 @@ namespace	Factory {
 		}
 
 	private:
+		/**
+		 *	\brief Creates the specified number of objects and puts them into the pool.
+		 *	\param size the number of objects to create.
+		 *	\throw Exception memory exhausted.
+		 */
 		void	hydrate(size_t size) {
 			SCOPELOCK(this);
 			try {
 				for (size_t i = 0 ; i < size ; ++i) {
-					this->_pool.push(new C());
+					C* element = new C();
+					this->push(element);
 				}
 				DEBUG(this->_name + ": adding " + StringOfSize(size) + " items into the pool");
 			} catch (const std::bad_alloc&) {
@@ -77,22 +113,45 @@ namespace	Factory {
 		}
 	};
 
+	/**
+	 *	\class BasicPool Library/Factory/Pool.hpp
+	 *	\brief A base class for all objects pools.
+	 *	Base classes are intended to be singleton, otherwise this class is useless and Pool could be used.
+	 */
 	template<class C>
 	class BasicPool {
 	protected:
-		Factory::Pool<C>*	_pool;
+		Factory::Pool<C>*	_pool; /*!< the pool of objects. */
 
 	public:
+		/**
+		 *	\brief Constructor of BasicPool.
+		 *	Sets the pool to nullptr.
+		 */
 		BasicPool(): _pool(nullptr) {}
+
+		/**
+		 *	\brief Destructor of BasicPool.
+		 *	Will delete the pool if it was set.
+		 */
 		virtual ~BasicPool() { this->destroyPool(); }
 
 	public:
+		/**
+		 *	\brief Initializes the pool if it was not already created.
+		 *	\param originalSize the number of objects to create now.
+		 *	\param hydrateSize the number of objects to create when the pool is empty.
+		 *	\param className the stored objects' class name.
+		 */
 		void	initPool(size_t originalSize, size_t hydrateSize, const std::string& className) {
 			if (this->_pool == nullptr) {
 				this->_pool = new Factory::Pool<C>(originalSize, hydrateSize, className);
 			}
 		}
 
+		/**
+		 *	\brief Deletes the pool and sets it to nullptr.
+		 */
 		void	destroyPool() {
 			if (this->_pool != nullptr) {
 				delete this->_pool;
@@ -100,10 +159,18 @@ namespace	Factory {
 			this->_pool = nullptr;
 		}
 
+		/**
+		 *	\brief Takes an object from the pool.
+		 *	\return the object.
+		 */
 		C*	create() {
 			return this->_pool->get();
 		}
 
+		/**
+		 *	\brief Puts an object back into the pool.
+		 *	\param element the object to put back into the pool.
+		 */
 		void	remove(C* element) {
 			if (element != nullptr) {
 				this->_pool->push(element);

@@ -8,8 +8,8 @@
  *	\class OrderedList Library/Collection/OrderedList.hpp
  *	\brief a std::list which keeps its values ordered.
  *
- *	Should not be used for gigantic lists (each push_back iterates through the list).
- *	To insert values, only the `push_back()` method should be used, otherwise the values will not be in order.
+ *	Should not be used for gigantic lists (each push iterates through the list).
+ *	To insert values, only the `push()` method should be used, otherwise the values will not be in order.
  */
 template<typename T>
 class	OrderedList :public std::list<T> {
@@ -47,18 +47,18 @@ public:
 	 *	Must always be used to keep all values ordered.
 	 *	\param val the value to insert.
 	 */
-	virtual void push_back(const T& val) {
+	virtual void push(const T& val) {
 		if (this->empty()) {
-			this->std::list<T>::push_back(val);
+			this->push_back(val);
 			return ;
 		}
 		for (auto it = this->begin() ; it != this->end() ; ++it) {
 			if (this->_compare(val, *it)) {
-				this->std::list<T>::insert(it, val);
+				this->insert(it, val);
 				return ;
 			}
 			else if (std::next(it,1) == this->end()) {
-				this->std::list<T>::push_back(val);
+				this->push_back(val);
 				return ;
 			}
 		}

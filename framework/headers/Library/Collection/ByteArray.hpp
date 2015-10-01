@@ -270,27 +270,58 @@ public:
 	void	push_frontStr(const std::string& str, bool resize = false);
 
 public:
+	/**
+	 *	\class Pool Library/Collection/ByteArray.hpp
+	 *	\brief a singleton pool of ByteArrays
+	 */
 	struct	Pool :public Singleton<ByteArray::Pool>, public Factory::BasicPool<ByteArray> {
 			friend class Singleton<ByteArray::Pool>;
 	public:
-		const size_t	ORIGINAL_SIZE = 100;
-		const size_t	HYDRATE_SIZE = 100;
-		const size_t	MAX_BUFFER_SIZE = 1000;
+		const size_t	ORIGINAL_SIZE = 100; /*!< Number of ByteArrays to create at initialization. */
+		const size_t	HYDRATE_SIZE = 100; /*!< Number of ByteArrays to create when the pool is empty. */
+		const size_t	MAX_BUFFER_SIZE = 1000;  /*!< Limit size (in bytes) of a ByteArray inside the pool. */
 
 	private:
+		/**
+		 *	\brief Deleted copy constructor of Pool.
+		 */
 		Pool(const Pool&) = delete;
+
+		/**
+		 *	\brief Deleted move constructor of Pool.
+		 */
 		Pool(const Pool&&) = delete;
+
+		/**
+		 *	\brief Deleted assignment constructor of Pool.
+		 */
 		Pool& operator=(const Pool&) = delete;
 
 	private:
+		/**
+		 *	\brief Constructor of Pool.
+		 */
 		Pool();
+
+		/**
+		 *	\brief Destructor of Pool.
+		 */
 		virtual ~Pool();
 
 	public:
+		/**
+		 *	\brief Creates the pool.
+		 */
 		void init();
 
 	public:
-		ByteArray*	create(size_t);
+		/**
+		 *	\brief Takes a ByteArray from the pool, with at least the required number of bytes.
+		 *
+		 *	\param size the minimum required size.
+		 *	\return the ByteArray.
+		 */
+		ByteArray*	create(size_t size);
 
 		/**
 		 *	\class Guard Library/Collection/ByteArray.hpp
@@ -305,20 +336,55 @@ public:
 	};
 };
 
+/**
+ *	\class ByteArrayExtractor Library/Collection/ByteArray.hpp
+ *	\brief an object which will extract data from a ByteArray without altering its data.
+ */
 class ByteArrayExtractor {
 private:
-	const ByteArray *	_bytearray;
-	size_t				_offset;
+	const ByteArray *	_bytearray; /*!< a pointer to the ByteArray whose data is being extracted. */
+	size_t				_offset; /*!< an offset moving after each extraction. */
 
 public:
-	ByteArrayExtractor(const ByteArray *, size_t = 0);
-	ByteArrayExtractor(const ByteArrayExtractor&);
+	/**
+	 *	\brief Constructor of ByteArrayExtractor.
+	 *	\param bytearray the ByteArray from which the data will be extracted.
+	 *	\param offset the offset from which the extraction will begin.
+	 */
+	ByteArrayExtractor(const ByteArray *bytearray, size_t offset = 0);
+
+	/**
+	 *	\brief Copy constructor of ByteArrayExtractor.
+	 *	The pointer to the bytearray will be copied.
+	 *	\param oth the ByteArrayExtractor to copy.
+	 */
+	ByteArrayExtractor(const ByteArrayExtractor& oth);
+
+	/**
+	 *	\brief Copy constructor of ByteArrayExtractor.
+	 *	The pointer to the bytearray will be copied.
+	 *	\param oth the ByteArrayExtractor to copy.
+	 */
 	ByteArrayExtractor& operator=(const ByteArrayExtractor&);
+
+	/**
+	 *	\brief Destructor of ByteArrayExtractor.
+	 */
 	~ByteArrayExtractor();
 
 public:
-	void	extractString(std::string&, size_t);
+	/**
+	 *	\brief	extract a string from the ByteArray.
+	 *	\param str the string to which the data will be copied.
+	 *	\param size the number of bytes inside the ByteArray to put inside the string.
+	 */
+	void	extractString(std::string& str, size_t size);
 
+	/**
+	 *	\brief	extract data from the ByteArray.
+	 *	Can be used for integer types (uint16_t, etc.).
+	 *	\param data the object to which the data will be copied.
+	 */
 	template<typename T>
 	void	extract(T& data) {
 		size_t size = static_cast<size_t>(sizeof(T));

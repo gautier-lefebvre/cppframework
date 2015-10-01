@@ -59,12 +59,12 @@ void	Core::Network::UDP::SocketClient::push(ByteArray* datagram) {
 }
 
 ByteArray*	Core::Network::UDP::SocketClient::nextDatagram() {
-	if (this->_input.first.empty()) {
+	if (this->_output.first.empty()) {
 		return nullptr;
 	} else {
-		ByteArray* datagram = this->_input.first.front();
-		this->_input.first.pop();
-		this->_input.second -= datagram->getSize();
+		ByteArray* datagram = this->_output.first.front();
+		this->_output.first.pop();
+		this->_output.second -= datagram->getSize();
 		return datagram;
 	}
 }
