@@ -1,4 +1,7 @@
+#include	<netdb.h>
+
 #include	"Core/Network/UDP/SocketClient.hh"
+#include	"Core/Network/Exception.hh"
 
 Core::Network::UDP::SocketClient::SocketClient():
 	_addr(),
@@ -23,7 +26,6 @@ void	Core::Network::UDP::SocketClient::reinit() {
 		ByteArray::Pool::get().remove(this->_input.first.front());
 		this->_input.first.pop();
 	}
-	this->_input.first.clear();
 	this->_input.second = 0;
 
 	// reinit datagrams to send
@@ -32,7 +34,6 @@ void	Core::Network::UDP::SocketClient::reinit() {
 		ByteArray::Pool::get().remove(this->_output.first.front());
 		this->_output.first.pop();
 	}
-	this->_output.first.clear();
 	this->_output.second = 0;
 }
 

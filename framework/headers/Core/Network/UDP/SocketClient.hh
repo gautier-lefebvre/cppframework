@@ -5,8 +5,9 @@
 #include	<queue>
 #include	<utility>
 
+#include	"Library/Collection/ByteArray.hpp"
 #include	"Library/Threading/Lock.hpp"
-#include	"Library/Factory/IFactored.hh"
+#include	"Library/Factory/AFactored.hh"
 
 namespace			Core {
 	namespace		Network {
