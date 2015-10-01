@@ -40,6 +40,8 @@ void	Core::Network::UDP::SocketClient::reinit() {
 void	Core::Network::UDP::SocketClient::init(const sockaddr_in& addr) {
 	if (&(addr) != &(this->_addr)) {
 		memcpy(&(this->_addr), &(addr), sizeof(sockaddr_in));
+		this->_info.first = static_cast<uint32_t>(this->_addr.sin_addr.s_addr);
+		this->_info.second = ntohs(this->_addr.sin_port);
 	}
 }
 

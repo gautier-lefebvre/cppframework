@@ -1,4 +1,4 @@
-NAME=			cppframework
+NAME=			cppframework.so
 
 SRCDIR=			sources/
 
@@ -37,6 +37,7 @@ LDPTHREAD=		-lpthread
 LDFLAGS=		$(LDPTHREAD) -lssl -lcrypto -lcurl
 
 CXXFLAGS=		-Iheaders/ -std=c++11 -W -Wall -Wextra -Werror
+CXXFLAGS+=		-c -fPIC # dynamic library
 
 CXX=			g++
 
@@ -50,7 +51,7 @@ debug:			compile
 nodebug:		compile
 
 compile:		$(OBJ)
-				@$(CXX) -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+				@$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
 
 
 %.o:			%.cpp
