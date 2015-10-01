@@ -48,6 +48,7 @@ namespace	Factory {
 			C*	element = this->_pool.front();
 			this->_pool.pop();
 			element->isValid(true);
+			element->updateLastOutOfPoolTimePoint();
 			return element;
 		}
 
@@ -87,25 +88,25 @@ namespace	Factory {
 
 	public:
 		void	initPool(size_t originalSize, size_t hydrateSize, const std::string& className) {
-			if (_pool == nullptr) {
-				_pool = new Factory::Pool<C>(originalSize, hydrateSize, className);
+			if (this->_pool == nullptr) {
+				this->_pool = new Factory::Pool<C>(originalSize, hydrateSize, className);
 			}
 		}
 
 		void	destroyPool() {
-			if (_pool != nullptr) {
-				delete _pool;
+			if (this->_pool != nullptr) {
+				delete this->_pool;
 			}
-			_pool = nullptr;
+			this->_pool = nullptr;
 		}
 
 		C*	create() {
-			return _pool->get();
+			return this->_pool->get();
 		}
 
 		void	remove(C* element) {
 			if (element != nullptr) {
-				_pool->push(element);
+				this->_pool->push(element);
 			}
 		}
 	};

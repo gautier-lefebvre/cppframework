@@ -13,42 +13,7 @@
  *	\class ByteArray Library/Collection/ByteArray.hpp
  *	\brief Raw data container.
  */
-class		ByteArray :public Factory::AFactored, public Threading::Lock {
-public:
-	struct	Pool :public Singleton<ByteArray::Pool>, public Factory::BasicPool<ByteArray> {
-			friend class Singleton<ByteArray::Pool>;
-	public:
-		const size_t	ORIGINAL_SIZE = 100;
-		const size_t	HYDRATE_SIZE = 100;
-		const size_t	MAX_BUFFER_SIZE = 1000;
-
-	private:
-		Pool(const Pool&) = delete;
-		Pool(const Pool&&) = delete;
-		Pool& operator=(const Pool&) = delete;
-
-	private:
-		Pool();
-		virtual ~Pool();
-
-	public:
-		void init();
-
-	public:
-		ByteArray*	create(size_t);
-
-		/**
-		 *	\class Guard Library/Collection/ByteArray.hpp
-		 *	\brief a guard class which sends a ByteArray back to the pool in its destructor.
-		 */
-		struct	Guard {
-			ByteArray*	bytearray;
-
-			Guard(ByteArray*);
-			~Guard();
-		};
-	};
-
+class	ByteArray :public Factory::AFactored, public Threading::Lock {
 protected:
 	uint8_t	*_bytearray; /*!< Pointer to the start of the data. */
 	size_t	_size; /*!< Size of the data in bytes. */
@@ -303,6 +268,41 @@ public:
 	 *	\param resize if \a true, the ByteArray will be resized to have enough space to add the string (if it didn't before).
 	 */
 	void	push_frontStr(const std::string& str, bool resize = false);
+
+public:
+	struct	Pool :public Singleton<ByteArray::Pool>, public Factory::BasicPool<ByteArray> {
+			friend class Singleton<ByteArray::Pool>;
+	public:
+		const size_t	ORIGINAL_SIZE = 100;
+		const size_t	HYDRATE_SIZE = 100;
+		const size_t	MAX_BUFFER_SIZE = 1000;
+
+	private:
+		Pool(const Pool&) = delete;
+		Pool(const Pool&&) = delete;
+		Pool& operator=(const Pool&) = delete;
+
+	private:
+		Pool();
+		virtual ~Pool();
+
+	public:
+		void init();
+
+	public:
+		ByteArray*	create(size_t);
+
+		/**
+		 *	\class Guard Library/Collection/ByteArray.hpp
+		 *	\brief a guard class which sends a ByteArray back to the pool in its destructor.
+		 */
+		struct	Guard {
+			ByteArray*	bytearray;
+
+			Guard(ByteArray*);
+			~Guard();
+		};
+	};
 };
 
 class ByteArrayExtractor {

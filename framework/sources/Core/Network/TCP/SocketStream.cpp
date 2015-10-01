@@ -41,20 +41,20 @@ void	Core::Network::TCP::SocketStream::push(const void* buffer, size_t size) {
 		SCOPELOCK(this);
 		this->_output->push(buffer, size);
 	} catch (const std::out_of_range& e) {
-		throw Core::Exception(e.what());
+		throw Core::Network::Exception(e.what());
 	}
 }
 
 void		Core::Network::TCP::SocketStream::recv() {
 	SCOPELOCK(this);
 	if (this->_input->full()) {
-		throw Core::Exception("recv: buffer is full");
+		throw Core::Network::Exception("recv: buffer is full");
 	}
 	ssize_t ret = ::recv(this->_fd, this->_input->atEnd(), this->_input->availableSpace(), 0);
 	if (ret == -1) {
-		throw Core::Exception(std::string("recv: ") + strerror(errno));
+		throw Core::Network::Exception(std::string("recv: ") + strerror(errno));
 	} else if (ret == 0) {
-		throw Core::Exception("connection closed");
+		throw Core::Network::Exception("connection closed");
 	} else if (ret > 0) {
 		this->_input->moveEnd(static_cast<size_t>(ret));
 	}
@@ -64,7 +64,7 @@ void		Core::Network::TCP::SocketStream::send() {
 	SCOPELOCK(this);
 	ssize_t ret = ::send(this->_fd, this->_output->atStart(), this->_output->getSize(), MSG_NOSIGNAL);
 	if (ret == -1) {
-		throw Core::Exception(std::string("send: ") + strerror(errno));
+		throw Core::Network::Exception(std::string("send: ") + strerror(errno));
 	} else if (ret > 0) {
 		this->_output->clearStart(static_cast<size_t>(ret));
 	}

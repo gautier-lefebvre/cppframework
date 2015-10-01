@@ -22,7 +22,8 @@ COREDIR=		$(SRCDIR)Core/
 CORESRC=		$(COREDIR)Exception.cpp							\
 				$(COREDIR)Network/Exception.cpp					\
 				$(COREDIR)Network/TCP/Socket.cpp				\
-				$(COREDIR)Network/TCP/SocketStream.cpp
+				$(COREDIR)Network/TCP/SocketStream.cpp			\
+				$(COREDIR)Network/UDP/SocketClient.cpp
 
 SRC=			$(LIBRARYSRC)									\
 				$(CORESRC)										\

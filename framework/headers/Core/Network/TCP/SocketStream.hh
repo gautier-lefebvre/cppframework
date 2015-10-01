@@ -8,26 +8,6 @@ namespace			Core {
 	namespace		Network {
 		namespace	TCP {
 			class	SocketStream :public Socket {
-			public:
-				struct	Pool :public Singleton<Core::Network::TCP::SocketStream::Pool>, public Factory::BasicPool<Core::Network::TCP::SocketStream> {
-					friend class Singleton<Core::Network::TCP::SocketStream::Pool>;
-				public:
-					const size_t	ORIGINAL_SIZE = 100;
-					const size_t	HYDRATE_SIZE = 10;
-
-				private:
-					Pool(const Pool&) = delete;
-					Pool(const Pool&&) = delete;
-					Pool& operator=(const Pool&) = delete;
-
-				private:
-					Pool();
-					virtual ~Pool();
-
-				public:
-					void init();
-				};
-
 			protected:
 				ByteArray	*_input;
 				ByteArray	*_output;
@@ -48,6 +28,26 @@ namespace			Core {
 				void	push(const void*, size_t);
 				void	recv();
 				void	send();
+
+			public:
+				struct	Pool :public Singleton<Core::Network::TCP::SocketStream::Pool>, public Factory::BasicPool<Core::Network::TCP::SocketStream> {
+					friend class Singleton<Core::Network::TCP::SocketStream::Pool>;
+				public:
+					const size_t	ORIGINAL_SIZE = 100;
+					const size_t	HYDRATE_SIZE = 10;
+
+				private:
+					Pool(const Pool&) = delete;
+					Pool(const Pool&&) = delete;
+					Pool& operator=(const Pool&) = delete;
+
+				private:
+					Pool();
+					virtual ~Pool();
+
+				public:
+					void init();
+				};
 			};
 		}
 	}

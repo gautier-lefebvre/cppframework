@@ -5,6 +5,7 @@
 
 #include	"Library/Threading/Lock.hpp"
 #include	"Library/Factory/IFactored.hh"
+#include	"Core/Network/UDP/SocketClient.hh"
 
 namespace			Core {
 	namespace		Network {
@@ -24,6 +25,10 @@ namespace			Core {
 				void	socket();
 				void	close();
 				void	bind(uint16_t);
+
+			public:
+				ByteArray*	recvfrom(struct sockaddr&);
+				void		sendto(SocketClient*);
 
 			public:
 				void	addToSet(fd_set&, int&) const;
