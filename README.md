@@ -68,5 +68,5 @@ Based on the modules you activate and the number of workers you choose, you will
 Code from third parties:
 - the *jsoncpp* library available [here](https://github.com/open-source-parsers/jsoncpp).
 - the *utf8* library available [here](http://sourceforge.net/projects/utfcpp/).
-- *reader-writer lock with writer priority*, translated from python [here](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/)
-- an implementation of the *SHA-512* hashing function found [here](http://www.zedwood.com/article/cpp-sha512-function)
+- *reader-writer lock with writer priority*, translated from python [here](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/).
+- an implementation of the *SHA-512* hashing function found [here](http://www.zedwood.com/article/cpp-sha512-function).

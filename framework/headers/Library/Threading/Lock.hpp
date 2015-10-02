@@ -1,85 +1,187 @@
-#ifndef		__LIBRARY_THREADING_LOCK_HH__
-#define		__LIBRARY_THREADING_LOCK_HH__
+#ifndef		__LIBRARY_THREADING_LOCK_HPP__
+#define		__LIBRARY_THREADING_LOCK_HPP__
 
 #include	<mutex>
 
+/**
+ *	\namespace Threading
+ *	\brief Classes to use for synchronization, like locks and conditions variables.
+ */
 namespace 	Threading {
+
+	/**
+	 *	\class Lock Library/Threading/Lock.hpp
+	 *	\brief A reentrant lock class.
+	 */
 	class	Lock {
 	protected:
-		std::recursive_mutex _lock;
+		std::recursive_mutex _lock; /*!< the mutex used for locking */
 
 	public:
+		/**
+		 *	\brief Constructor of Lock.
+		 *	Inits the mutex.
+		 */
 		Lock(void);
+
+		/**
+		 *	\brief Destructor of Lock.
+		 */
 		virtual ~Lock();
 
+	public:
+		/**
+		 *	\brief Locks the mutex.
+		 */
 		void	lock();
+
+		/**
+		 *	\brief Unlocks the mutex.
+		 */
 		void	unlock();
 	};
 
+	/**
+	 *	\class Lockable Library/Threading/Lock.hpp
+	 *	\brief A templated class to use when setting an object lockable.
+	 *	Can be useful for locking object of the STL, like `Threading::Lockable<std::list<int>>`.
+	 */
 	template<class C>
 	class	Lockable :public C, public Threading::Lock {
 	public:
+		/**
+		 *	\brief Copy constructor of Lockable.
+		 *	\param oth the Lockable object to copy.
+		 */
 		Lockable(const Lockable<C>& oth):
 			C(oth),
 			Threading::Lock()
 		{}
 
+		/**
+		 *	\brief Default constructor of Lockable.
+		 *	\params args the arguments which will be passed to the constructor of the templated class.
+		 */
 		template<typename... Args>
 		Lockable(const Args&... args):
 			C(args...),
 			Threading::Lock()
 		{}
 
+		/**
+		 *	\brief Destructor of Lockable.
+		 */
 		virtual ~Lockable() {}
 	};
 
+	/**
+	 *	\class ReadWriteLock Library/Threading/Lock.hpp
+	 *	\brief A reader writer lock with writer priority.
+	 */
 	class	ReadWriteLock {
 	public:
+		/**
+		 *	\class WriterGuard Library/Threading/Lock.hpp
+		 *	\brief A guard class which locks a ReadWriteLock as a writer in its constructor and unlocks it in its destructor.
+		 */
 		class WriterGuard {
 		private:
-			ReadWriteLock *_lock;
+			ReadWriteLock *_lock; /*!< the read write lock. */
 
 		public:
-			WriterGuard(ReadWriteLock*);
+			/**
+			 *	\brief Constructor of WriterGuard. Locks the lock passed in parameter as writer.
+			 *	\param rwlock the lock.
+			 */
+			WriterGuard(ReadWriteLock* rwlock);
+
+			/**
+			 *	\brief Destructor of WriterGuard. Unlocks the lock given at creation as writer.
+			 */
 			~WriterGuard();
 		};
 
+		/**
+		 *	\class ReaderGuard Library/Threading/Lock.hpp
+		 *	\brief A guard class which locks a ReadWriteLock as a reader in its constructor and unlocks it in its destructor.
+		 */
 		class ReaderGuard {
 		private:
-			ReadWriteLock *_lock;
+			ReadWriteLock *_lock; /*!< the read write lock. */
 
 		public:
+			/**
+			 *	\brief Constructor of ReaderGuard. Locks the lock passed in parameter as reader.
+			 *	\param rwlock the lock.
+			 */
 			ReaderGuard(ReadWriteLock*);
-			~ReaderGuard();
+
+			/**
+			 *	\brief Destructor of ReaderGuard. Unlocks the lock given at creation as reader.
+			 */
+ 			~ReaderGuard();
 		};
 
 	private:
-		class  LightSwitch :public Threading::Lock {
+		/**
+		 *	\class LightSwitch Library/Threading/Lock.hpp
+		 *	\brief an object used to count the number of times another mutex was locked.
+		 */
+		class  LightSwitch :public std::mutex {
 		private:
-			size_t	_counter;
+			size_t	_counter; /*!< the number of times the mutex was locked. */
 
 		public:
+			/**
+			 *	\brief Constructor of LightSwitch. Sets the counter to 0.
+			 */
 			LightSwitch();
 
 		public:
-			void	acquire(Lock&);
-			void	release(Lock&);
+			/**
+			 *	\brief Increments the counter and locks the mutex if it hits 1.
+			 *	\param mutex the mutex to lock.
+			 */
+			void	acquire(std::mutex& mutex);
+
+			/**
+			 *	\brief Decrements the counter and unlocks the mutex if it hits 0.
+			 *	\param mutex the mutex to lock.
+			 */
+			void	release(std::mutex& mutex);
 		};
 
 	private:
-		LightSwitch	_readSwitch;
-		LightSwitch	_writeSwitch;
-		Lock		_noReaders;
-		Lock		_noWriters;
-		Lock		_readersQueue;
+		LightSwitch	_readSwitch; /*!< the switch used for the _noWriters mutex. */
+		LightSwitch	_writeSwitch; /*!< the switch used for the _noReaders mutex. */
+		std::mutex	_noReaders; /*!< the mutex used to check if there are no readers. */
+		std::mutex	_noWriters; /*!< the mutex used to check if there are no writers. */
+		std::mutex	_readersQueue; /*!< the mutex used to make readers wait to lock the ReadWriteLock. */
 
 	public:
+		/**
+		 *	\brief Constructor of ReadWriteLock.
+		 */
 		ReadWriteLock();
 
+		/**
+		 *	\brief Locks the ReadWriteLock as a reader.
+		 */
 		void	readerAcquire();
+
+		/**
+		 *	\brief Unlocks the ReadWriteLock as a reader.
+		 */
 		void	readerRelease();
 
+		/**
+		 *	\brief Locks the ReadWriteLock as a writer.
+		 */
 		void	writerAcquire();
+
+		/**
+		 *	\brief Unlocks the ReadWriteLock as a writer.
+		 */
 		void	writerRelease();
 	};
 }
@@ -88,4 +190,4 @@ typedef		std::lock_guard<Threading::Lock> ScopeLock;
 
 #define		SCOPELOCK(x)		std::lock_guard<Threading::Lock> lockguard(*(x));
 
-#endif		/* __LIBRARY_THREADING_LOCK_HH__ */
+#endif		/* __LIBRARY_THREADING_LOCK_HPP__ */
