@@ -11,18 +11,24 @@
 #include	"Library/Threading/Lock.hpp"
 #include	"Library/Tool/Date.hh"
 
+/**
+ *	\class Logger Library/Tool/Logger.hpp
+ *	\brief A singleton object used for logging.
+ */
 class Logger :public Singleton<Logger>, public Threading::Lock {
 	friend class Singleton<Logger>;
 public:
+	/*! Logging levels. */
 	enum class Level {
-		DEBUG    = 0,
-		INFO     = 1,
-		WARNING  = 2,
-		ERROR    = 3,
-		CRITICAL = 4
+		DEBUG    = 0, /*!< Used to debug. */
+		INFO     = 1, /*!< Used to log information. */
+		WARNING  = 2, /*!< Used to log minor errors. */
+		ERROR    = 3, /*!< Used to log non-critical errors. */
+		CRITICAL = 4  /*!< Used to log critical errors. */
 	};
 
 private:
+	/*!< Colors usable in a terminal. */
 	enum class Color {
 		WHITE,
 		SKYBLUE,
@@ -43,7 +49,7 @@ private:
 		{Logger::Color::GREEN, std::string("\033[92m")},
 		{Logger::Color::RED, std::string("\033[91m")},
 		{Logger::Color::NONE, std::string("\033[0m")}
-	};
+	}; /*!< Used to init colors inside the terminal. */
 
 	const std::map<Logger::Level, Logger::Color> LevelToColor = {
 		{Logger::Level::CRITICAL, Logger::Color::RED},
@@ -51,19 +57,42 @@ private:
 		{Logger::Level::WARNING, Logger::Color::YELLOW},
 		{Logger::Level::INFO, Logger::Color::GREEN},
 		{Logger::Level::DEBUG, Logger::Color::WHITE}
-	};
+	}; /*!< associates a level to a color. */
 
 private:
-	Logger::Level _level;
-	size_t        _offset;
+	Logger::Level _level; /*!< Lowest level of logging. */
+	size_t        _offset; /*!< Current number of \t to write before printing the log. */
 
 private:
+	/*! Deleted copy constructor of Logger. */
+	Logger(const Logger&) = delete;
+
+	/*! Deleted move constructor of Logger. */
+	Logger(const Logger&&) = delete;
+
+	/*! Deleted assignement constructor of Logger. */
+	Logger& operator=(const Logger&) = delete;
+
+private:
+	/*! Default constructor of Logger. */
 	Logger();
+
+	/*! Destructor of Logger. */
 	virtual ~Logger();
 
 public:
-	void	setLevel(Logger::Level);
+	/**
+	 *	\brief Sets the lowest level of logging.
+	 *	\param level the lowest level of logging.
+	 */
+	void	setLevel(Logger::Level level);
 
+	/**
+	 *	\brief Logs the message only if its level is greater or equal to the lowest debugging level.
+	 *	Prints in a "hh:mm:ss:µµµµµµ -- msg" format.
+	 *	\param msg the message to log.
+	 *	\param level the logging level.
+	 */
 	template<typename T>
 	void	log(const T &msg, Logger::Level level) {
 		if (level >= this->_level) {
@@ -88,9 +117,23 @@ public:
 		}
 	}
 
-	void	setOffset(size_t);
-	void	addOffset(size_t);
-	void	delOffset(size_t);
+	/**
+	 *	\brief Sets the offset to an absolute number.
+	 *	\param off the offset.
+	 */
+	void	setOffset(size_t off);
+
+	/**
+	 *	\brief Increments the offset by the given number.
+	 *	\param off the incrementation.
+	 */
+	void	addOffset(size_t off);
+
+	/**
+	 *	\brief Decrements the offset by the given number.
+	 *	\param off the decrementation.
+	 */
+	void	delOffset(size_t off);
 };
 
 static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
@@ -99,7 +142,7 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
 	{Logger::Level::WARNING, std::string("WARNING")},
 	{Logger::Level::ERROR, std::string("ERROR")},
 	{Logger::Level::CRITICAL, std::string("CRITICAL")}
-};
+}; /*!< Used to translate the enum Logging::Level to a string. */
 
 #ifdef 		__DEBUG__
 # define		LOG(x, y)				Logger::get().log(x, y)
