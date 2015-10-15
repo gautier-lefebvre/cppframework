@@ -4,6 +4,8 @@
 #include	"Core/Network/Exception.hh"
 
 Core::Network::UDP::SocketClient::SocketClient():
+	Factory::AFactored(),
+	Threading::Lock(),
 	_addr(),
 	_info(std::make_pair(0, 0)),
 	_input(std::make_pair(std::queue<ByteArray*>(), 0)),

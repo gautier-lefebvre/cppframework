@@ -30,6 +30,9 @@ namespace			Core {
 				void	send();
 
 			public:
+				size_t	getData(const std::function<size_t (ByteArray&, ByteArray&)>&, ByteArray&);
+
+			public:
 				struct	Pool :public Singleton<Core::Network::TCP::SocketStream::Pool>, public Factory::BasicPool<Core::Network::TCP::SocketStream> {
 					friend class Singleton<Core::Network::TCP::SocketStream::Pool>;
 				public:

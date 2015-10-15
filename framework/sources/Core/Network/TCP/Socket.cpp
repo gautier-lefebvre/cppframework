@@ -11,6 +11,7 @@
 #include	"Library/Tool/Macro.hh"
 
 Core::Network::TCP::Socket::Socket():
+	Factory::AFactored(),
 	Threading::Lock(),
 	_fd(-1)
 {}

@@ -7,6 +7,7 @@ LIBRARYSRC=		$(LIBRARYDIR)Collection/ByteArray.cpp			\
 				$(LIBRARYDIR)Encryption/MD5.cpp					\
 				$(LIBRARYDIR)Encryption/XOR.cpp					\
 				$(LIBRARYDIR)Factory/AFactored.cpp				\
+				$(LIBRARYDIR)Property/AEndable.cpp				\
 				$(LIBRARYDIR)ThirdParty/json.cpp				\
 				$(LIBRARYDIR)Threading/Condition.cpp			\
 				$(LIBRARYDIR)Threading/Lock.cpp					\
@@ -21,6 +22,11 @@ LIBRARYSRC=		$(LIBRARYDIR)Collection/ByteArray.cpp			\
 COREDIR=		$(SRCDIR)Core/
 CORESRC=		$(COREDIR)Exception.cpp							\
 				$(COREDIR)Network/Exception.cpp					\
+				$(COREDIR)Network/HTTP/AMessage.cpp				\
+				$(COREDIR)Network/HTTP/Client.cpp				\
+				$(COREDIR)Network/HTTP/Connection.cpp			\
+				$(COREDIR)Network/HTTP/Request.cpp				\
+				$(COREDIR)Network/HTTP/Response.cpp				\
 				$(COREDIR)Network/TCP/Socket.cpp				\
 				$(COREDIR)Network/TCP/SocketStream.cpp			\
 				$(COREDIR)Network/UDP/SocketClient.cpp

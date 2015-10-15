@@ -34,7 +34,7 @@ The UDP/IP module works in the same way as the TCP/IP one, except that the callb
 
 #### http
 
-The HTTP module works this way: each remote server runs on a different thread, as you can't send a new request before completely reading the response to the last request you sent. Whenever you want to send a HTTP request, the manager will check if you already have a connection to this url (defined by a path and a port), and create a new thread dynamically. You don't have to initialize anything, but you have the choice.
+The HTTP module is a HTTP client. It works this way: each remote server runs on a different thread, as you can't send a new request before completely reading the response to the last request you sent. Whenever you want to send a HTTP request, the manager will check if you already have a connection to this url (defined by a path and a port), and create a new thread dynamically. You don't have to initialize anything, but you have the choice.
 
 When sending a HTTP request, you can provide a callback method which will be called when the response to this particular request is read.
 

@@ -70,6 +70,11 @@ void		Core::Network::TCP::SocketStream::send() {
 	}
 }
 
+size_t	Core::Network::TCP::SocketStream::getData(const std::function<size_t (ByteArray&, ByteArray&)>& dataGetter, ByteArray& dest) {
+	SCOPELOCK(this);
+	return dataGetter(*(this->_input), dest);
+}
+
 /**
  *	SocketStream pool
  */

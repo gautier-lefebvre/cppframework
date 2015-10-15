@@ -21,9 +21,9 @@ private:
 	Singleton(const Singleton&) = delete;
 
 	/**
-	 *	\brief Deleted move constructor of Pool.
+	 *	\brief Deleted move constructor of Singleton.
 	 */
-	Pool(const Pool&&) = delete;
+	Singleton(const Singleton&&) = delete;
 
 	/**
 	 *	\brief deleted assignment constructor.
