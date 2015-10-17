@@ -17,14 +17,14 @@ namespace			Core {
 				ByteArray							*body;
 
 			public:
-				AMessage();
-				virtual ~AMessage();
+				AMessage(void);
+				virtual ~AMessage(void);
 
 			public:
-				virtual void	reinit();
+				virtual void	reinit(void);
 
 			public:
-				void init();
+				void init(void);
 
 			public:
 				const std::string&	getHeader(const std::string& header) const;

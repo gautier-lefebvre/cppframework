@@ -75,10 +75,10 @@ private:
 
 private:
 	/*! Default constructor of Logger. */
-	Logger();
+	Logger(void);
 
 	/*! Destructor of Logger. */
-	virtual ~Logger();
+	virtual ~Logger(void);
 
 public:
 	/**

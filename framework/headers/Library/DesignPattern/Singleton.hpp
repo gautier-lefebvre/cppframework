@@ -34,19 +34,19 @@ protected:
 	/**
 	 *	\brief Constructor of Singleton.
 	 */
-	Singleton() {}
+	Singleton(void) {}
 
 	/**
 	 *	\brief Destructor of Singleton.
 	 */
-	virtual ~Singleton() {}
+	virtual ~Singleton(void) {}
 
 public:
 	/**
 	 *	\brief Returns a reference on a Singleton subclass instance. Creates it before returning if it does not exist.
 	 *	\return a reference on the subclass instance.
 	 */
-	static T&	get() {
+	static T&	get(void) {
 		if (_instance == nullptr) {
 			_instance = new T();
 		}
@@ -57,14 +57,14 @@ public:
 	 *	\brief Returns a pointer on a Singleton subclass instance. Creates it before returning if it does not exist.
 	 *	\return a pointer on the subclass instance.
 	 */
-	static T*	asPtr() {
+	static T*	asPtr(void) {
 		return &(get());
 	}
 
 	/**
 	 *	\brief Destroys the singleton sublass instance.
 	 */
-	static void	destroy() {
+	static void	destroy(void) {
 		if (_instance) {
 			delete (_instance);
 		}

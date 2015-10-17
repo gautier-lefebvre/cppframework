@@ -22,7 +22,7 @@ public:
 	 *	\brief returns the time in hh:mm:ss:µµµµµµ format.
 	 *	\return a string representing the current time.
 	 */
-	static const std::string getTime();
+	static const std::string getTime(void);
 };
 
 #endif		/* __LIBRARY_TOOL_DATE_HH__ */

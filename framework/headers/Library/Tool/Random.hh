@@ -16,7 +16,7 @@ public:
 	/**
 	 *	\brief Sets the seed to the current timestamp.
 	 */
-	static void init();
+	static void init(void);
 
 	/**
 	 *	\brief Generates a pseudo-random signed 32 bits integer, between two values.

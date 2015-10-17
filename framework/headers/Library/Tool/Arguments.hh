@@ -106,12 +106,12 @@ public:
 	/**
 	 *	\brief Constructor of Arguments.
 	 */
-	Arguments();
+	Arguments(void);
 
 	/**
 	 *	\brief Destructor of Arguments.
 	 */
-	virtual ~Arguments();
+	virtual ~Arguments(void);
 
 public:
 	/**
@@ -178,7 +178,7 @@ public:
 	 *
 	 *	\return \a true if the arguments are valid.
 	 */
-	bool run();
+	bool run(void);
 
 	/**
 	 *	\brief Gets an argument.
@@ -200,14 +200,14 @@ public:
 	 *	\brief Usage of the program.
 	 *	\return a string describing the usage of the program.
 	 */
-	std::string usage() const;
+	std::string usage(void) const;
 
 private:
 	/**
 	 *	\brief Checks the validity of the arguments.
 	 *	\return \a true if the arguments are valid.
 	 */
-	bool check();
+	bool check(void);
 
 	/**
 	 *	\brief Finds an argument.

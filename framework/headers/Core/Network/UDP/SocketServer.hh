@@ -15,15 +15,15 @@ namespace			Core {
 				int	_fd;
 
 			public:
-				SocketServer();
-				virtual ~SocketServer();
+				SocketServer(void);
+				virtual ~SocketServer(void);
 
 			public:
-				virtual void reinit();
+				virtual void reinit(void);
 
 			public:
-				void	socket();
-				void	close();
+				void	socket(void);
+				void	close(void);
 				void	bind(uint16_t);
 
 			public:

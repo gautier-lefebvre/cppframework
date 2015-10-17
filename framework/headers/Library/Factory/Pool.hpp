@@ -2,6 +2,7 @@
 #define		__LIBRARY_FACTORY_POOL_HPP__
 
 #include	<queue>
+#include	<utility>
 #include	<string>
 
 #include	"Library/Threading/Lock.hpp"
@@ -49,7 +50,7 @@ namespace	Factory {
 		 *
 		 *	Deletes every object still inside the pool.
 		 */
-		virtual ~Pool() {
+		virtual ~Pool(void) {
 			SCOPELOCK(this);
 			while (!(this->_pool.empty())) {
 				delete this->_pool.front();
@@ -64,7 +65,7 @@ namespace	Factory {
 		 *	Will set the object's validity to true and its last out of pool time point to current time.
 		 *	\return the object popped from the pool.
 		 */
-		C* get() {
+		C* get(void) {
 			SCOPELOCK(this);
 			if (this->_pool.empty()) {
 				this->hydrate(this->_hydrate);
@@ -128,13 +129,13 @@ namespace	Factory {
 		 *	\brief Constructor of BasicPool.
 		 *	Sets the pool to nullptr.
 		 */
-		BasicPool(): _pool(nullptr) {}
+		BasicPool(void): _pool(nullptr) {}
 
 		/**
 		 *	\brief Destructor of BasicPool.
 		 *	Will delete the pool if it was set.
 		 */
-		virtual ~BasicPool() { this->destroyPool(); }
+		virtual ~BasicPool(void) { this->destroyPool(); }
 
 	public:
 		/**
@@ -152,7 +153,7 @@ namespace	Factory {
 		/**
 		 *	\brief Deletes the pool and sets it to nullptr.
 		 */
-		void	destroyPool() {
+		void	destroyPool(void) {
 			if (this->_pool != nullptr) {
 				delete this->_pool;
 			}
@@ -163,8 +164,20 @@ namespace	Factory {
 		 *	\brief Takes an object from the pool.
 		 *	\return the object.
 		 */
-		C*	create() {
+		C*	create(void) {
 			return this->_pool->get();
+		}
+
+		/**
+		 *	\brief Takes an object from the pool.
+		 *	The object must have an `init` method with the same arguments.
+		 *	\return the object.
+		 */
+		template<typename... Args>
+		C*	create(Args&... args) {
+			C* item = this->_pool->get();
+			item->init(args...);
+			return item;
 		}
 
 		/**

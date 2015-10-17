@@ -19,7 +19,7 @@ public:
 	 *
 	 *	Sets x and y to 0.
 	 */
-	Array2(): x(0), y(0) {}
+	Array2(void): x(0), y(0) {}
 
 	/**
 	 *	\brief Contructor of Array2.
@@ -97,7 +97,7 @@ public:
 	/**
 	 *	\brief Destructor of Array2.
 	 */
-	~Array2() {}
+	~Array2(void) {}
 };
 
 /**
@@ -116,7 +116,7 @@ public:
 	 *
 	 *	Sets x, y and z to 0.
 	 */
-	Array3(): x(0), y(0), z(0) {}
+	Array3(void): x(0), y(0), z(0) {}
 	
 	/**
 	 *	\brief Contructor of Array3.
@@ -201,7 +201,7 @@ public:
 	/**
 	 *	\brief Destructor of Array3.
 	 */
-	~Array3() {}
+	~Array3(void) {}
 };
 
 /**

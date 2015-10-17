@@ -1,3 +1,4 @@
+#include	"Library/Tool/Logger.hpp"
 #include	"Core/Event/Manager.hh"
 
 Core::Event::Manager::Manager():
@@ -16,11 +17,19 @@ void	Core::Event::Manager::unregister(const Core::Event::EventBase* event) {
 }
 
 void	Core::Event::Manager::subscribe(const Core::Event::EventBase* event, const std::function<void (const Core::Event::IEventArgs*)>& callback, const void* callee) {
-	this->_events.at(event).addSubscriber(callee, callback);
+	try {
+		this->_events.at(event).addSubscriber(callee, callback);
+	} catch (const std::out_of_range&) {
+		WARNING("Trying to subscribe to an unregistered event");
+	}
 }
 
 void	Core::Event::Manager::unsubscribe(const Core::Event::EventBase* event, const void *callee) {
-	this->_events.at(event).delSubscriber(callee);
+	try {
+		this->_events.at(event).delSubscriber(callee);
+	} catch (const std::out_of_range&) {
+		WARNING("Trying to subscribe to an unregistered event");
+	}
 }
 
 const Core::Event::EventInfo& getInfo(const Core::Event::EventBase* event) const {

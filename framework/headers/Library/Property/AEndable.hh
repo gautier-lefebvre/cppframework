@@ -15,25 +15,25 @@ public:
 	 *
 	 *	Sets the end state to false.
 	 */
-	AEndable();
+	AEndable(void);
 
 	/**
 	 *	\brief Destructor of AEndable.
 	 */
-	virtual ~AEndable();
+	virtual ~AEndable(void);
 
 public:
 	/**
 	 *	\brief Tells the child class that it must stop.
 	 */
-	virtual void	end() = 0;
+	virtual void	end(void) = 0;
 
 public:
 	/**
 	 *	\brief Checks if the end method has been called.
 	 *	\return true if the end method has been called.
 	 */
-	bool	mustEnd() const;
+	bool	mustEnd(void) const;
 
 	/**
 	 *	\brief Changes the end states of the object.

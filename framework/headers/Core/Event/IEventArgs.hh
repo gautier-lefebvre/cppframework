@@ -7,10 +7,10 @@ namespace		Core {
 	namespace	Event {
 		class	IEventArgs :public Factory::AFactored {
 		public:
-			virtual ~IEventArgs() {}
+			virtual ~IEventArgs(void) {}
 
 		public:
-			virtual void reinit() = 0;
+			virtual void reinit(void) = 0;
 		};
 	}
 }

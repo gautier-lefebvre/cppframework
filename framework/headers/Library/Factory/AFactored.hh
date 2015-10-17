@@ -22,19 +22,19 @@ namespace	Factory {
 		 *	\brief Constructor of AFactored.
 		 *	Will set valid to false, infering that the object is created by the pool itself.
 		 */
-		AFactored();
+		AFactored(void);
 
 		/**
 		 *	\brief Destructor of AFactored.
 		 */
-		virtual ~AFactored();
+		virtual ~AFactored(void);
 
 	public:
 		/**
 		 *	\brief This method is called when the object is returned to the pool.
 		 *	Subclass object should return any pooled object it owns to its own pool.
 		 */
-		virtual void reinit() = 0;
+		virtual void reinit(void) = 0;
 
 	public:
 		/**
@@ -47,13 +47,13 @@ namespace	Factory {
 		 *	\brief Checks if the object is inside the pool.
 		 *	\return true if the object is out of the pool, elsewise false.
 		 */
-		bool	isValid() const;
+		bool	isValid(void) const;
 
 		/**
 		 *	\brief Sets the last out of pool time point to current time.
 		 *	This uses a steady clock.
 		 */
-		void	updateLastOutOfPoolTimePoint();
+		void	updateLastOutOfPoolTimePoint(void);
 
 		/**
 		 *	\brief Retrieves the last out of pool time point.
@@ -61,7 +61,7 @@ namespace	Factory {
 		 *
 		 *	This can be useful to determine if an object was returned to the pool between some actions.
 		 */
-		const std::chrono::steady_clock::time_point& lastOutOfPoolTimePoint() const;
+		const std::chrono::steady_clock::time_point& lastOutOfPoolTimePoint(void) const;
 	};
 }
 

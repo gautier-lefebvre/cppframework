@@ -22,11 +22,11 @@ namespace			Core {
 				static const size_t BUFFER_SIZE = 32768;
 
 			public:
-				SocketClient();
-				virtual ~SocketClient();
+				SocketClient(void);
+				virtual ~SocketClient(void);
 
 			public:
-				virtual void reinit();
+				virtual void reinit(void);
 
 			public:
 				void	init(const sockaddr_in&);
@@ -35,14 +35,14 @@ namespace			Core {
 				bool	hasDataToSend(void) const;
 				void	push(ByteArray*);
 
-				ByteArray*	nextDatagram();
+				ByteArray*	nextDatagram(void);
 				void	received(ByteArray*);
 
 			public:
-				const sockaddr_in&	socketAddress() const;
+				const sockaddr_in&	socketAddress(void) const;
 
 			public:
-				const std::pair<uint32_t, uint16_t>& clientInformation() const;
+				const std::pair<uint32_t, uint16_t>& clientInformation(void) const;
 
 			public:
 				struct	Pool :public Singleton<Core::Network::UDP::SocketClient::Pool>, public Factory::BasicPool<Core::Network::UDP::SocketClient> {
@@ -57,11 +57,11 @@ namespace			Core {
 					Pool& operator=(const Pool&) = delete;
 
 				private:
-					Pool();
-					virtual ~Pool();
+					Pool(void);
+					virtual ~Pool(void);
 
 				public:
-					void init();
+					void init(void);
 				};
 			};
 		}

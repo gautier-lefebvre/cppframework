@@ -16,21 +16,21 @@ namespace			Core {
 				int	_fd;
 
 			public:
-				Socket();
-				virtual ~Socket();
+				Socket(void);
+				virtual ~Socket(void);
 
 			public:
-				virtual void	reinit();
+				virtual void	reinit(void);
 
 			public:
-				void		socket();
-				void		close();
+				void		socket(void);
+				void		close(void);
 				void		connect(const std::string&, uint16_t);
 				void		bind(uint16_t) const;
 				void		listen(int) const;
 				uint32_t	accept(Socket*) const;
-				uint32_t	getpeername() const;
-				uint32_t	getsockname() const;
+				uint32_t	getpeername(void) const;
+				uint32_t	getsockname(void) const;
 
 			public:
 				void	addToSet(fd_set&, int&) const;
@@ -49,11 +49,11 @@ namespace			Core {
 					Pool& operator=(const Pool&) = delete;
 
 				private:
-					Pool();
-					virtual ~Pool();
+					Pool(void);
+					virtual ~Pool(void);
 
 				public:
-					void init();
+					void init(void);
 				};
 			};
 		}

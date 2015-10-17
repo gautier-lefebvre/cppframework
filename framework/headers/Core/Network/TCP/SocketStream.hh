@@ -16,18 +16,18 @@ namespace			Core {
 				static const size_t	BUFFER_SIZE = 32768;
 
 			public:
-				SocketStream();
-				virtual ~SocketStream();
+				SocketStream(void);
+				virtual ~SocketStream(void);
 
 			public:
-				virtual void	reinit();
+				virtual void	reinit(void);
 
 			public:
-				void	init();
-				bool	hasDataToSend() const;
+				void	init(void);
+				bool	hasDataToSend(void) const;
 				void	push(const void*, size_t);
-				void	recv();
-				void	send();
+				void	recv(void);
+				void	send(void);
 
 			public:
 				size_t	getData(const std::function<size_t (ByteArray&, ByteArray&)>&, ByteArray&);
@@ -45,11 +45,11 @@ namespace			Core {
 					Pool& operator=(const Pool&) = delete;
 
 				private:
-					Pool();
-					virtual ~Pool();
+					Pool(void);
+					virtual ~Pool(void);
 
 				public:
-					void init();
+					void init(void);
 				};
 			};
 		}

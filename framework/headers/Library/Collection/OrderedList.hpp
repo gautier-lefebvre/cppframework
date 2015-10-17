@@ -22,7 +22,7 @@ public:
 	 *
 	 *	The comparison method is a simple `v1 < v2`.
 	 */
-	OrderedList():
+	OrderedList(void):
 		std::list<T>(),
 		_compare([] (const T& a, const T& b) -> bool { return a < b; })
 	{}
@@ -39,7 +39,7 @@ public:
 	/**
 	 *	\brief Destructor of OrderedList.
 	 */
-	virtual ~OrderedList() {}
+	virtual ~OrderedList(void) {}
 
 	/**
 	 *	\brief Inserts the value in the right place inside the list.

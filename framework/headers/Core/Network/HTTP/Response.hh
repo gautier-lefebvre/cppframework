@@ -66,10 +66,10 @@ namespace			Core {
 				uint32_t	status;
 				std::string	reason;
 
-				Response();
-				virtual ~Response();
+				Response(void);
+				virtual ~Response(void);
 
-				virtual void reinit();
+				virtual void reinit(void);
 			};
 		}
 	}

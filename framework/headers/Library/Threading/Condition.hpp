@@ -19,28 +19,28 @@ namespace	Threading {
 		/**
 		 *	\brief Constructor of Condition.
 		 */
-		Condition();
+		Condition(void);
 
 		/**
 		 *	\brief Destructor of Condition.
 		 */
-		virtual ~Condition();
+		virtual ~Condition(void);
 
 	public:
 		/**
 		 *	\brief Waits for the condition variable to be notified. Will unlock the mutex, wait, and lock it again before returning.
 		 */
-		void	wait();
+		void	wait(void);
 
 		/**
 		 *	\brief Wakes one thread waiting on this condition variable.
 		 */
-		void	notify();
+		void	notify(void);
 
 		/**
 		 *	\brief Wakes all threads waiting on this condition variable.
 		 */
-		void	notify_all();
+		void	notify_all(void);
 
 		/**
 		 *	\brief Waits until this condition variable is notified and the predicate is true.
@@ -111,7 +111,7 @@ namespace	Threading {
 		/**
 		 *	\brief Destructor of Notifiable.
 		 */
-		virtual ~Notifiable() {}
+		virtual ~Notifiable(void) {}
 	};
 }
 

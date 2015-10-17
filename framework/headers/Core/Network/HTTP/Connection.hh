@@ -1,4 +1,4 @@
-#ifndef		__CORE_NETWORK_HTTP_CONNECTION_HH__
+void#ifndef		__CORE_NETWORK_HTTP_CONNECTION_HH__
 #define		__CORE_NETWORK_HTTP_CONNECTION_HH__
 
 #include	<queue>
@@ -30,21 +30,21 @@ namespace			Core {
 
 			public:
 				Connection(const std::string &, uint16_t, uint16_t, const std::string& user_agent);
-				virtual ~Connection();
+				virtual ~Connection(void);
 
 			public:
-				virtual void	end();
+				virtual void	end(void);
 
 			public:
-				void		run();
-				const std::string&	getHost() const;
-				uint16_t	getPort() const;
-				uint16_t	getSecurePort() const;
+				void		run(void);
+				const std::string&	getHost(void) const;
+				uint16_t	getPort(void) const;
+				uint16_t	getSecurePort(void) const;
 				void		addRequest(Core::Network::HTTP::Request*);
 
 			private:
 				void		sendRequest(const Core::Network::HTTP::Request*) const;
-				void		routine();
+				void		routine(void);
 				Response*	exec(const Core::Network::HTTP::Request*) const;
 
 			private:

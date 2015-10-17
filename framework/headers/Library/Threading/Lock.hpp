@@ -27,18 +27,18 @@ namespace 	Threading {
 		/**
 		 *	\brief Destructor of Lock.
 		 */
-		virtual ~Lock();
+		virtual ~Lock(void);
 
 	public:
 		/**
 		 *	\brief Locks the mutex.
 		 */
-		void	lock();
+		void	lock(void);
 
 		/**
 		 *	\brief Unlocks the mutex.
 		 */
-		void	unlock();
+		void	unlock(void);
 	};
 
 	/**
@@ -71,7 +71,7 @@ namespace 	Threading {
 		/**
 		 *	\brief Destructor of Lockable.
 		 */
-		virtual ~Lockable() {}
+		virtual ~Lockable(void) {}
 	};
 
 	/**
@@ -98,7 +98,7 @@ namespace 	Threading {
 			/**
 			 *	\brief Destructor of WriterGuard. Unlocks the lock given at creation as writer.
 			 */
-			~WriterGuard();
+			~WriterGuard(void);
 		};
 
 		/**
@@ -119,7 +119,7 @@ namespace 	Threading {
 			/**
 			 *	\brief Destructor of ReaderGuard. Unlocks the lock given at creation as reader.
 			 */
- 			~ReaderGuard();
+ 			~ReaderGuard(void);
 		};
 
 	private:
@@ -135,7 +135,7 @@ namespace 	Threading {
 			/**
 			 *	\brief Constructor of LightSwitch. Sets the counter to 0.
 			 */
-			LightSwitch();
+			LightSwitch(void);
 
 		public:
 			/**
@@ -162,27 +162,27 @@ namespace 	Threading {
 		/**
 		 *	\brief Constructor of ReadWriteLock.
 		 */
-		ReadWriteLock();
+		ReadWriteLock(void);
 
 		/**
 		 *	\brief Locks the ReadWriteLock as a reader.
 		 */
-		void	readerAcquire();
+		void	readerAcquire(void);
 
 		/**
 		 *	\brief Unlocks the ReadWriteLock as a reader.
 		 */
-		void	readerRelease();
+		void	readerRelease(void);
 
 		/**
 		 *	\brief Locks the ReadWriteLock as a writer.
 		 */
-		void	writerAcquire();
+		void	writerAcquire(void);
 
 		/**
 		 *	\brief Unlocks the ReadWriteLock as a writer.
 		 */
-		void	writerRelease();
+		void	writerRelease(void);
 	};
 }
 

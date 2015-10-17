@@ -20,7 +20,7 @@ public:
 	 *
 	 *	The \a key and \a value maps are empty.
 	 */
-	BidiMap():
+	BidiMap(void):
 		key(),
 		value()
 	{}
@@ -75,7 +75,7 @@ public:
 	/**
 	 *	\brief Destructor of BidiMap.
 	 */
-	virtual ~BidiMap() {}
+	virtual ~BidiMap(void) {}
 
 	/**
 	 *	\brief Adds a key/value pair.

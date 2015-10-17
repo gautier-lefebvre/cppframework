@@ -1,6 +1,8 @@
 #ifndef		__CORE_EVENT_EVENTBASE_HH__
 #define		__CORE_EVENT_EVENTBASE_HH__
 
+#include	"Library/Factory/AFactored.hh"
+
 namespace		Core {
 	namespace	Event {
 		enum class Source {
@@ -14,16 +16,19 @@ namespace		Core {
 			NETWORK_HTTP
 		};
 
-		class	EventBase {
+		class	EventBase :public Factory::AFactored {
 		private:
 			Source	_source;
 
 		public:
 			EventBase(Source);
-			virtual ~EventBase();
+			virtual ~EventBase(void);
 
 		public:
-			Source	getSource() const;
+			virtual void	reinit(void) = 0;
+
+		public:
+			Source	getSource(void) const;
 		};
 	}
 }

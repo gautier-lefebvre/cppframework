@@ -21,17 +21,13 @@ namespace		Core {
 			Manager& operator=(const Manager&) = delete;
 
 		public:
-			Manager();
-			virtual ~Manager();
+			Manager(void);
+			virtual ~Manager(void);
 
 		public:
-			// register event / cleanup
 			void	register(const Core::Event::EventBase*, const std::function<void (Core::Event::IEventArgs*)>&);
 			void	unregister(const Core::Event::EventBase*);
 
-			// subscribe callback to event
-			// void* is the this of the subscriber (can't compare std::function)
-			// a same object can't subscribe twice to same event
 			void	subscribe(const Core::Event::EventBase*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);
 			void	unsubscribe(const Core::Event::EventBase*, const void *);
 

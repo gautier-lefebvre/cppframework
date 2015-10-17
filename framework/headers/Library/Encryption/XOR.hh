@@ -22,12 +22,12 @@ namespace	Encryption {
 		 *
 		 *	The key is set to \a nullptr.
 		 */
-		XOR();
+		XOR(void);
 
 		/**
 		 *	\brief Destructor of XOR.
 		 */
-		virtual ~XOR();
+		virtual ~XOR(void);
 
 	public:
 		/**
@@ -51,7 +51,7 @@ namespace	Encryption {
 		/**
 		 *	\brief Resets the key to \a nullptr.
 		 */
-		void	clear();
+		void	clear(void);
 	};
 }
 

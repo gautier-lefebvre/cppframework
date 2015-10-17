@@ -15,12 +15,12 @@ namespace			Core {
 				bool		secure;
 				std::function<void (const Core::Network::HTTP::Response *)> success;
 				std::function<void (const Core::Network::HTTP::Response *)> error;
-				std::function<void ()> clean;
+				std::function<void (void)> clean;
 
-				Request();
-				virtual ~Request();
+				Request(void);
+				virtual ~Request(void);
 
-				virtual void reinit();
+				virtual void reinit(void);
 			};
 		}
 	}

@@ -51,7 +51,7 @@ public:
 	 *
 	 *	This deletes the data.
 	 */
-	virtual ~ByteArray();
+	virtual ~ByteArray(void);
 
 public:
 	/**
@@ -59,38 +59,38 @@ public:
 	 *
 	 *	Sets the current size to 0 and sets the data to an array of 0.
 	 */
-	virtual void reinit();
+	virtual void reinit(void);
 
 public:
 	/**
 	 *	\brief returns the current size.
 	 *	\return the current size in bytes.
 	 */
-	size_t	getSize() const;
+	size_t	getSize(void) const;
 
 	/**
 	 *	\brief returns the available space.
 	 *	\return the available space in bytes (maximum size - current size).
 	 */
-	size_t	availableSpace() const;
+	size_t	availableSpace(void) const;
 
 	/**
 	 *	\brief returns the maximum size.
 	 *	\return the maximum size in bytes.
 	 */
-	size_t	getSizeMax() const;
+	size_t	getSizeMax(void) const;
 
 	/**
 	 *	\brief Checks if the ByteArray is empty.
 	 *	\return \a true if the ByteArray is empty (i.e if the size is 0).
 	 */
-	bool empty() const;
+	bool empty(void) const;
 
 	/**
 	 *	\brief Checks if the ByteArray is full.
 	 *	\return \a true if the ByteArray is full (i.e if the available space is 0).
 	 */
-	bool full() const;
+	bool full(void) const;
 
 	/**
 	 *	\brief Returns the value of a byte at a given index.
@@ -123,19 +123,19 @@ public:
 	 *	\brief Returns a pointer to the beginning of the data.
 	 *	\return a pointer to the beginning of the data.
 	 */
-	const uint8_t*	getBytes() const;
+	const uint8_t*	getBytes(void) const;
 
 	/**
 	 *	\brief Returns a pointer to the end of the data.
 	 *	\return a pointer to the end of the data.
 	 */
-	uint8_t* atEnd();
+	uint8_t* atEnd(void);
 
 	/**
 	 *	\brief Returns a pointer to the beginning of the data.
 	 *	\return a pointer to the beginning of the data.
 	 */
-	uint8_t* atStart();
+	uint8_t* atStart(void);
 
 	/**
 	 *	\brief Returns a pointer to a certain index of the data.
@@ -301,18 +301,18 @@ public:
 		/**
 		 *	\brief Constructor of Pool.
 		 */
-		Pool();
+		Pool(void);
 
 		/**
 		 *	\brief Destructor of Pool.
 		 */
-		virtual ~Pool();
+		virtual ~Pool(void);
 
 	public:
 		/**
 		 *	\brief Creates the pool.
 		 */
-		void init();
+		void init(void);
 
 	public:
 		/**
@@ -331,7 +331,7 @@ public:
 			ByteArray*	bytearray;
 
 			Guard(ByteArray*);
-			~Guard();
+			~Guard(void);
 		};
 	};
 };
@@ -370,7 +370,7 @@ public:
 	/**
 	 *	\brief Destructor of ByteArrayExtractor.
 	 */
-	~ByteArrayExtractor();
+	~ByteArrayExtractor(void);
 
 public:
 	/**

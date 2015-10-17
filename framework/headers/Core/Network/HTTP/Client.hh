@@ -23,11 +23,11 @@ namespace			Core {
 				Client& operator=(const Client&) = delete;
 
 			private:
-				Client();
-				virtual ~Client();
+				Client(void);
+				virtual ~Client(void);
 
 			public:
-				virtual void	end();
+				virtual void	end(void);
 
 			public:
 				void	init(const std::string& user_agent);
