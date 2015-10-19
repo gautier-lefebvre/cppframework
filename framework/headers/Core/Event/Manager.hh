@@ -13,7 +13,7 @@ namespace		Core {
 		class	Manager :public Singleton<Core::Event::Manager>, public Threading::Lock {
 			friend class Singleton<Core::Event::Manager>;
 		private:
-			std::unordered_map<const Core::Event::EventBase*, Core::Event::EventInfo>	_events;
+			std::unordered_map<const Core::Event::Event*, Core::Event::EventInfo>	_events;
 
 		private:
 			Manager(const Manager&) = delete;
@@ -25,14 +25,15 @@ namespace		Core {
 			virtual ~Manager(void);
 
 		public:
-			void	register(const Core::Event::EventBase*, const std::function<void (Core::Event::IEventArgs*)>&);
-			void	unregister(const Core::Event::EventBase*);
+			void	register(const Core::Event::Event*);
+			void	register(const Core::Event::Event*, const std::function<void (Core::Event::IEventArgs*)>&);
+			void	unregister(const Core::Event::Event*);
 
-			void	subscribe(const Core::Event::EventBase*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);
-			void	unsubscribe(const Core::Event::EventBase*, const void *);
+			void	subscribe(const Core::Event::Event*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);
+			void	unsubscribe(const Core::Event::Event*, const void *);
 
 		public:
-			const Core::Event::EventInfo&	getInfo(const Core::Event::EventBase*) const;
+			const Core::Event::EventInfo&	getInfo(const Core::Event::Event*) const;
 		};
 	}
 }

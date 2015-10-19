@@ -2,16 +2,16 @@
 
 #include	"Library/Encryption/XOR.hh"
 
-Encryption::XOR::XOR():
+Encryption::XOR::XOR(void):
 	_key(nullptr),
 	_length(0)
 {}
 
-Encryption::XOR::~XOR() {
+Encryption::XOR::~XOR(void) {
 	this->clear();
 }
 
-void	Encryption::XOR::clear() {
+void	Encryption::XOR::clear(void) {
 	if (this->_key != nullptr) {
 		delete[] (this->_key);
 	}

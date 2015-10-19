@@ -19,11 +19,11 @@ Core::Network::HTTP::Connection::Connection(const std::string& host, uint16_t po
 	_pendingRequests()
 {}
 
-Core::Network::HTTP::Connection::~Connection() {
+Core::Network::HTTP::Connection::~Connection(void) {
 	this->end();
 }
 
-void	Core::Network::HTTP::Connection::end() {
+void	Core::Network::HTTP::Connection::end(void) {
 	SCOPELOCK(this);
 	if (!(this->mustEnd())) {
 		{
@@ -49,7 +49,7 @@ void	Core::Network::HTTP::Connection::end() {
 	}
 }
 
-void	Core::Network::HTTP::Connection::run() {
+void	Core::Network::HTTP::Connection::run(void) {
 	SCOPELOCK(this);
 	try {
 		this->_thread = new std::thread(&Core::Network::HTTP::Connection::routine, this);
@@ -58,15 +58,15 @@ void	Core::Network::HTTP::Connection::run() {
 	}
 }
 
-const std::string&	Core::Network::HTTP::Connection::getHost() const {
+const std::string&	Core::Network::HTTP::Connection::getHost(void) const {
 	return this->_host;
 }
 
-uint16_t			Core::Network::HTTP::Connection::getPort() const {
+uint16_t			Core::Network::HTTP::Connection::getPort(void) const {
 	return this->_port;
 }
 
-uint16_t			Core::Network::HTTP::Connection::getSecurePort() const {
+uint16_t			Core::Network::HTTP::Connection::getSecurePort(void) const {
 	return this->_port;
 }
 
@@ -78,7 +78,7 @@ void	Core::Network::HTTP::Connection::addRequest(::Core::Network::HTTP::Request 
 	}
 }
 
-void	Core::Network::HTTP::Connection::routine() {
+void	Core::Network::HTTP::Connection::routine(void) {
 	::Core::Network::HTTP::Request *request;
 	while (!(this->mustEnd())) {
 		request = nullptr;

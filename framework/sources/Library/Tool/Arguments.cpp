@@ -39,7 +39,7 @@ Arguments::Incompatible::Incompatible(const std::list<std::string>& flags, bool 
 	oneMandatory(mandatory)
 {}
 
-Arguments::Arguments():
+Arguments::Arguments(void):
 	_ac(0),
 	_av(nullptr),
 	_arguments(),
@@ -48,7 +48,7 @@ Arguments::Arguments():
 	_incompatibleArguments()
 {}
 
-Arguments::~Arguments() {
+Arguments::~Arguments(void) {
 	for (auto& it : this->_expected) {
 		delete it;
 	}
@@ -94,7 +94,7 @@ void	Arguments::incompatible(const std::list<std::string>& flags, bool mandatory
 	this->incompatible(new Arguments::Incompatible(flags, mandatory));
 }
 
-bool	Arguments::run() {
+bool	Arguments::run(void) {
 	int i = 1;
 	while (i < this->_ac) {
 		if (strlen(this->_av[i]) > 0 && this->_av[i][0] == '-') {
@@ -110,7 +110,7 @@ bool	Arguments::run() {
 	return this->check();
 }
 
-bool	Arguments::check() {
+bool	Arguments::check(void) {
 	for (auto& inc : this->_incompatibleArguments) {
 		uint nb = 0;
 		for (auto& flag : inc->flags) {
@@ -181,7 +181,7 @@ const Arguments::Arg&	Arguments::operator[](const std::string& flag) const {
 	return (*this->arg(flag));
 }
 
-std::string Arguments::usage() const {
+std::string Arguments::usage(void) const {
 	std::string usage = std::string("Usage: ") + this->_av[0];
 	for (auto& it: this->_expected) {
 		if (!this->isIncompatible(it->flag)) {

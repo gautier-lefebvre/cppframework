@@ -143,17 +143,32 @@ void	Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exec
 
 	if (eventTask) {
 		try {
-			const Core::Event::EventInfo& eventInfo = Core::Event::Manager::get().getInfo(eventTask->_event);
+			// execute only if the event was not unregistered before it was executed
+			if (eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
+				try {
+					const Core::Event::EventInfo& eventInfo = Core::Event::Manager::get().getInfo(eventTask->_event);
 
-			if (exec) {
-				for (auto& subscriber : eventInfo.subscribers) {
-					subscriber.second(eventTask->_args);
+					if (exec) {
+						for (auto& subscriber : eventInfo.subscribers) {
+							subscriber.second(eventTask->_args);
+						}
+					}
+
+					if (eventInfo.cleanup) {
+						eventInfo.cleanup(eventTask->_args); // must return IEventArgs subclass to factory in cleanup method
+					}
+				} catch (const std::out_of_range&) {
+					WARNING("Unregistered event");
+				}
+			} else {
+				// avoid leak since there is no way to know which pool the args must be returned to
+				if (eventTask->_args) {
+					delete eventTask->_args;
 				}
 			}
-
-			eventInfo.cleanup(eventTask->_args); // must return IEventArgs subclass to factory in cleanup method
-		} catch (const std::out_of_range&) {
-			WARNING("Unregistered event");
+		} catch (const std::exception& e) {
+			Core::Worker::EventTask::Pool::remove(eventTask);
+			throw e;
 		}
 
 		Core::Worker::EventTask::Pool::remove(eventTask);

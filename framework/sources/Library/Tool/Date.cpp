@@ -21,7 +21,7 @@ int	Date::gettimeofday(struct timeval *tp) {
 	return 0;
 }
 
-const std::string Date::getTime() {
+const std::string Date::getTime(void) {
 	struct timeval	t;
 	struct tm		*tm;
 	std::stringstream	ss;

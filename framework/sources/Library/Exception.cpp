@@ -17,7 +17,7 @@ Exception& Exception::operator=(const std::exception& e) noexcept {
 	return *this;
 }
 
-Exception::~Exception() {}
+Exception::~Exception(void) {}
 
 const char*	Exception::what(void) const noexcept {
 	return this->_what.c_str();

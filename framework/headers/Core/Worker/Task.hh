@@ -3,7 +3,7 @@
 
 #include	<chrono>
 
-#include	"Core/Event/EventBase.hh"
+#include	"Core/Event/Event.hh"
 #include	"Core/Event/IEventArgs.hh"
 
 namespace		Core {
@@ -32,8 +32,9 @@ namespace		Core {
 
 		class	EventTask :public ATask {
 		public:
-			const Core::Event::EventBase*	_event;
-			Core::Event::IEventArgs*		_args;
+			std::chrono::steady_clock::time_point	_eventCreation;
+			const Core::Event::Event*				_event;
+			Core::Event::IEventArgs*				_args;
 
 		public:
 			EventTask(void);
@@ -43,7 +44,7 @@ namespace		Core {
 			virtual void reinit(void);
 
 		public:
-			void init(const Core::Event::EventBase*, Core::Event::IEventArgs*);
+			void init(const Core::Event::Event*, Core::Event::IEventArgs*);
 
 		public:
 			struct	Pool :public Singleton<Core::Worker::EventTask::Pool>, public Factory::BasicPool<Core::Worker::EventTask> {

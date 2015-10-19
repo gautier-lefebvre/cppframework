@@ -1,16 +1,16 @@
 #include	"Library/Threading/Lock.hpp"
 
-Threading::Lock::Lock():
+Threading::Lock::Lock(void):
 	_lock()
 {}
 
-Threading::Lock::~Lock() {}
+Threading::Lock::~Lock(void) {}
 
-void	Threading::Lock::lock() {
+void	Threading::Lock::lock(void) {
 	this->_lock.lock();
 }
 
-void	Threading::Lock::unlock() {
+void	Threading::Lock::unlock(void) {
 	this->_lock.unlock();
 }
 
@@ -19,7 +19,7 @@ Threading::ReadWriteLock::WriterGuard::WriterGuard(Threading::ReadWriteLock *loc
 	this->_lock->writerAcquire();
 }
 
-Threading::ReadWriteLock::WriterGuard::~WriterGuard() {
+Threading::ReadWriteLock::WriterGuard::~WriterGuard(void) {
 	this->_lock->writerRelease();
 }
 
@@ -28,11 +28,11 @@ Threading::ReadWriteLock::ReaderGuard::ReaderGuard(Threading::ReadWriteLock *loc
 	this->_lock->readerAcquire();
 }
 
-Threading::ReadWriteLock::ReaderGuard::~ReaderGuard() {
+Threading::ReadWriteLock::ReaderGuard::~ReaderGuard(void) {
 	this->_lock->readerRelease();
 }
 
-Threading::ReadWriteLock::LightSwitch::LightSwitch():
+Threading::ReadWriteLock::LightSwitch::LightSwitch(void):
 	std::mutex(),
 	_counter(0)
 {}
@@ -53,7 +53,7 @@ void Threading::ReadWriteLock::LightSwitch::release(std::mutex& lock) {
 	}
 }
 
-Threading::ReadWriteLock::ReadWriteLock():
+Threading::ReadWriteLock::ReadWriteLock(void):
 	_readSwitch(),
 	_writeSwitch(),
 	_noReaders(),
@@ -61,7 +61,7 @@ Threading::ReadWriteLock::ReadWriteLock():
 	_readersQueue()
 {}
 
-void	Threading::ReadWriteLock::readerAcquire() {
+void	Threading::ReadWriteLock::readerAcquire(void) {
 	ScopeLock slr(this->_readersQueue);
 	{
 		ScopeLock slw(this->_noReaders);
@@ -69,16 +69,16 @@ void	Threading::ReadWriteLock::readerAcquire() {
 	}
 }
 
-void	Threading::ReadWriteLock::readerRelease() {
+void	Threading::ReadWriteLock::readerRelease(void) {
 	this->_readSwitch.release(this->_noWriters);
 }
 
-void	Threading::ReadWriteLock::writerAcquire() {
+void	Threading::ReadWriteLock::writerAcquire(void) {
 	this->_writeSwitch.acquire(this->_noReaders);
 	this->_noWriters.lock();
 }
 
-void	Threading::ReadWriteLock::writerRelease() {
+void	Threading::ReadWriteLock::writerRelease(void) {
 	this->_noWriters.unlock();
 	this->_writeSwitch.release(this->_noReaders);
 }

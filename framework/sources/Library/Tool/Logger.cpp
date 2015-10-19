@@ -1,13 +1,13 @@
 #include	"Library/Tool/Logger.hpp"
 #include	"Library/Tool/Macro.hh"
 
-Logger::Logger():
+Logger::Logger(void):
 	Threading::Lock(),
 	_level(Logger::Level::DEBUG),
 	_offset(0)
 {}
 
-Logger::~Logger() {}
+Logger::~Logger(void) {}
 
 void	Logger::setLevel(Logger::Level level) {
 	SCOPELOCK(this);

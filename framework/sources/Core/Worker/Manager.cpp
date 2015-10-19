@@ -68,7 +68,7 @@ void	Core::Worker::Manager::add(Core::Worker::DelayedTask* delayedTask) {
 	}
 }
 
-void	Core::Worker::Manager::add(const Core::Event::EventBase* event, Core::Event::IEventArgs* args) {
+void	Core::Worker::Manager::add(const Core::Event::Event* event, Core::Event::IEventArgs* args) {
 	if (event != nullptr) {
 		Core::Worker::EventTask* eventTask = Core::Worker::EventTask::Pool::get().create(event, args);
 		this->add(eventTask);

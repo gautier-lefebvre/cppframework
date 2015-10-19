@@ -3,7 +3,7 @@
 #include	"Core/Network/UDP/SocketClient.hh"
 #include	"Core/Network/Exception.hh"
 
-Core::Network::UDP::SocketClient::SocketClient():
+Core::Network::UDP::SocketClient::SocketClient(void):
 	Factory::AFactored(),
 	Threading::Lock(),
 	_addr(),
@@ -12,9 +12,9 @@ Core::Network::UDP::SocketClient::SocketClient():
 	_output(std::make_pair(std::queue<ByteArray*>(), 0))
 {}
 
-Core::Network::UDP::SocketClient::~SocketClient() {}
+Core::Network::UDP::SocketClient::~SocketClient(void) {}
 
-void	Core::Network::UDP::SocketClient::reinit() {
+void	Core::Network::UDP::SocketClient::reinit(void) {
 	// reinit socket address
 	memset(&(this->_addr), 0, sizeof(sockaddr_in));
 
@@ -47,7 +47,7 @@ void	Core::Network::UDP::SocketClient::init(const sockaddr_in& addr) {
 	}
 }
 
-bool	Core::Network::UDP::SocketClient::hasDataToSend() const {
+bool	Core::Network::UDP::SocketClient::hasDataToSend(void) const {
 	return !this->_output.first.empty();
 }
 
@@ -60,7 +60,7 @@ void	Core::Network::UDP::SocketClient::push(ByteArray* datagram) {
 	}
 }
 
-ByteArray*	Core::Network::UDP::SocketClient::nextDatagram() {
+ByteArray*	Core::Network::UDP::SocketClient::nextDatagram(void) {
 	if (this->_output.first.empty()) {
 		return nullptr;
 	} else {
@@ -80,11 +80,11 @@ void	Core::Network::UDP::SocketClient::received(ByteArray* datagram) {
 	}
 }
 
-const sockaddr_in& Core::Network::UDP::SocketClient::socketAddress() const {
+const sockaddr_in& Core::Network::UDP::SocketClient::socketAddress(void) const {
 	return this->_addr;
 }
 
-const std::pair<uint32_t, uint16_t>& Core::Network::UDP::SocketClient::clientInformation() const {
+const std::pair<uint32_t, uint16_t>& Core::Network::UDP::SocketClient::clientInformation(void) const {
 	return this->_info;
 }
 
@@ -92,13 +92,13 @@ const std::pair<uint32_t, uint16_t>& Core::Network::UDP::SocketClient::clientInf
  *	Core::Network::UDP::SocketClient pool
  */
 
-Core::Network::UDP::SocketClient::Pool::Pool():
+Core::Network::UDP::SocketClient::Pool::Pool(void):
 	Factory::BasicPool<Core::Network::UDP::SocketClient>()
 {}
 
-Core::Network::UDP::SocketClient::Pool::~Pool() {}
+Core::Network::UDP::SocketClient::Pool::~Pool(void) {}
 
-void	Core::Network::UDP::SocketClient::Pool::init() {
+void	Core::Network::UDP::SocketClient::Pool::init(void) {
 	this->initPool(Core::Network::UDP::SocketClient::Pool::ORIGINAL_SIZE,
 		Core::Network::UDP::SocketClient::Pool::HYDRATE_SIZE,
 		"Core::Network::UDP::SocketClient");

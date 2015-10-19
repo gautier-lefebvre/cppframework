@@ -21,6 +21,7 @@ Core::Worker::ATask::Source Core::Worker::ATask::getSource(void) const {
 
 Core::Worker::EventTask::EventTask(void):
 	Core::Worker::ATask(Core::Worker::ATask::Source::EVENT),
+	_eventCreation(),
 	_event(nullptr),
 	_args(nullptr)
 {}
@@ -34,7 +35,8 @@ void	Core::Worker::EventTask::reinit(void) {
 	this->_args = nullptr;
 }
 
-void	Core::Worker::EventTask::init(const Core::Event::EventBase* ebase, Core::Event::IEventArgs* args) {
+void	Core::Worker::EventTask::init(const Core::Event::Event* ebase, Core::Event::IEventArgs* args) {
+	this->_eventCreation = ebase->lastOutOfPoolTimePoint();
 	this->_event = ebase;
 	this->_args = args;
 }

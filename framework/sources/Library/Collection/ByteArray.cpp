@@ -33,7 +33,7 @@ ByteArray&	ByteArray::operator=(const ByteArray& oth) {
 	return (*this);
 }
 
-ByteArray::~ByteArray() {
+ByteArray::~ByteArray(void) {
 	if (this->_bytearray != nullptr) {
 		delete[] this->_bytearray;
 	}
@@ -47,7 +47,7 @@ uint8_t		ByteArray::operator[](size_t idx) const {
 	}
 }
 
-void		ByteArray::reinit() {
+void		ByteArray::reinit(void) {
 	this->_size = 0;
 	memset(this->_bytearray, 0, this->_sizemax);
 }
@@ -69,15 +69,15 @@ void	ByteArray::resize(size_t size, bool force, bool keep) {
 	}
 }
 
-const uint8_t*	ByteArray::getBytes() const {
+const uint8_t*	ByteArray::getBytes(void) const {
 	return (this->_bytearray);
 }
 
-uint8_t*	ByteArray::atEnd() {
+uint8_t*	ByteArray::atEnd(void) {
 	return (this->_bytearray + this->_size);
 }
 
-uint8_t*	ByteArray::atStart() {
+uint8_t*	ByteArray::atStart(void) {
 	return (this->_bytearray);
 }
 
@@ -146,23 +146,23 @@ void		ByteArray::push_frontStr(const std::string& str, bool resize) {
 	this->push_front(str.c_str(), str.length(), resize);
 }
 
-size_t		ByteArray::availableSpace() const {
+size_t		ByteArray::availableSpace(void) const {
 	return (this->getSizeMax() - this->getSize());
 }
 
-size_t		ByteArray::getSize() const {
+size_t		ByteArray::getSize(void) const {
 	return this->_size;
 }
 
-size_t		ByteArray::getSizeMax() const {
+size_t		ByteArray::getSizeMax(void) const {
 	return (this->_sizemax);
 }
 
-bool		ByteArray::empty() const {
+bool		ByteArray::empty(void) const {
 	return (this->_size == 0);
 }
 
-bool		ByteArray::full() const {
+bool		ByteArray::full(void) const {
 	return (this->availableSpace() == 0);
 }
 
@@ -191,7 +191,7 @@ ByteArrayExtractor& ByteArrayExtractor::operator=(const ByteArrayExtractor& oth)
 	return *this;
 }
 
-ByteArrayExtractor::~ByteArrayExtractor() {}
+ByteArrayExtractor::~ByteArrayExtractor(void) {}
 
 void	ByteArrayExtractor::extractString(std::string& data, size_t length) {
 	if (this->_bytearray->getSize() - this->_offset < length) {
@@ -208,13 +208,13 @@ void	ByteArrayExtractor::extractString(std::string& data, size_t length) {
  *	ByteArray pool
  */
 
-ByteArray::Pool::Pool():
+ByteArray::Pool::Pool(void):
 	Factory::BasicPool<ByteArray>()
 {}
 
-ByteArray::Pool::~Pool() {}
+ByteArray::Pool::~Pool(void) {}
 
-void	ByteArray::Pool::init() {
+void	ByteArray::Pool::init(void) {
 	this->initPool(this->ORIGINAL_SIZE,
 					this->HYDRATE_SIZE,
 					"ByteArray");
@@ -228,4 +228,4 @@ ByteArray* ByteArray::Pool::create(size_t size) {
 
 ByteArray::Pool::Guard::Guard(ByteArray* bytearray): bytearray(bytearray) {}
 
-ByteArray::Pool::Guard::~Guard() { ByteArray::Pool::get().remove(this->bytearray); }
+ByteArray::Pool::Guard::~Guard(void) { ByteArray::Pool::get().remove(this->bytearray); }

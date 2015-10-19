@@ -4,4 +4,4 @@ Core::Network::Exception::Exception(const std::string& msg) noexcept:
 	Core::Exception(msg)
 {}
 
-Core::Network::Exception::~Exception() {}
+Core::Network::Exception::~Exception(void) {}

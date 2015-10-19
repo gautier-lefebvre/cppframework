@@ -1,12 +1,12 @@
 #include	"Library/Property/AEndable.hh"
 
-AEndable::AEndable():
+AEndable::AEndable(void):
 	_end(false)
 {}
 
-AEndable::~AEndable() {}
+AEndable::~AEndable(void) {}
 
-bool	AEndable::mustEnd() const {
+bool	AEndable::mustEnd(void) const {
 	return this->_end;
 }
 

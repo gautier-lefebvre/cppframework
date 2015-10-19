@@ -7,7 +7,7 @@ void	Random::setSeed(unsigned int seed) {
 	srand(seed);
 }
 
-void	Random::init() {
+void	Random::init(void) {
 	Random::setSeed(time(nullptr));
 }
 

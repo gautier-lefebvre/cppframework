@@ -5,18 +5,18 @@
 #include	"Core/Network/HTTP/Client.hh"
 #include	"Core/Network/Exception.hh"
 
-Core::Network::HTTP::Client::Client():
+Core::Network::HTTP::Client::Client(void):
 	Threading::Lock(),
 	AEndable(),
 	_userAgent(""),
 	_connections()
 {}
 
-Core::Network::HTTP::Client::~Client() {
+Core::Network::HTTP::Client::~Client(void) {
 	this->end();
 }
 
-void	Core::Network::HTTP::Client::end() {
+void	Core::Network::HTTP::Client::end(void) {
 	SCOPELOCK(this);
 	if (!(this->mustEnd())) {
 		this->mustEnd(true);

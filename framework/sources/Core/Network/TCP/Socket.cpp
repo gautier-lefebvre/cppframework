@@ -10,22 +10,22 @@
 #include	"Core/Network/Exception.hh"
 #include	"Library/Tool/Macro.hh"
 
-Core::Network::TCP::Socket::Socket():
+Core::Network::TCP::Socket::Socket(void):
 	Factory::AFactored(),
 	Threading::Lock(),
 	_fd(-1)
 {}
 
-Core::Network::TCP::Socket::~Socket() {
+Core::Network::TCP::Socket::~Socket(void) {
 	this->reinit();
 }
 
-void	Core::Network::TCP::Socket::reinit() {
+void	Core::Network::TCP::Socket::reinit(void) {
 	SCOPELOCK(this);
 	this->close();
 }
 
-void	Core::Network::TCP::Socket::socket() {
+void	Core::Network::TCP::Socket::socket(void) {
 	SCOPELOCK(this);
 	this->reinit();
 	if ((this->_fd = ::socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -33,7 +33,7 @@ void	Core::Network::TCP::Socket::socket() {
 	}
 }
 
-void	Core::Network::TCP::Socket::close() {
+void	Core::Network::TCP::Socket::close(void) {
 	SCOPELOCK(this);
 	if (this->_fd != -1) {
 		::close(this->_fd);
@@ -90,7 +90,7 @@ uint32_t	Core::Network::TCP::Socket::accept(Core::Network::TCP::Socket* socket) 
 	return static_cast<uint32_t>(sin.sin_addr.s_addr);
 }
 
-uint32_t	Core::Network::TCP::Socket::getpeername() const {
+uint32_t	Core::Network::TCP::Socket::getpeername(void) const {
 	sockaddr_in sin;
 	socklen_t size = sizeof(sockaddr_in);
 	if (::getpeername(this->_fd, reinterpret_cast<sockaddr*>(&sin), &size) == -1) {
@@ -99,7 +99,7 @@ uint32_t	Core::Network::TCP::Socket::getpeername() const {
 	return static_cast<uint32_t>(sin.sin_addr.s_addr);
 }
 
-uint32_t	Core::Network::TCP::Socket::getsockname() const {
+uint32_t	Core::Network::TCP::Socket::getsockname(void) const {
 	sockaddr_in sin;
 	socklen_t size = sizeof(sockaddr_in);
 	if (::getsockname(this->_fd, reinterpret_cast<sockaddr*>(&sin), &size) == -1) {
@@ -121,13 +121,13 @@ bool	Core::Network::TCP::Socket::isset(fd_set& set) const {
  *	Socket pool
  */
 
-Core::Network::TCP::Socket::Pool::Pool():
+Core::Network::TCP::Socket::Pool::Pool(void):
 	Factory::BasicPool<Core::Network::TCP::Socket>()
 {}
 
-Core::Network::TCP::Socket::Pool::~Pool() {}
+Core::Network::TCP::Socket::Pool::~Pool(void) {}
 
-void	Core::Network::TCP::Socket::Pool::init() {
+void	Core::Network::TCP::Socket::Pool::init(void) {
 	this->initPool(Core::Network::TCP::Socket::Pool::ORIGINAL_SIZE,
 		Core::Network::TCP::Socket::Pool::HYDRATE_SIZE,
 		"Core::Network::TCP::Socket");

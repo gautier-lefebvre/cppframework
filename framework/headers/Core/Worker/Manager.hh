@@ -8,7 +8,7 @@
 #include	"Library/Property/AEndable.hh"
 #include	"Library/Threading/Lock.hpp"
 #include	"Library/Threading/Condition.hpp"
-#include	"Core/Event/EventBase.hh"
+#include	"Core/Event/Event.hh"
 #include	"Core/Event/IEventArgs.hh"
 #include	"Core/Worker/Task.hh"
 #include	"Core/Worker/Thread.hh"
@@ -45,7 +45,7 @@ namespace		Core {
 		public:
 			void	init(size_t nbWorkers, bool delayedTasks);
 			void	add(Core::Worker::ATask*);
-			void	add(const Core::Event::EventBase*, Core::Event::IEventArgs*);
+			void	add(const Core::Event::Event*, Core::Event::IEventArgs*);
 			void	add(void); // set args from httptask::init
 			void	add(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
 			void	add(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);

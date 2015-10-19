@@ -1,6 +1,12 @@
 #include	"Core/Event/EventInfo.hh"
 
-Core::Event::EventInfo::EventInfo(const Core::Event::EventBase* ebase, const std::function<void (Core::Event::IEventArgs*)>& clean):
+Core::Event::EventInfo::EventInfo(const Core::Event::Event* ebase):
+	base(ebase),
+	cleanup(nullptr),
+	subscribers()
+{}
+
+Core::Event::EventInfo::EventInfo(const Core::Event::Event* ebase, const std::function<void (Core::Event::IEventArgs*)>& clean):
 	base(ebase),
 	cleanup(clean),
 	subscribers()
