@@ -43,7 +43,7 @@ namespace	Core {
 			void	tasksRoutine(void);
 			void	delayedTasksRoutine(void);
 
-		private:
+		public:
 			static void	executeEventTask(Core::Worker::ATask*, bool exec = true);
 			static void	executeHTTPTask(Core::Worker::ATask*, bool exec = true);
 			static void	executePeriodicTask(Core::Worker::ATask*, bool exec = true);

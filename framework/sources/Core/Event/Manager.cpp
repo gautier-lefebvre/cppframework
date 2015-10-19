@@ -1,5 +1,7 @@
 #include	"Library/Tool/Logger.hpp"
 #include	"Core/Event/Manager.hh"
+#include	"Core/Worker/Manager.hh"
+#include	"Core/Worker/Thread.hh"
 
 Core::Event::Manager::Manager(void):
 	Threading::Lock(),
@@ -33,6 +35,19 @@ void	Core::Event::Manager::unsubscribe(const Core::Event::Event* event, const vo
 		this->_events.at(event).delSubscriber(callee);
 	} catch (const std::out_of_range&) {
 		WARNING("Trying to subscribe to an unregistered event");
+	}
+}
+
+void	Core::Event::Manager::fireAsync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
+	Core::Worker::Manager::get().add(event, args);
+}
+
+void	Core::Event::Manager::fireSync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
+	try {
+		Core::Worker::EventTask* eventTask = Core::Worker::EventTask::Pool::get().create(event, args);
+		Core::Worker::Thread::executeEventTask(eventTask, true);
+	} catch (const std::exception& e) {
+		CRITICAL(e.what());
 	}
 }
 

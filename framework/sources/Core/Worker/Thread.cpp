@@ -131,6 +131,7 @@ void	Core::Worker::Thread::tasksRoutine(void) {
 				(*handler)(task, true);
 			} catch (const std::out_of_range &) {
 				WARNING("Unknown task");
+				delete task;
 			} catch (const std::exception& e) {
 				CRITICAL(e.what());
 			}
@@ -187,7 +188,7 @@ void	Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec)
 
 		Core::Worker::HTTPTask::Pool::remove(httpTask);
 	} else {
-		CRITICAL("Cant reinterpret_cast an EventTask");
+		CRITICAL("Cant reinterpret_cast an HTTPTask");
 	}
 }
 
@@ -203,7 +204,7 @@ void	Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool e
 			Core::Worker::Manager::add(periodicTask);
 		}
 	} else {
-		CRITICAL("Cant reinterpret_cast an EventTask");
+		CRITICAL("Cant reinterpret_cast a PeriodicTask");
 	}
 }
 

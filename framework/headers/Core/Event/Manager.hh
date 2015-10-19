@@ -33,6 +33,10 @@ namespace		Core {
 			void	unsubscribe(const Core::Event::Event*, const void *);
 
 		public:
+			void	fireAsync(const Core::Event::Event*, Core::Event::IEventArgs*) const;
+			void	fireSync(const Core::Event::Event*, Core::Event::IEventArgs*) const; // note that the args are no longer valid after this method is called
+
+		public:
 			const Core::Event::EventInfo&	getInfo(const Core::Event::Event*) const;
 		};
 	}
