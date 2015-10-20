@@ -1,240 +1,240 @@
-#include	"Library/Tool/Converter.hpp"
-#include	"Library/Tool/Logger.hpp"
-#include	"Core/Event/Manager.hh"
-#include	"Core/Worker/Thread.hh"
-#include	"Core/Worker/Manager.hh"
-#include	"Core/Exception.hh"
+#include  "Library/Tool/Converter.hpp"
+#include  "Library/Tool/Logger.hpp"
+#include  "Core/Event/Manager.hh"
+#include  "Core/Worker/Thread.hh"
+#include  "Core/Worker/Manager.hh"
+#include  "Core/Exception.hh"
 
 const std::map<Core::Worker::ATask::Source, Core::Worker::Thread::WorkerHandler> Core::Worker::Thread::TaskHandlerMap = {
-	{Core::Worker::ATask::Source::EVENT, &Core::Worker::Thread::executeEventTask},
-	{Core::Worker::ATask::Source::HTTP_CALLBACK, &Core::Worker::Thread::executeHTTPTask},
-	{Core::Worker::ATask::Source::PERIODIC_TASK, &Core::Worker::Thread::executePeriodicTask}
+  {Core::Worker::ATask::Source::EVENT, &Core::Worker::Thread::executeEventTask},
+  {Core::Worker::ATask::Source::HTTP_CALLBACK, &Core::Worker::Thread::executeHTTPTask},
+  {Core::Worker::ATask::Source::PERIODIC_TASK, &Core::Worker::Thread::executePeriodicTask}
 };
 
 Core::Worker::Thread::Thread(size_t id, Core::Worker::Thread::Assignment assignment):
-	Threading::Lock(),
-	AEndable(),
-	_id(id),
-	_thread(nullptr)
+  Threading::Lock(),
+  AEndable(),
+  _id(id),
+  _thread(nullptr)
 {
-	void	(Core::Worker::*routine)() = nullptr;
-	if (assignment == Core::Worker::Thread::Assignment::TASKS) {
-		routine = &Core::Worker::Thread::tasksRoutine;
-	} else {
-		routine = &Core::Worker::Thread::delayedTasksRoutine;
-	}
+  void  (Core::Worker::*routine)() = nullptr;
+  if (assignment == Core::Worker::Thread::Assignment::TASKS) {
+    routine = &Core::Worker::Thread::tasksRoutine;
+  } else {
+    routine = &Core::Worker::Thread::delayedTasksRoutine;
+  }
 
-	if (routine != nullptr) {
-		this->_thread = new std::thread(routine, this);
-	} else {
-		// throw Core::Exception("Invalid assignment for worker {0}", this->_id); // need fastformat
-	}
+  if (routine != nullptr) {
+    this->_thread = new std::thread(routine, this);
+  } else {
+    // throw Core::Exception("Invalid assignment for worker {0}", this->_id); // need fastformat
+  }
 }
 
 Core::Worker::Thread::~Thread(void) {
-	this->end();
+  this->end();
 }
 
-void	Core::Worker::Thread::cleanup(void) {
-	Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-	Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
-	Core::Worker::ATask* task;
-	Core::Worker::DelayedTask* delayedTask;
-	WorkerHandler handler;
+void  Core::Worker::Thread::cleanup(void) {
+  Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
+  Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+  Core::Worker::ATask* task;
+  Core::Worker::DelayedTask* delayedTask;
+  WorkerHandler handler;
 
-	while (!taskQueue.empty()) {
-		task = taskQueue.front();
-		taskQueue.pop();
+  while (!taskQueue.empty()) {
+    task = taskQueue.front();
+    taskQueue.pop();
 
-		try {
-			handler = Core::Worker::Thread::TaskHandlerMap.at(task->getSource());
-			(*handler)(task, false);
-		} catch (const std::out_of_range& e) {
-			WARNING("Unknown task");
-		} catch (const std::exception& e) {
-			CRITICAL(e.what());
-		}
-	}
+    try {
+      handler = Core::Worker::Thread::TaskHandlerMap.at(task->getSource());
+      (*handler)(task, false);
+    } catch (const std::out_of_range& e) {
+      WARNING("Unknown task");
+    } catch (const std::exception& e) {
+      CRITICAL(e.what());
+    }
+  }
 
-	while (!delayedTaskQueue.empty()) {
-		delayedTask = delayedTaskQueue.top();
-		delayedTaskQueue.pop();
+  while (!delayedTaskQueue.empty()) {
+    delayedTask = delayedTaskQueue.top();
+    delayedTaskQueue.pop();
 
-		try {
-			handler = Core::Worker::Thread::TaskHandlerMap.at(delayedTask->_task->getSource());
-			(*handler)(delayedTask->_task, false);
-		} catch (const std::out_of_range& e) {
-			WARNING("Unknown task");
-		} catch (const std::exception& e) {
-			CRITICAL(e.what());
-		}
+    try {
+      handler = Core::Worker::Thread::TaskHandlerMap.at(delayedTask->_task->getSource());
+      (*handler)(delayedTask->_task, false);
+    } catch (const std::out_of_range& e) {
+      WARNING("Unknown task");
+    } catch (const std::exception& e) {
+      CRITICAL(e.what());
+    }
 
-		Core::Worker::DelayedTask::Pool::remove(delayedTask);
-	}
+    Core::Worker::DelayedTask::Pool::remove(delayedTask);
+  }
 }
 
-void	Core::Worker::Thread::end(void) {
-	SCOPELOCK(this);
-	if (!this->mustEnd()) {
-		Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-		Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+void  Core::Worker::Thread::end(void) {
+  SCOPELOCK(this);
+  if (!this->mustEnd()) {
+    Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
+    Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
 
-		this->mustEnd(true);
+    this->mustEnd(true);
 
-		{
-			ScopeLock sltasks(taskQueue);
-			taskQueue.notify_all();
-		}
+    {
+      ScopeLock sltasks(taskQueue);
+      taskQueue.notify_all();
+    }
 
-		{
-			ScopeLock sldtasks(delayedTaskQueue);
-			delayedTaskQueue.notify_all();
-		}
+    {
+      ScopeLock sldtasks(delayedTaskQueue);
+      delayedTaskQueue.notify_all();
+    }
 
-		if (this->_thread) {
-			try {
-				this->_thread->join();
-			} catch (const std::system_error&) {}
+    if (this->_thread) {
+      try {
+        this->_thread->join();
+      } catch (const std::system_error&) {}
 
-			delete this->_thread;
-		}
+      delete this->_thread;
+    }
 
-		this->_thread = nullptr;
-	}
+    this->_thread = nullptr;
+  }
 }
 
-size_t	Core::Worker::Thread::getID(void) const {
-	return this->_id;
+size_t  Core::Worker::Thread::getID(void) const {
+  return this->_id;
 }
 
-void	Core::Worker::Thread::tasksRoutine(void) {
-	Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-	Core::Worker::ATask* task;
-	WorkerHandler handler;
+void  Core::Worker::Thread::tasksRoutine(void) {
+  Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
+  Core::Worker::ATask* task;
+  WorkerHandler handler;
 
-	while (!this->mustEnd()) {
-		task = nullptr;
+  while (!this->mustEnd()) {
+    task = nullptr;
 
-		{
-			SCOPELOCK(&taskQueue);
-			if (taskQueue.empty()) {
-				taskQueue.wait();
-			} else {
-				task = taskQueue.front();
-				taskQueue.pop();
-			}
-		}
+    {
+      SCOPELOCK(&taskQueue);
+      if (taskQueue.empty()) {
+        taskQueue.wait();
+      } else {
+        task = taskQueue.front();
+        taskQueue.pop();
+      }
+    }
 
-		if (task != nullptr) {
-			try {
-				handler = Core::Worker::Thread::TaskHandlerMap.at(task->getSource());
-				(*handler)(task, true);
-			} catch (const std::out_of_range &) {
-				WARNING("Unknown task");
-				delete task;
-			} catch (const std::exception& e) {
-				CRITICAL(e.what());
-			}
-		}
-	}
+    if (task != nullptr) {
+      try {
+        handler = Core::Worker::Thread::TaskHandlerMap.at(task->getSource());
+        (*handler)(task, true);
+      } catch (const std::out_of_range &) {
+        WARNING("Unknown task");
+        delete task;
+      } catch (const std::exception& e) {
+        CRITICAL(e.what());
+      }
+    }
+  }
 }
 
-void	Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exec) {
-	Core::Worker::EventTask *eventTask = reinterpret_cast<Core::Worker::EventTask*>(task);
+void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exec) {
+  Core::Worker::EventTask *eventTask = reinterpret_cast<Core::Worker::EventTask*>(task);
 
-	if (eventTask) {
-		try {
-			// execute only if the event was not unregistered before it was executed
-			if (eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
-				try {
-					const Core::Event::EventInfo& eventInfo = Core::Event::Manager::get().getInfo(eventTask->_event);
+  if (eventTask) {
+    try {
+      // execute only if the event was not unregistered before it was executed
+      if (eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
+        try {
+          const Core::Event::EventInfo& eventInfo = Core::Event::Manager::get().getInfo(eventTask->_event);
 
-					if (exec) {
-						for (auto& subscriber : eventInfo.subscribers) {
-							subscriber.second(eventTask->_args);
-						}
-					}
+          if (exec) {
+            for (auto& subscriber : eventInfo.subscribers) {
+              subscriber.second(eventTask->_args);
+            }
+          }
 
-					if (eventInfo.cleanup) {
-						eventInfo.cleanup(eventTask->_args); // must return IEventArgs subclass to factory in cleanup method
-					}
-				} catch (const std::out_of_range&) {
-					WARNING("Unregistered event");
-				}
-			} else {
-				// avoid leak since there is no way to know which pool the args must be returned to
-				if (eventTask->_args) {
-					delete eventTask->_args;
-				}
-			}
-		} catch (const std::exception& e) {
-			Core::Worker::EventTask::Pool::remove(eventTask);
-			throw e;
-		}
+          if (eventInfo.cleanup) {
+            eventInfo.cleanup(eventTask->_args); // must return IEventArgs subclass to factory in cleanup method
+          }
+        } catch (const std::out_of_range&) {
+          WARNING("Unregistered event");
+        }
+      } else {
+        // avoid leak since there is no way to know which pool the args must be returned to
+        if (eventTask->_args) {
+          delete eventTask->_args;
+        }
+      }
+    } catch (const std::exception& e) {
+      Core::Worker::EventTask::Pool::remove(eventTask);
+      throw e;
+    }
 
-		Core::Worker::EventTask::Pool::remove(eventTask);
-	} else {
-		CRITICAL("Cant reinterpret_cast an EventTask");
-	}
+    Core::Worker::EventTask::Pool::remove(eventTask);
+  } else {
+    CRITICAL("Cant reinterpret_cast an EventTask");
+  }
 }
 
-void	Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec) {
-	Core::Worker::HTTPTask *httpTask = reinterpret_cast<Core::Worker::HTTPTask*>(task);
+void  Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec) {
+  Core::Worker::HTTPTask *httpTask = reinterpret_cast<Core::Worker::HTTPTask*>(task);
 
-	if (httpTask) {
-		if (exec) {
-			// must implement http
-		}
+  if (httpTask) {
+    if (exec) {
+      // must implement http
+    }
 
-		Core::Worker::HTTPTask::Pool::remove(httpTask);
-	} else {
-		CRITICAL("Cant reinterpret_cast an HTTPTask");
-	}
+    Core::Worker::HTTPTask::Pool::remove(httpTask);
+  } else {
+    CRITICAL("Cant reinterpret_cast an HTTPTask");
+  }
 }
 
-void	Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool exec) {
-	Core::Worker::PeriodicTask *periodicTask = reinterpret_cast<Core::Worker::PeriodicTask*>(task);
+void  Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool exec) {
+  Core::Worker::PeriodicTask *periodicTask = reinterpret_cast<Core::Worker::PeriodicTask*>(task);
 
-	if (periodicTask) {
-		if (exec == false || periodicTask->_off) {
-			periodicTask->_clean();
-			Core::Worker::PeriodicTask::Pool::remove(periodicTask);
-		} else {
-			periodicTask->_callback();
-			Core::Worker::Manager::add(periodicTask);
-		}
-	} else {
-		CRITICAL("Cant reinterpret_cast a PeriodicTask");
-	}
+  if (periodicTask) {
+    if (exec == false || periodicTask->_off) {
+      periodicTask->_clean();
+      Core::Worker::PeriodicTask::Pool::remove(periodicTask);
+    } else {
+      periodicTask->_callback();
+      Core::Worker::Manager::add(periodicTask);
+    }
+  } else {
+    CRITICAL("Cant reinterpret_cast a PeriodicTask");
+  }
 }
 
-void	Core::Worker::Thread::delayedTasksRoutine(void) {
-	Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
-	Core::Worker::DelayedTask* delayedTask;
+void  Core::Worker::Thread::delayedTasksRoutine(void) {
+  Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+  Core::Worker::DelayedTask* delayedTask;
 
-	while (!this->mustEnd()) {
-		delayedTask = nullptr;
+  while (!this->mustEnd()) {
+    delayedTask = nullptr;
 
-		{
-			SCOPELOCK(&delayedTaskQueue);
-			if (delayedTaskQueue.empty()) {
-				delayedTaskQueue.wait();
-			} else {
-				if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
-					if (!delayedTaskQueue.empty()) {
-						if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
-							delayedTaskQueue.pop();
-						} else {
-							delayedTask = nullptr;
-						}
-					}
-				}
-			}
-		}
+    {
+      SCOPELOCK(&delayedTaskQueue);
+      if (delayedTaskQueue.empty()) {
+        delayedTaskQueue.wait();
+      } else {
+        if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
+          if (!delayedTaskQueue.empty()) {
+            if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
+              delayedTaskQueue.pop();
+            } else {
+              delayedTask = nullptr;
+            }
+          }
+        }
+      }
+    }
 
-		if (delayedTask != nullptr) {
-			Core::Worker::Manager::get().add(delayedTask->_task);
-			Core::Worker::DelayedTask::Pool::remove(delayedTask);
-		}
-	}
+    if (delayedTask != nullptr) {
+      Core::Worker::Manager::get().add(delayedTask->_task);
+      Core::Worker::DelayedTask::Pool::remove(delayedTask);
+    }
+  }
 }

@@ -1,16 +1,16 @@
-#include	<cstdlib>
-#include	<ctime>
+#include  <cstdlib>
+#include  <ctime>
 
-#include	"Library/Tool/Random.hh"
+#include  "Library/Tool/Random.hh"
 
-void	Random::setSeed(unsigned int seed) {
-	srand(seed);
+void  Random::setSeed(unsigned int seed) {
+  srand(seed);
 }
 
-void	Random::init(void) {
-	Random::setSeed(time(nullptr));
+void  Random::init(void) {
+  Random::setSeed(time(nullptr));
 }
 
 int32_t Random::getInt(int32_t min, int32_t max) {
-	return (rand() % (max - min) + min);
+  return (rand() % (max - min) + min);
 }

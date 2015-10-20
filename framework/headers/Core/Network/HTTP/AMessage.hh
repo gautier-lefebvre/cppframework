@@ -1,37 +1,37 @@
-#ifndef		__CORE_NETWORK_HTTP_AMESSAGE_HH__
-#define		__CORE_NETWORK_HTTP_AMESSAGE_HH__
+#ifndef   __CORE_NETWORK_HTTP_AMESSAGE_HH__
+#define   __CORE_NETWORK_HTTP_AMESSAGE_HH__
 
-#include	<map>
-#include	<string>
+#include  <map>
+#include  <string>
 
-#include	"Library/Collection/ByteArray.hpp"
-#include	"Library/Factory/AFactored.hh"
+#include  "Library/Collection/ByteArray.hpp"
+#include  "Library/Factory/AFactored.hh"
 
-namespace			Core {
-	namespace		Network {
-		namespace	HTTP {
-			struct	AMessage :public Factory::AFactored {
-			public:
-				std::string							version;
-				std::map<std::string, std::string>	headers;
-				ByteArray							*body;
+namespace     Core {
+  namespace   Network {
+    namespace HTTP {
+      struct  AMessage :public Factory::AFactored {
+      public:
+        std::string             version;
+        std::map<std::string, std::string>  headers;
+        ByteArray             *body;
 
-			public:
-				AMessage(void);
-				virtual ~AMessage(void);
+      public:
+        AMessage(void);
+        virtual ~AMessage(void);
 
-			public:
-				virtual void	reinit(void);
+      public:
+        virtual void  reinit(void);
 
-			public:
-				void init(void);
+      public:
+        void init(void);
 
-			public:
-				const std::string&	getHeader(const std::string& header) const;
-				bool				hasHeader(const std::string& header) const;
-			};
-		}
-	}	
+      public:
+        const std::string&  getHeader(const std::string& header) const;
+        bool        hasHeader(const std::string& header) const;
+      };
+    }
+  } 
 }
 
-#endif		/* __CORE_NETWORK_HTTP_AMESSAGE_HH__ */
+#endif    /* __CORE_NETWORK_HTTP_AMESSAGE_HH__ */

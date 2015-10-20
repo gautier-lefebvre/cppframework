@@ -1,30 +1,30 @@
-#include	"Library/Tool/Logger.hpp"
-#include	"Library/Tool/Macro.hh"
+#include  "Library/Tool/Logger.hpp"
+#include  "Library/Tool/Macro.hh"
 
 Logger::Logger(void):
-	Threading::Lock(),
-	_level(Logger::Level::DEBUG),
-	_offset(0)
+  Threading::Lock(),
+  _level(Logger::Level::DEBUG),
+  _offset(0)
 {}
 
 Logger::~Logger(void) {}
 
-void	Logger::setLevel(Logger::Level level) {
-	SCOPELOCK(this);
-	this->_level = level;
+void  Logger::setLevel(Logger::Level level) {
+  SCOPELOCK(this);
+  this->_level = level;
 }
 
-void	Logger::setOffset(size_t off) {
-	SCOPELOCK(this);
-	this->_offset = off;
+void  Logger::setOffset(size_t off) {
+  SCOPELOCK(this);
+  this->_offset = off;
 }
 
-void	Logger::addOffset(size_t off) {
-	SCOPELOCK(this);
-	this->_offset += off;
+void  Logger::addOffset(size_t off) {
+  SCOPELOCK(this);
+  this->_offset += off;
 }
 
-void	Logger::delOffset(size_t off) {
-	SCOPELOCK(this);
-	this->_offset -= MIN(off, this->_offset);
+void  Logger::delOffset(size_t off) {
+  SCOPELOCK(this);
+  this->_offset -= MIN(off, this->_offset);
 }
