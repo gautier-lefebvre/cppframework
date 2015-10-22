@@ -45,23 +45,10 @@ namespace     Core {
         const std::pair<uint32_t, uint16_t>& clientInformation(void) const;
 
       public:
-        struct  Pool :public Singleton<Core::Network::UDP::SocketClient::Pool>, public Factory::BasicPool<Core::Network::UDP::SocketClient> {
-          friend class Singleton<Core::Network::UDP::SocketClient::Pool>;
-        public:
-          const size_t  ORIGINAL_SIZE = 100;
-          const size_t  HYDRATE_SIZE = 10;
-
-        private:
-          Pool(const Pool&) = delete;
-          Pool(const Pool&&) = delete;
-          Pool& operator=(const Pool&) = delete;
-
-        private:
-          Pool(void);
-          virtual ~Pool(void);
-
-        public:
-          void init(void);
+        struct  Pool :public Factory::BasicPool<Core::Network::UDP::SocketClient> {
+          static const size_t ORIGINAL_SIZE = 100;
+          static const size_t HYDRATE_SIZE  = 10;
+          static void init(void);
         };
       };
     }

@@ -63,6 +63,7 @@ Below, an example:
 - MyClass fires the events in methods `clear` and `insert`, passing a struct inheriting from Core::Event::IEventArgs and containing the value inserted for the latter.
 - MySubscriber prints the value inserted in the callback method.
 
+(Note: this is deprecated (mostly the pool part is simplified, and you can also fire events synchronously))
 ```
 #include <list>
 #include <iostream> // to print

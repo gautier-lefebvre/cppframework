@@ -208,24 +208,6 @@ void  ByteArrayExtractor::extractString(std::string& data, size_t length) {
  *  ByteArray pool
  */
 
-ByteArray::Pool::Pool(void):
-  Factory::BasicPool<ByteArray>()
-{}
+ByteArray::Guard::Guard(ByteArray* bytearray): bytearray(bytearray) {}
 
-ByteArray::Pool::~Pool(void) {}
-
-void  ByteArray::Pool::init(void) {
-  this->initPool(this->ORIGINAL_SIZE,
-          this->HYDRATE_SIZE,
-          "ByteArray");
-}
-
-ByteArray* ByteArray::Pool::create(size_t size) {
-  ByteArray* bytearray = this->_pool->get();
-  bytearray->resize(size);
-  return bytearray;
-}
-
-ByteArray::Pool::Guard::Guard(ByteArray* bytearray): bytearray(bytearray) {}
-
-ByteArray::Pool::Guard::~Guard(void) { ByteArray::Pool::get().remove(this->bytearray); }
+ByteArray::Guard::~Guard(void) { ByteArray::remove(this->bytearray); }

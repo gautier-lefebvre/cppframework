@@ -11,7 +11,7 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class Socket :public Factory::AFactored, public Threading::Lock {
+      class   Socket :public Factory::AFactored, public Threading::Lock {
       protected:
         int _fd;
 
@@ -37,11 +37,7 @@ namespace     Core {
         bool      isset(fd_set&) const;
 
       public:
-        struct  Pool :public Factory::BasicPool<Core::Network::TCP::Socket> {
-          static const size_t ORIGINAL_SIZE = 10;
-          static const size_t HYDRATE_SIZE  = 10;
-          static void init(void);
-        };
+        static Factory::Pool<Core::Network::TCP::Socket> *Pool;
       };
     }
   }

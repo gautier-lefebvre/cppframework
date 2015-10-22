@@ -13,7 +13,7 @@
  *  \class ByteArray Library/Collection/ByteArray.hpp
  *  \brief Raw data container.
  */
-class  ByteArray :public Factory::AFactored, public Threading::Lock {
+class  ByteArray :public Factory::AFactored, public Threading::Lock, public HasBasicPool<ByteArray, 100, 10> {
 protected:
   uint8_t  *_bytearray; /*!< Pointer to the start of the data. */
   size_t  _size; /*!< Size of the data in bytes. */
@@ -157,6 +157,15 @@ public:
   void  resize(size_t size, bool force = false, bool keep = false);
 
   /**
+   *  \brief Shortcut to resize (used by the Pool).
+   *
+   *  \a resize is more explicit, \a init is only meant to be used by the Pool.
+   *
+   *  \param size the number of bytes of the new ByteArray.
+   */
+  void  init(size_t size);
+
+  /**
    *  \brief Seeks a sequence of bytes inside the ByteArray.
    *  \param ptr the start of the sequence to seek.
    *  \param size the number of bytes of the sequence to seek.
@@ -270,69 +279,13 @@ public:
   void  push_frontStr(const std::string& str, bool resize = false);
 
 public:
-  /**
-   *  \class Pool Library/Collection/ByteArray.hpp
-   *  \brief a singleton pool of ByteArrays
-   */
-  struct  Pool :public Singleton<ByteArray::Pool>, public Factory::BasicPool<ByteArray> {
-      friend class Singleton<ByteArray::Pool>;
+  struct Guard {
   public:
-    const size_t  ORIGINAL_SIZE = 100; /*!< Number of ByteArrays to create at initialization. */
-    const size_t  HYDRATE_SIZE = 100; /*!< Number of ByteArrays to create when the pool is empty. */
-    const size_t  MAX_BUFFER_SIZE = 1000;  /*!< Limit size (in bytes) of a ByteArray inside the pool. */
-
-  private:
-    /**
-     *  \brief Deleted copy constructor of Pool.
-     */
-    Pool(const Pool&) = delete;
-
-    /**
-     *  \brief Deleted move constructor of Pool.
-     */
-    Pool(const Pool&&) = delete;
-
-    /**
-     *  \brief Deleted assignment constructor of Pool.
-     */
-    Pool& operator=(const Pool&) = delete;
-
-  private:
-    /**
-     *  \brief Constructor of Pool.
-     */
-    Pool(void);
-
-    /**
-     *  \brief Destructor of Pool.
-     */
-    virtual ~Pool(void);
+    ByteArray*  bytearray;
 
   public:
-    /**
-     *  \brief Creates the pool.
-     */
-    void init(void);
-
-  public:
-    /**
-     *  \brief Takes a ByteArray from the pool, with at least the required number of bytes.
-     *
-     *  \param size the minimum required size.
-     *  \return the ByteArray.
-     */
-    ByteArray*  create(size_t size);
-
-    /**
-     *  \class Guard Library/Collection/ByteArray.hpp
-     *  \brief a guard class which sends a ByteArray back to the pool in its destructor.
-     */
-    struct  Guard {
-      ByteArray*  bytearray;
-
-      Guard(ByteArray*);
-      ~Guard(void);
-    };
+    Guard(ByteArray* b);
+    ~Guard();
   };
 };
 

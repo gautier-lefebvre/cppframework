@@ -7,7 +7,7 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class SocketStream :public Socket {
+      class   SocketStream :public Socket {
       protected:
         ByteArray*  _input;
         ByteArray*  _output;
@@ -33,11 +33,7 @@ namespace     Core {
         size_t  getData(const std::function<size_t (ByteArray&, ByteArray&)>&, ByteArray&);
 
       public:
-        struct  Pool :public Factory::BasicPool<Core::Network::TCP::SocketStream> {
-          static const size_t ORIGINAL_SIZE = 100;
-          static const size_t HYDRATE_SIZE  = 10;
-          static void init(void);
-        };
+        static Factory::Pool<Core::Network::TCP::SocketStream> *Pool;
       };
     }
   }

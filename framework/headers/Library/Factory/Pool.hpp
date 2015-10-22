@@ -18,8 +18,8 @@ namespace  Factory {
   template<class C>
   class  Pool :public Threading::Lock {
   private:
-    std::queue<C*>  _pool; /*!< the collection of objects. */
-    size_t      _hydrate; /*!< the number of objects to create when the pool is empty. */
+    std::queue<C*> _pool; /*!< the collection of objects. */
+    size_t         _hydrate; /*!< the number of objects to create when the pool is empty. */
     std::string    _name; /*!< the stored objects' class name. */
 
   public:
@@ -77,6 +77,13 @@ namespace  Factory {
       return element;
     }
 
+    template<typename... Args>
+    C*  get(Args&... args) {
+      C* item = this->get();
+      item->init(args...);
+      return item;
+    }
+
     /**
      *  \brief Puts an object back into the pool.
      *  Will reinit the object and set its validity to false.
@@ -119,10 +126,12 @@ namespace  Factory {
    *  \brief A base class for all objects pools.
    *  Base classes are intended to be singleton, otherwise this class is useless and Pool could be used.
    */
-  template<class C>
-  class BasicPool {
-  private:
-    static Factory::Pool<C>*  _pool; /*!< the pool of objects. */
+  template<class C, size_t O, size_t H>
+  class HasBasicPool {
+  protected:
+    static Factory::Pool<C>* _pool; /*!< the pool of objects. */
+    static const size_t POOL_ORIGINAL_SIZE = O;
+    static const size_t POOL_HYDRATE_SIZE  = H;
 
   public:
     /**
@@ -131,9 +140,12 @@ namespace  Factory {
      *  \param hydrateSize the number of objects to create when the pool is empty.
      *  \param className the stored objects' class name.
      */
-    static void  initPool(size_t originalSize, size_t hydrateSize, const std::string& className) {
+    static void  initPool(const std::string& className) {
       if (_pool == nullptr) {
-        _pool = new Factory::Pool<C>(originalSize, hydrateSize, className);
+        _pool = new Factory::Pool<C>(
+            POOL_ORIGINAL_SIZE,
+            POOL_HYDRATE_SIZE,
+            className);
       }
     }
 
@@ -149,22 +161,12 @@ namespace  Factory {
 
     /**
      *  \brief Takes an object from the pool.
-     *  \return the object.
-     */
-    static C*  create(void) {
-      return _pool->get();
-    }
-
-    /**
-     *  \brief Takes an object from the pool.
      *  The object must have an `init` method with the same arguments.
      *  \return the object.
      */
     template<typename... Args>
     static C*  create(Args&... args) {
-      C* item = _pool->get();
-      item->init(args...);
-      return item;
+      return _pool->get(args...);
     }
 
     /**
@@ -178,5 +180,8 @@ namespace  Factory {
     }
   };
 }
+
+template<class C, size_t O, size_t H>
+Factory::Pool<C>*  HasBasicPool<C, O, H>::_pool = nullptr;
 
 #endif    /* __LIBRARY_FACTORY_POOL_HPP__ */

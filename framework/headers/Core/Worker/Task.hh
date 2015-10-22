@@ -47,24 +47,7 @@ namespace    Core {
       void init(const Core::Event::Event*, Core::Event::IEventArgs*);
 
     public:
-      struct  Pool :public Singleton<Core::Worker::EventTask::Pool>, public Factory::BasicPool<Core::Worker::EventTask> {
-        friend class Singleton<Core::Worker::EventTask::Pool>;
-      public:
-        const size_t  ORIGINAL_SIZE = 100;
-        const size_t  HYDRATE_SIZE = 20;
-
-      private:
-        Pool(const Pool&) = delete;
-        Pool(const Pool&&) = delete;
-        Pool& operator=(const Pool&) = delete;
-
-      private:
-        Pool(void);
-        virtual ~Pool(void);
-
-      public:
-        void init(void);
-      };
+      static Factory::Pool<Core::Worker::EventTask> *Pool;
     };
 
     class  HTTPTask :public ATask {
@@ -82,24 +65,7 @@ namespace    Core {
       void init(void); // same
 
     public:
-      struct  Pool :public Singleton<Core::Worker::HTTPTask::Pool>, public Factory::BasicPool<Core::Worker::HTTPTask> {
-        friend class Singleton<Core::Worker::HTTPTask::Pool>;
-      public:
-        const size_t  ORIGINAL_SIZE = 100;
-        const size_t  HYDRATE_SIZE = 20;
-
-      private:
-        Pool(const Pool&) = delete;
-        Pool(const Pool&&) = delete;
-        Pool& operator=(const Pool&) = delete;
-
-      private:
-        Pool(void);
-        virtual ~Pool(void);
-
-      public:
-        void init(void);
-      };
+      static Factory::Pool<Core::Worker::HTTPTask> *Pool;
     };
 
     class  PeriodicTask :public ATask {
@@ -121,24 +87,7 @@ namespace    Core {
       void  stop(bool);
 
     public:
-      struct  Pool :public Singleton<Core::Worker::PeriodicTask::Pool>, public Factory::BasicPool<Core::Worker::PeriodicTask> {
-        friend class Singleton<Core::Worker::PeriodicTask::Pool>;
-      public:
-        const size_t  ORIGINAL_SIZE = 20;
-        const size_t  HYDRATE_SIZE = 10;
-
-      private:
-        Pool(const Pool&) = delete;
-        Pool(const Pool&&) = delete;
-        Pool& operator=(const Pool&) = delete;
-
-      private:
-        Pool(void);
-        virtual ~Pool(void);
-
-      public:
-        void init(void);
-      };
+      static Factory::Pool<Core::Worker::PeriodicTask> *Pool;
     };
 
     class  DelayedTask :public Factory::AFactored {
@@ -163,24 +112,7 @@ namespace    Core {
       bool operator==(const ATask*) const;
 
     public:
-      struct  Pool :public Singleton<Core::Worker::DelayedTask::Pool>, public Factory::BasicPool<Core::Worker::DelayedTask> {
-        friend class Singleton<Core::Worker::DelayedTask::Pool>;
-      public:
-        const size_t  ORIGINAL_SIZE = 100;
-        const size_t  HYDRATE_SIZE = 20;
-
-      private:
-        Pool(const Pool&) = delete;
-        Pool(const Pool&&) = delete;
-        Pool& operator=(const Pool&) = delete;
-
-      private:
-        Pool(void);
-        virtual ~Pool(void);
-
-      public:
-        void init(void);
-      };
+      static Factory::Pool<Core::Worker::DelayedTask> *Pool;
     };
   }
 }
