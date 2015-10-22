@@ -4,7 +4,7 @@ SRCDIR=     sources/
 
 LIBRARYDIR= $(SRCDIR)Library/
 LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp      \
-            $(LIBRARYDIR)Encryption/MD5.cpp        	   \
+            $(LIBRARYDIR)Encryption/MD5.cpp            \
             $(LIBRARYDIR)Encryption/XOR.cpp            \
             $(LIBRARYDIR)Factory/AFactored.cpp         \
             $(LIBRARYDIR)Property/AEndable.cpp         \
