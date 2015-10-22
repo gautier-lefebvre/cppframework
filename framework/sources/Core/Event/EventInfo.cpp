@@ -13,7 +13,7 @@ Core::Event::EventInfo::EventInfo(const Core::Event::Event* ebase, const std::fu
 {}
 
 Core::Event::EventInfo::EventInfo(const Core::Event::EventInfo& oth):
-  base(oth.ebase),
+  base(oth.base),
   cleanup(oth.cleanup),
   subscribers(oth.subscribers)
 {}
@@ -28,9 +28,9 @@ Core::Event::EventInfo& Core::Event::EventInfo::operator=(const Core::Event::Eve
 }
 
 void  Core::Event::EventInfo::addSubscriber(const void *subscriber, const std::function<void  (const Core::Event::IEventArgs*)>& callback) {
-  this->subscribers[subscribers] = callback;
+  this->subscribers[subscriber] = callback;
 }
 
 void  Core::Event::EventInfo::delSubscriber(const void *subscriber) {
-  this->subscribers.remove(subscriber);
+  this->subscribers.erase(subscriber);
 }

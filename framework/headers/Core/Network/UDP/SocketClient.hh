@@ -12,7 +12,7 @@
 namespace     Core {
   namespace   Network {
     namespace UDP {
-      class SocketClient :public Factory::AFactored, public Threading::Lock {
+      class   SocketClient :public Factory::AFactored, public Threading::Lock, public Factory::HasBasicPool<Core::Network::UDP::SocketClient, 100, 20> {
       private:
         sockaddr_in _addr;
         std::pair<uint32_t, uint16_t> _info; // IP, port
@@ -43,13 +43,6 @@ namespace     Core {
 
       public:
         const std::pair<uint32_t, uint16_t>& clientInformation(void) const;
-
-      public:
-        struct  Pool :public Factory::BasicPool<Core::Network::UDP::SocketClient> {
-          static const size_t ORIGINAL_SIZE = 100;
-          static const size_t HYDRATE_SIZE  = 10;
-          static void init(void);
-        };
       };
     }
   }

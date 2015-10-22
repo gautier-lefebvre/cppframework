@@ -10,19 +10,19 @@ Core::Event::Manager::Manager(void):
 
 Core::Event::Manager::~Manager(void) {}
 
-void  Core::Event::Manager::register(const Core::Event::Event* event) {
+void  Core::Event::Manager::registerEvent(const Core::Event::Event* event) {
   this->_events.emplace(event, Core::Event::EventInfo(event));
 }
 
-void  Core::Event::Manager::register(const Core::Event::Event* event, const std::function<void (Core::Event::IEventArgs*)>& cleanup) {
+void  Core::Event::Manager::registerEvent(const Core::Event::Event* event, const std::function<void (Core::Event::IEventArgs*)>& cleanup) {
   this->_events.emplace(event, Core::Event::EventInfo(event, cleanup));
 }
 
-void  Core::Event::Manager::unregister(const Core::Event::Event* event) {
-  this->_events.remove(event);
+void  Core::Event::Manager::unregisterEvent(const Core::Event::Event* event) {
+  this->_events.erase(event);
 }
 
-void  Core::Event::Manager::subscribe(const Core::Event::Event* event, const std::function<void (const Core::Event::IEventArgs*)>& callback, const void* callee) {
+void  Core::Event::Manager::subscribeToEvent(const Core::Event::Event* event, const std::function<void (const Core::Event::IEventArgs*)>& callback, const void* callee) {
   try {
     this->_events.at(event).addSubscriber(callee, callback);
   } catch (const std::out_of_range&) {
@@ -30,7 +30,7 @@ void  Core::Event::Manager::subscribe(const Core::Event::Event* event, const std
   }
 }
 
-void  Core::Event::Manager::unsubscribe(const Core::Event::Event* event, const void *callee) {
+void  Core::Event::Manager::unsubscribeFromEvent(const Core::Event::Event* event, const void *callee) {
   try {
     this->_events.at(event).delSubscriber(callee);
   } catch (const std::out_of_range&) {
@@ -38,19 +38,19 @@ void  Core::Event::Manager::unsubscribe(const Core::Event::Event* event, const v
   }
 }
 
-void  Core::Event::Manager::fireAsync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
+void  Core::Event::Manager::fireEventAsync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
   Core::Worker::Manager::get().add(event, args);
 }
 
-void  Core::Event::Manager::fireSync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
+void  Core::Event::Manager::fireEventSync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
   try {
-    Core::Worker::EventTask* eventTask = Core::Worker::EventTask::Pool::get().create(event, args);
+    Core::Worker::EventTask* eventTask = Core::Worker::EventTask::getFromPool(event, args);
     Core::Worker::Thread::executeEventTask(eventTask, true);
   } catch (const std::exception& e) {
     CRITICAL(e.what());
   }
 }
 
-const Core::Event::EventInfo& getInfo(const Core::Event::Event* event) const {
+const Core::Event::EventInfo& Core::Event::Manager::getInfo(const Core::Event::Event* event) const {
   return this->_events.at(event);
 }

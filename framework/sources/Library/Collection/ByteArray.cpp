@@ -69,6 +69,10 @@ void  ByteArray::resize(size_t size, bool force, bool keep) {
   }
 }
 
+void  ByteArray::init(size_t size) {
+  this->resize(size);
+}
+
 const uint8_t*  ByteArray::getBytes(void) const {
   return (this->_bytearray);
 }
@@ -197,7 +201,7 @@ void  ByteArrayExtractor::extractString(std::string& data, size_t length) {
   if (this->_bytearray->getSize() - this->_offset < length) {
     throw std::out_of_range("ByteArrayExtractor::extract: There are not enough bytes left in ByteArray to extract successfully");
   } else {
-    ByteArray::Pool::Guard guard(ByteArray::Pool::get().create(length));
+    ByteArray::Guard guard(ByteArray::getFromPool(length));
     this->_bytearray->get(guard.bytearray->atStart(), length, this->_offset);
     data = reinterpret_cast<const char*>(guard.bytearray->getBytes());
     this->_offset += length;
@@ -210,4 +214,4 @@ void  ByteArrayExtractor::extractString(std::string& data, size_t length) {
 
 ByteArray::Guard::Guard(ByteArray* bytearray): bytearray(bytearray) {}
 
-ByteArray::Guard::~Guard(void) { ByteArray::remove(this->bytearray); }
+ByteArray::Guard::~Guard(void) { ByteArray::returnToPool(this->bytearray); }

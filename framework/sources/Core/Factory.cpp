@@ -1,5 +1,5 @@
 #include  "Core/Factory.hh"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Collection/ByteArray.hpp"
 
 void Core::Factory::init(void) {
   // init every pool (+ bytearray)

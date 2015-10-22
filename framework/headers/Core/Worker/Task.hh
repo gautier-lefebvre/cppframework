@@ -3,6 +3,7 @@
 
 #include  <chrono>
 
+#include  "Library/Factory/Pool.hpp"
 #include  "Core/Event/Event.hh"
 #include  "Core/Event/IEventArgs.hh"
 
@@ -30,7 +31,7 @@ namespace    Core {
       Source  getSource(void) const;
     };
 
-    class  EventTask :public ATask {
+    class  EventTask :public ATask, public Factory::HasBasicPool<Core::Worker::EventTask, 100, 20> {
     public:
       std::chrono::steady_clock::time_point  _eventCreation;
       const Core::Event::Event*        _event;
@@ -45,30 +46,24 @@ namespace    Core {
 
     public:
       void init(const Core::Event::Event*, Core::Event::IEventArgs*);
-
-    public:
-      static Factory::Pool<Core::Worker::EventTask> *Pool;
     };
 
-    class  HTTPTask :public ATask {
+    class  HTTPTask :public ATask, public Factory::HasBasicPool<Core::Worker::HTTPTask, 20, 5> {
     public:
       // set http args
 
     public:
-      EventTask(void);
-      virtual ~EventTask(void);
+      HTTPTask(void);
+      virtual ~HTTPTask(void);
 
     public:
       virtual void reinit(void);
 
     public:
       void init(void); // same
-
-    public:
-      static Factory::Pool<Core::Worker::HTTPTask> *Pool;
     };
 
-    class  PeriodicTask :public ATask {
+    class  PeriodicTask :public ATask, public Factory::HasBasicPool<Core::Worker::PeriodicTask, 10, 2> {
     public:
       std::function<void (void)>  _callback;
       std::function<void (void)>  _clean;
@@ -85,12 +80,9 @@ namespace    Core {
     public:
       void  init(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&);
       void  stop(bool);
-
-    public:
-      static Factory::Pool<Core::Worker::PeriodicTask> *Pool;
     };
 
-    class  DelayedTask :public Factory::AFactored {
+    class  DelayedTask :public Factory::AFactored, public Factory::HasBasicPool<Core::Worker::DelayedTask, 50, 10> {
     public:
       ATask*  _task;
       std::chrono::steady_clock::time_point  _timePoint;
@@ -110,9 +102,6 @@ namespace    Core {
       bool operator<(const DelayedTask&) const;
       bool operator>(const DelayedTask&) const;
       bool operator==(const ATask*) const;
-
-    public:
-      static Factory::Pool<Core::Worker::DelayedTask> *Pool;
     };
   }
 }

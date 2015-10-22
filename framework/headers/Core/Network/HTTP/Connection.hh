@@ -1,4 +1,4 @@
-void#ifndef   __CORE_NETWORK_HTTP_CONNECTION_HH__
+#ifndef   __CORE_NETWORK_HTTP_CONNECTION_HH__
 #define   __CORE_NETWORK_HTTP_CONNECTION_HH__
 
 #include  <queue>

@@ -3,7 +3,7 @@
 
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Logger.hpp"
-#include  "Library/String.hh"
+#include  "Library/Tool/String.hh"
 #include  "Core/Network/HTTP/Connection.hh"
 // #include  "Core/Worker/Manager.hh"
 #include  "Core/Network/Exception.hh"
@@ -42,7 +42,7 @@ void  Core::Network::HTTP::Connection::end(void) {
     {
       ScopeLock slrequest(this->_pendingRequests);
       while (!(this->_pendingRequests.empty())) {
-        Core::Network::HTTP::Request::get().remove(this->_pendingRequests.front());
+        Core::Network::HTTP::Request::returnToPool(this->_pendingRequests.front());
         this->_pendingRequests.pop();
       }
     }
@@ -93,7 +93,7 @@ void  Core::Network::HTTP::Connection::routine(void) {
     }
     if (request != nullptr) {
       this->sendRequest(request);
-      Core::Network::HTTP::Request::get().remove(request);
+      Core::Network::HTTP::Request::returnToPool(request);
     }
   }
 }
@@ -104,7 +104,7 @@ void  Core::Network::HTTP::Connection::sendRequest(const ::Core::Network::HTTP::
   try {
     response = this->exec(request);
   } catch (const Core::Exception& e) {
-    response = Core::Network::HTTP::Response::get().create();
+    response = Core::Network::HTTP::Response::getFromPool();
     response->status = 400;
     response->reason = e.what();
   }
@@ -154,7 +154,7 @@ size_t  Core::Network::HTTP::Connection::write_callback(void *data, size_t size,
 
 
 Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
-  Core::Network::HTTP::Response  *response = Core::Network::HTTP::Response::get().create();
+  Core::Network::HTTP::Response  *response = Core::Network::HTTP::Response::getFromPool();
   CURLcode  result;
   std::string  protocol;
   uint16_t  port;
@@ -170,7 +170,7 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
     curl_easy_setopt(handle, CURLOPT_URL, std::string(protocol + "://" + this->_host + request->url).c_str());
     curl_easy_setopt(handle, CURLOPT_PORT, static_cast<long>(port));
     if (request->body->getSize() > 0) {
-      curl_easy_setopt(handle, CURLOPT_POSTFIELDS, request->body->getBuffer());
+      curl_easy_setopt(handle, CURLOPT_POSTFIELDS, request->body->getBytes());
       curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, request->body->getSize());
     }
     if (request->method == "GET") {
@@ -213,7 +213,7 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
     if (handle != NULL) {
       curl_easy_cleanup(handle);
     }
-    Core::Network::HTTP::Response::get().remove(response);
+    Core::Network::HTTP::Response::returnToPool(response);
     throw Core::Exception(e.what());
   }
 }

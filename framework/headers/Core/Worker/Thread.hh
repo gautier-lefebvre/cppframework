@@ -14,7 +14,7 @@ namespace  Core {
     class  Thread :public Threading::Lock, public AEndable {
     private:
       typedef void (*WorkerHandler)(Core::Worker::ATask*, bool);
-      static const std::map<Core::Worker::Task::Source, WorkerHandler> TaskHandlerMap;
+      static const std::map<Core::Worker::ATask::Source, WorkerHandler> TaskHandlerMap;
 
     public:
       static void cleanup();

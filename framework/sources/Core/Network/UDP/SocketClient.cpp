@@ -25,7 +25,7 @@ void  Core::Network::UDP::SocketClient::reinit(void) {
   // reinit received datagrams
   // send back all bytearrays to pool
   while (!this->_input.first.empty()) {
-    ByteArray::Pool::get().remove(this->_input.first.front());
+    ByteArray::returnToPool(this->_input.first.front());
     this->_input.first.pop();
   }
   this->_input.second = 0;
@@ -33,7 +33,7 @@ void  Core::Network::UDP::SocketClient::reinit(void) {
   // reinit datagrams to send
   // send back all bytearrays to pool
   while (!this->_output.first.empty()) {
-    ByteArray::Pool::get().remove(this->_output.first.front());
+    ByteArray::returnToPool(this->_output.first.front());
     this->_output.first.pop();
   }
   this->_output.second = 0;
@@ -86,20 +86,4 @@ const sockaddr_in& Core::Network::UDP::SocketClient::socketAddress(void) const {
 
 const std::pair<uint32_t, uint16_t>& Core::Network::UDP::SocketClient::clientInformation(void) const {
   return this->_info;
-}
-
-/**
- *  Core::Network::UDP::SocketClient pool
- */
-
-Core::Network::UDP::SocketClient::Pool::Pool(void):
-  Factory::BasicPool<Core::Network::UDP::SocketClient>()
-{}
-
-Core::Network::UDP::SocketClient::Pool::~Pool(void) {}
-
-void  Core::Network::UDP::SocketClient::Pool::init(void) {
-  this->initPool(Core::Network::UDP::SocketClient::Pool::ORIGINAL_SIZE,
-    Core::Network::UDP::SocketClient::Pool::HYDRATE_SIZE,
-    "Core::Network::UDP::SocketClient");
 }

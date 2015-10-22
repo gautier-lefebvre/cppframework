@@ -13,7 +13,7 @@
  *  \class ByteArray Library/Collection/ByteArray.hpp
  *  \brief Raw data container.
  */
-class  ByteArray :public Factory::AFactored, public Threading::Lock, public HasBasicPool<ByteArray, 100, 10> {
+class  ByteArray :public Factory::AFactored, public Threading::Lock, public Factory::HasBasicPool<ByteArray, 100, 10> {
 protected:
   uint8_t  *_bytearray; /*!< Pointer to the start of the data. */
   size_t  _size; /*!< Size of the data in bytes. */

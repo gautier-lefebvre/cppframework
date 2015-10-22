@@ -165,7 +165,7 @@ namespace  Factory {
      *  \return the object.
      */
     template<typename... Args>
-    static C*  create(Args&... args) {
+    static C*  getFromPool(Args&... args) {
       return _pool->get(args...);
     }
 
@@ -173,7 +173,7 @@ namespace  Factory {
      *  \brief Puts an object back into the pool.
      *  \param element the object to put back into the pool.
      */
-    static void  remove(C* element) {
+    static void  returnToPool(C* element) {
       if (element != nullptr) {
         _pool->push(element);
       }
@@ -182,6 +182,6 @@ namespace  Factory {
 }
 
 template<class C, size_t O, size_t H>
-Factory::Pool<C>*  HasBasicPool<C, O, H>::_pool = nullptr;
+Factory::Pool<C>*  Factory::HasBasicPool<C, O, H>::_pool = nullptr;
 
 #endif    /* __LIBRARY_FACTORY_POOL_HPP__ */

@@ -1,53 +1,61 @@
-NAME=      cppframework.so
+NAME=       cppframework.so
 
-SRCDIR=      sources/
+SRCDIR=     sources/
 
-LIBRARYDIR=    $(SRCDIR)Library/
-LIBRARYSRC=    $(LIBRARYDIR)Collection/ByteArray.cpp      \
-        $(LIBRARYDIR)Encryption/MD5.cpp          \
-        $(LIBRARYDIR)Encryption/XOR.cpp          \
-        $(LIBRARYDIR)Factory/AFactored.cpp        \
-        $(LIBRARYDIR)Property/AEndable.cpp        \
-        $(LIBRARYDIR)ThirdParty/json.cpp        \
-        $(LIBRARYDIR)Threading/Condition.cpp      \
-        $(LIBRARYDIR)Threading/Lock.cpp          \
-        $(LIBRARYDIR)Tool/Arguments.cpp          \
-        $(LIBRARYDIR)Tool/Date.cpp            \
-        $(LIBRARYDIR)Tool/Logger.cpp          \
-        $(LIBRARYDIR)Tool/Random.cpp          \
-        $(LIBRARYDIR)Tool/String.cpp          \
-        $(LIBRARYDIR)Tool/TypeChecker.cpp        \
-        $(LIBRARYDIR)Exception.cpp
+LIBRARYDIR= $(SRCDIR)Library/
+LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp      \
+            $(LIBRARYDIR)Encryption/MD5.cpp        	   \
+            $(LIBRARYDIR)Encryption/XOR.cpp            \
+            $(LIBRARYDIR)Factory/AFactored.cpp         \
+            $(LIBRARYDIR)Property/AEndable.cpp         \
+            $(LIBRARYDIR)ThirdParty/json.cpp           \
+            $(LIBRARYDIR)ThirdParty/sha512.cpp         \
+            $(LIBRARYDIR)Threading/Condition.cpp       \
+            $(LIBRARYDIR)Threading/Lock.cpp            \
+            $(LIBRARYDIR)Tool/Arguments.cpp            \
+            $(LIBRARYDIR)Tool/Date.cpp                 \
+            $(LIBRARYDIR)Tool/Logger.cpp               \
+            $(LIBRARYDIR)Tool/Random.cpp               \
+            $(LIBRARYDIR)Tool/String.cpp               \
+            $(LIBRARYDIR)Tool/TypeChecker.cpp          \
+            $(LIBRARYDIR)Exception.cpp
 
 COREDIR=    $(SRCDIR)Core/
-CORESRC=    $(COREDIR)Exception.cpp              \
-        $(COREDIR)Network/Exception.cpp          \
-        $(COREDIR)Network/HTTP/AMessage.cpp        \
-        $(COREDIR)Network/HTTP/Client.cpp        \
-        $(COREDIR)Network/HTTP/Connection.cpp      \
-        $(COREDIR)Network/HTTP/Request.cpp        \
-        $(COREDIR)Network/HTTP/Response.cpp        \
-        $(COREDIR)Network/TCP/Socket.cpp        \
-        $(COREDIR)Network/TCP/SocketStream.cpp      \
-        $(COREDIR)Network/UDP/SocketClient.cpp
+CORESRC=    $(COREDIR)Exception.cpp                    \
+            $(COREDIR)Factory.cpp                      \
+            $(COREDIR)Event/Event.cpp                  \
+            $(COREDIR)Event/EventInfo.cpp              \
+            $(COREDIR)Event/Manager.cpp                \
+            $(COREDIR)Network/Exception.cpp            \
+            $(COREDIR)Network/HTTP/AMessage.cpp        \
+            $(COREDIR)Network/HTTP/Client.cpp          \
+            $(COREDIR)Network/HTTP/Connection.cpp      \
+            $(COREDIR)Network/HTTP/Request.cpp         \
+            $(COREDIR)Network/HTTP/Response.cpp        \
+            $(COREDIR)Network/TCP/Socket.cpp           \
+            $(COREDIR)Network/TCP/SocketStream.cpp     \
+            $(COREDIR)Network/UDP/SocketClient.cpp     \
+            $(COREDIR)Worker/Manager.cpp               \
+            $(COREDIR)Worker/Task.cpp                  \
+            $(COREDIR)Worker/Thread.cpp
 
-SRC=      $(LIBRARYSRC)                  \
-        $(CORESRC)                    \
-        $(SRCDIR)App/main.cpp
+SRC=        $(LIBRARYSRC)         \
+            $(CORESRC)            \
+            $(SRCDIR)App/main.cpp
 
-OBJ=      $(SRC:.cpp=.o)
+OBJ=        $(SRC:.cpp=.o)
 
-DEPS=      $(OBJ:.o=.d)
+DEPS=       $(OBJ:.o=.d)
 
-LDPTHREAD=    -lpthread
+LDPTHREAD=  -lpthread
 LDFLAGS=    $(LDPTHREAD) -lssl -lcrypto -lcurl
 
-CXXFLAGS=    -Iheaders/ -std=c++11 -W -Wall -Wextra -Werror
-CXXFLAGS+=    -c -fPIC # dynamic library
+CXXFLAGS=   -Iheaders/ -std=c++11 -W -Wall -Wextra -Werror
+CXXFLAGS+=  -c -fPIC # dynamic library
 
-CXX=      g++
+CXX=        g++
 
-all:      $(NAME)
+all:        $(NAME)
 
 $(NAME):    debug
 
@@ -57,21 +65,21 @@ debug:      compile
 nodebug:    compile
 
 compile:    $(OBJ)
-        @$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+						# @$(CXX) -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+						@$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
 
-
-%.o:      %.cpp
-        @$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
+%.o:        %.cpp
+						@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
 
 clean:      
-        @rm -f $(OBJ) && echo "Objects removed"
+						@rm -f $(OBJ) && echo "Objects removed"
 
 clean_dep:
-        @rm -f $(DEPS) && echo "Dependencies removed"
+						@rm -f $(DEPS) && echo "Dependencies removed"
 
-fclean:      clean clean_dep
-        @rm -f $(NAME) && echo "Executable removed"
+fclean:     clean clean_dep
+						@rm -f $(NAME) && echo "Executable removed"
 
-re:        fclean all
+re:         fclean all
 
 -include $(DEPS)

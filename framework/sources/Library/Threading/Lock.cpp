@@ -33,12 +33,12 @@ Threading::ReadWriteLock::ReaderGuard::~ReaderGuard(void) {
 }
 
 Threading::ReadWriteLock::LightSwitch::LightSwitch(void):
-  std::mutex(),
+  _mutex(),
   _counter(0)
 {}
 
 void Threading::ReadWriteLock::LightSwitch::acquire(std::mutex& lock) {
-  SCOPELOCK(this);
+  SCOPELOCK_MUTEX(this->_mutex);
   this->_counter++;
   if (this->_counter == 1) {
     lock.lock();
@@ -46,7 +46,7 @@ void Threading::ReadWriteLock::LightSwitch::acquire(std::mutex& lock) {
 }
 
 void Threading::ReadWriteLock::LightSwitch::release(std::mutex& lock) {
-  SCOPELOCK(this);
+  SCOPELOCK_MUTEX(this->_mutex);
   this->_counter--;
   if (this->_counter == 0) {
     lock.unlock();
@@ -62,9 +62,9 @@ Threading::ReadWriteLock::ReadWriteLock(void):
 {}
 
 void  Threading::ReadWriteLock::readerAcquire(void) {
-  ScopeLock slr(this->_readersQueue);
+  ScopeLockMutex slr(this->_readersQueue);
   {
-    ScopeLock slw(this->_noReaders);
+    ScopeLockMutex slw(this->_noReaders);
     this->_readSwitch.acquire(this->_noWriters);
   }
 }

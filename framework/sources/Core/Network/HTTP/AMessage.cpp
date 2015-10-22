@@ -15,14 +15,14 @@ Core::Network::HTTP::AMessage::~AMessage(void) {
 
 void  Core::Network::HTTP::AMessage::reinit(void) {
   if (this->body != nullptr) {
-    ByteArray::Pool::get().remove(this->body);
+    ByteArray::returnToPool(this->body);
   }
   this->body = nullptr;
 }
 
 void  Core::Network::HTTP::AMessage::init(void) {
   if (this->body == nullptr) {
-    this->body = ByteArray::Pool::get().create();
+    this->body = ByteArray::getFromPool();
   }
 }
 

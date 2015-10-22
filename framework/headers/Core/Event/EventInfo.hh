@@ -1,6 +1,9 @@
 #ifndef   __CORE_EVENT_EVENTINFO_HH__
 #define   __CORE_EVENT_EVENTINFO_HH__
 
+#include  <functional>
+#include  <map>
+
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Event/Event.hh"
 

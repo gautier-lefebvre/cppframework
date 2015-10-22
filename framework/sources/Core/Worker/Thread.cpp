@@ -17,7 +17,7 @@ Core::Worker::Thread::Thread(size_t id, Core::Worker::Thread::Assignment assignm
   _id(id),
   _thread(nullptr)
 {
-  void  (Core::Worker::*routine)() = nullptr;
+  void  (Core::Worker::Thread::*routine)() = nullptr;
   if (assignment == Core::Worker::Thread::Assignment::TASKS) {
     routine = &Core::Worker::Thread::tasksRoutine;
   } else {
@@ -37,7 +37,7 @@ Core::Worker::Thread::~Thread(void) {
 
 void  Core::Worker::Thread::cleanup(void) {
   Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-  Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+  Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
   Core::Worker::ATask* task;
   Core::Worker::DelayedTask* delayedTask;
   WorkerHandler handler;
@@ -69,7 +69,7 @@ void  Core::Worker::Thread::cleanup(void) {
       CRITICAL(e.what());
     }
 
-    Core::Worker::DelayedTask::Pool::remove(delayedTask);
+    Core::Worker::DelayedTask::returnToPool(delayedTask);
   }
 }
 
@@ -77,7 +77,7 @@ void  Core::Worker::Thread::end(void) {
   SCOPELOCK(this);
   if (!this->mustEnd()) {
     Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-    Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+    Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
 
     this->mustEnd(true);
 
@@ -168,11 +168,11 @@ void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exe
         }
       }
     } catch (const std::exception& e) {
-      Core::Worker::EventTask::Pool::remove(eventTask);
+      Core::Worker::EventTask::returnToPool(eventTask);
       throw e;
     }
 
-    Core::Worker::EventTask::Pool::remove(eventTask);
+    Core::Worker::EventTask::returnToPool(eventTask);
   } else {
     CRITICAL("Cant reinterpret_cast an EventTask");
   }
@@ -186,7 +186,7 @@ void  Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec
       // must implement http
     }
 
-    Core::Worker::HTTPTask::Pool::remove(httpTask);
+    Core::Worker::HTTPTask::returnToPool(httpTask);
   } else {
     CRITICAL("Cant reinterpret_cast an HTTPTask");
   }
@@ -198,10 +198,10 @@ void  Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool 
   if (periodicTask) {
     if (exec == false || periodicTask->_off) {
       periodicTask->_clean();
-      Core::Worker::PeriodicTask::Pool::remove(periodicTask);
+      Core::Worker::PeriodicTask::returnToPool(periodicTask);
     } else {
       periodicTask->_callback();
-      Core::Worker::Manager::add(periodicTask);
+      Core::Worker::Manager::get().add(periodicTask);
     }
   } else {
     CRITICAL("Cant reinterpret_cast a PeriodicTask");
@@ -209,7 +209,7 @@ void  Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool 
 }
 
 void  Core::Worker::Thread::delayedTasksRoutine(void) {
-  Core::Worker::Manager::DelayedTaskQeue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+  Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
   Core::Worker::DelayedTask* delayedTask;
 
   while (!this->mustEnd()) {
@@ -234,7 +234,7 @@ void  Core::Worker::Thread::delayedTasksRoutine(void) {
 
     if (delayedTask != nullptr) {
       Core::Worker::Manager::get().add(delayedTask->_task);
-      Core::Worker::DelayedTask::Pool::remove(delayedTask);
+      Core::Worker::DelayedTask::returnToPool(delayedTask);
     }
   }
 }

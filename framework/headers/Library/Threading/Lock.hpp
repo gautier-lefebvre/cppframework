@@ -127,9 +127,10 @@ namespace   Threading {
      *  \class LightSwitch Library/Threading/Lock.hpp
      *  \brief an object used to count the number of times another mutex was locked.
      */
-    class  LightSwitch :public std::mutex {
+    class  LightSwitch {
     private:
-      size_t  _counter; /*!< the number of times the mutex was locked. */
+      std::mutex _mutex;
+      size_t     _counter; /*!< the number of times the mutex was locked. */
 
     public:
       /**
@@ -186,8 +187,10 @@ namespace   Threading {
   };
 }
 
-typedef    std::lock_guard<Threading::Lock> ScopeLock;
+typedef std::lock_guard<Threading::Lock> ScopeLock;
+typedef std::lock_guard<std::mutex>      ScopeLockMutex;
 
-#define    SCOPELOCK(x)    std::lock_guard<Threading::Lock> lockguard(*(x));
+#define SCOPELOCK(x)       std::lock_guard<Threading::Lock> lockguard(*(x));
+#define SCOPELOCK_MUTEX(x) std::lock_guard<std::mutex>      lockguard_mutex(x);
 
 #endif    /* __LIBRARY_THREADING_LOCK_HPP__ */

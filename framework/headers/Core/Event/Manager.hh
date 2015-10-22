@@ -25,16 +25,16 @@ namespace    Core {
       virtual ~Manager(void);
 
     public:
-      void  register(const Core::Event::Event*);
-      void  register(const Core::Event::Event*, const std::function<void (Core::Event::IEventArgs*)>&);
-      void  unregister(const Core::Event::Event*);
+      void  registerEvent(const Core::Event::Event*);
+      void  registerEvent(const Core::Event::Event*, const std::function<void (Core::Event::IEventArgs*)>&);
+      void  unregisterEvent(const Core::Event::Event*);
 
-      void  subscribe(const Core::Event::Event*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);
-      void  unsubscribe(const Core::Event::Event*, const void *);
+      void  subscribeToEvent(const Core::Event::Event*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);
+      void  unsubscribeFromEvent(const Core::Event::Event*, const void *);
 
     public:
-      void  fireAsync(const Core::Event::Event*, Core::Event::IEventArgs*) const;
-      void  fireSync(const Core::Event::Event*, Core::Event::IEventArgs*) const; // note that the args are no longer valid after this method is called
+      void  fireEventAsync(const Core::Event::Event*, Core::Event::IEventArgs*) const;
+      void  fireEventSync(const Core::Event::Event*, Core::Event::IEventArgs*) const; // note that the args are no longer valid after this method is called
 
     public:
       const Core::Event::EventInfo&  getInfo(const Core::Event::Event*) const;

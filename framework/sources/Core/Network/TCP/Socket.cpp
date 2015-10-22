@@ -116,19 +116,3 @@ void  Core::Network::TCP::Socket::addToSet(fd_set& set, int& max) const {
 bool  Core::Network::TCP::Socket::isset(fd_set& set) const {
   return (FD_ISSET(this->_fd, &set) != 0);
 }
-
-/**
- *  Socket pool
- */
-
-Core::Network::TCP::Socket::Pool::Pool(void):
-  Factory::BasicPool<Core::Network::TCP::Socket>()
-{}
-
-Core::Network::TCP::Socket::Pool::~Pool(void) {}
-
-void  Core::Network::TCP::Socket::Pool::init(void) {
-  this->initPool(Core::Network::TCP::Socket::Pool::ORIGINAL_SIZE,
-    Core::Network::TCP::Socket::Pool::HYDRATE_SIZE,
-    "Core::Network::TCP::Socket");
-}

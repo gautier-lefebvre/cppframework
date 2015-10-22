@@ -42,22 +42,6 @@ void  Core::Worker::EventTask::init(const Core::Event::Event* ebase, Core::Event
 }
 
 /**
- *  EventTaskPool
- */
-
-Core::Worker::EventTask::Pool::Pool(void):
-  Factory::BasicPool<Core::Worker::EventTask>()
-{}
-
-Core::Worker::EventTask::Pool::~Pool(void) {}
-
-void  Core::Worker::EventTask::Pool::init(void) {
-  this->initPool(Core::Worker::EventTask::Pool::ORIGINAL_SIZE,
-    Core::Worker::EventTask::Pool::HYDRATE_SIZE,
-    "Core::Worker::EventTask");
-}
-
-/**
  *  HTTPTask
  */
 
@@ -73,22 +57,6 @@ void  Core::Worker::HTTPTask::reinit(void) {
 }
 
 void  Core::Worker::HTTPTask::init(void) {
-}
-
-/**
- *  HTTPTaskPool
- */
-
-Core::Worker::HTTPTask::Pool::Pool(void):
-  Factory::BasicPool<Core::Worker::HTTPTask>()
-{}
-
-Core::Worker::HTTPTask::Pool::~Pool(void) {}
-
-void  Core::Worker::HTTPTask::Pool::init(void) {
-  this->initPool(Core::Worker::HTTPTask::Pool::ORIGINAL_SIZE,
-    Core::Worker::HTTPTask::Pool::HYDRATE_SIZE,
-    "Core::Worker::HTTPTask");
 }
 
 /**
@@ -122,22 +90,6 @@ void  Core::Worker::PeriodicTask::init(const std::function<void(void)>& callback
 
 void  Core::Worker::PeriodicTask::stop(bool off) {
   this->_off = off;
-}
-
-/**
- *  PeriodicTaskPool
- */
-
-Core::Worker::PeriodicTask::Pool::Pool(void):
-  Factory::BasicPool<Core::Worker::PeriodicTask>()
-{}
-
-Core::Worker::PeriodicTask::Pool::~Pool(void) {}
-
-void  Core::Worker::PeriodicTask::Pool::init(void) {
-  this->initPool(Core::Worker::PeriodicTask::Pool::ORIGINAL_SIZE,
-    Core::Worker::PeriodicTask::Pool::HYDRATE_SIZE,
-    "Core::Worker::PeriodicTask");
 }
 
 /**
@@ -178,20 +130,4 @@ bool  Core::Worker::DelayedTask::operator>(const Core::Worker::DelayedTask& oth)
 
 bool  Core::Worker::DelayedTask::operator==(const Core::Worker::ATask *oth) const {
   return this->_task == oth;
-}
-
-/**
- *  DelayedTask Pool
- */
-
-Core::Worker::DelayedTask::Pool::Pool(void):
-  Factory::BasicPool<Core::Worker::DelayedTask>()
-{}
-
-Core::Worker::DelayedTask::Pool::~Pool(void) {}
-
-void  Core::Worker::DelayedTask::Pool::init(void) {
-  this->initPool(Core::Worker::DelayedTask::Pool::ORIGINAL_SIZE,
-    Core::Worker::DelayedTask::Pool::HYDRATE_SIZE,
-    "Core::Worker::DelayedTask");
 }

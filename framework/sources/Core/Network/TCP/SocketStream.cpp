@@ -6,6 +6,8 @@
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/Exception.hh"
 
+const size_t Core::Network::TCP::SocketStream::BUFFER_SIZE = 32768;
+
 Core::Network::TCP::SocketStream::SocketStream(void):
   Core::Network::TCP::Socket(),
   _input(nullptr),
@@ -17,18 +19,18 @@ Core::Network::TCP::SocketStream::~SocketStream(void) {}
 void  Core::Network::TCP::SocketStream::reinit(void) {
   SCOPELOCK(this);
   this->Core::Network::TCP::Socket::reinit();
-  ByteArray::Pool::get().remove(this->_input);
-  ByteArray::Pool::get().remove(this->_output);
+  ByteArray::returnToPool(this->_input);
+  ByteArray::returnToPool(this->_output);
   this->_input = nullptr;
   this->_output = nullptr;
 }
 
 void  Core::Network::TCP::SocketStream::init(void) {
   if (this->_input == nullptr) {
-    this->_input = ByteArray::Pool::get().create(Core::Network::TCP::SocketStream::BUFFER_SIZE);
+    this->_input = ByteArray::getFromPool(Core::Network::TCP::SocketStream::BUFFER_SIZE);
   }
   if (this->_output == nullptr) {
-    this->_output = ByteArray::Pool::get().create(Core::Network::TCP::SocketStream::BUFFER_SIZE);
+    this->_output = ByteArray::getFromPool(Core::Network::TCP::SocketStream::BUFFER_SIZE);
   }
 }
 
@@ -73,20 +75,4 @@ void    Core::Network::TCP::SocketStream::send(void) {
 size_t  Core::Network::TCP::SocketStream::getData(const std::function<size_t (ByteArray&, ByteArray&)>& dataGetter, ByteArray& dest) {
   SCOPELOCK(this);
   return dataGetter(*(this->_input), dest);
-}
-
-/**
- *  SocketStream pool
- */
-
-Core::Network::TCP::SocketStream::Pool::Pool(void):
-  Factory::BasicPool<Core::Network::TCP::SocketStream>()
-{}
-
-Core::Network::TCP::SocketStream::Pool::~Pool(void) {}
-
-void  Core::Network::TCP::SocketStream::Pool::init(void) {
-  this->initPool(Core::Network::TCP::SocketStream::Pool::ORIGINAL_SIZE,
-    Core::Network::TCP::SocketStream::Pool::HYDRATE_SIZE,
-    "Core::Network::TCP::SocketStream");
 }

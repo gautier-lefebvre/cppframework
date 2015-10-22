@@ -11,7 +11,7 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class   Socket :public Factory::AFactored, public Threading::Lock {
+      class   Socket :public Factory::AFactored, public Threading::Lock, public Factory::HasBasicPool<Core::Network::TCP::Socket, 5, 2> {
       protected:
         int _fd;
 
@@ -35,9 +35,6 @@ namespace     Core {
       public:
         void      addToSet(fd_set&, int&) const;
         bool      isset(fd_set&) const;
-
-      public:
-        static Factory::Pool<Core::Network::TCP::Socket> *Pool;
       };
     }
   }

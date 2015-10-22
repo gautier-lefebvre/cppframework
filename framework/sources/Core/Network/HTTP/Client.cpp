@@ -64,7 +64,7 @@ void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *req
     this->getConnectionByHostPort(host, port, secureport)->addRequest(request);
   } catch (const Core::Network::Exception& e) {
     CRITICAL(e.what());
-    Core::Network::HTTP::Request::Pool::get().remove(request);
+    Core::Network::HTTP::Request::returnToPool(request);
   }
 }
 
@@ -72,6 +72,6 @@ void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *req
   if (connection != nullptr) {
     connection->addRequest(request);
   } else {
-    Core::Network::HTTP::Request::Pool::get().remove(request);
+    Core::Network::HTTP::Request::returnToPool(request);
   }
 }
