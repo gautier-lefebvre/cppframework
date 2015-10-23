@@ -11,6 +11,9 @@ namespace   Core {
 
     public:
       virtual void reinit(void) = 0;
+
+    public:
+      virtual void cleanup(void) = 0;
     };
   }
 }

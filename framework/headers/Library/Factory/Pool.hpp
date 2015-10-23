@@ -91,7 +91,7 @@ namespace  Factory {
      *  \param element the object to put back into the pool.
      */
     void  push(C* element) {
-      if (element != nullptr) {
+      if (element != nullptr && element->isValid()) {
         element->reinit();
         element->isValid(false);
         {

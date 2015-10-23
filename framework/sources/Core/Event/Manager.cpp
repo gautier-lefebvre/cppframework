@@ -14,10 +14,6 @@ void  Core::Event::Manager::registerEvent(const Core::Event::Event* event) {
   this->_events.emplace(event, Core::Event::EventInfo(event));
 }
 
-void  Core::Event::Manager::registerEvent(const Core::Event::Event* event, const std::function<void (Core::Event::IEventArgs*)>& cleanup) {
-  this->_events.emplace(event, Core::Event::EventInfo(event, cleanup));
-}
-
 void  Core::Event::Manager::unregisterEvent(const Core::Event::Event* event) {
   this->_events.erase(event);
 }
@@ -43,11 +39,14 @@ void  Core::Event::Manager::fireEventAsync(const Core::Event::Event* event, Core
 }
 
 void  Core::Event::Manager::fireEventSync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
+  Core::Worker::EventTask* eventTask = nullptr;
+
   try {
-    Core::Worker::EventTask* eventTask = Core::Worker::EventTask::getFromPool(event, args);
+    eventTask = Core::Worker::EventTask::getFromPool(event, args);
     Core::Worker::Thread::executeEventTask(eventTask, true);
   } catch (const std::exception& e) {
     CRITICAL(e.what());
+    Core::Worker::EventTask::returnToPool(eventTask);
   }
 }
 

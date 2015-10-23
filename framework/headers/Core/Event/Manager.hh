@@ -26,7 +26,6 @@ namespace    Core {
 
     public:
       void  registerEvent(const Core::Event::Event*);
-      void  registerEvent(const Core::Event::Event*, const std::function<void (Core::Event::IEventArgs*)>&);
       void  unregisterEvent(const Core::Event::Event*);
 
       void  subscribeToEvent(const Core::Event::Event*, const std::function<void (const Core::Event::IEventArgs*)>&, const void *);

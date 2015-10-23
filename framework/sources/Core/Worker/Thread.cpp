@@ -155,18 +155,16 @@ void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exe
             }
           }
 
-          if (eventInfo.cleanup) {
-            eventInfo.cleanup(eventTask->_args); // must return IEventArgs subclass to factory in cleanup method
-          }
         } catch (const std::out_of_range&) {
           WARNING("Unregistered event");
         }
-      } else {
-        // avoid leak since there is no way to know which pool the args must be returned to
-        if (eventTask->_args) {
-          delete eventTask->_args;
-        }
       }
+
+      // return the arguments and its attributes to their factory
+      if (eventTask->_args) {
+        eventTask->_args->cleanup();
+      }
+
     } catch (const std::exception& e) {
       Core::Worker::EventTask::returnToPool(eventTask);
       throw e;
