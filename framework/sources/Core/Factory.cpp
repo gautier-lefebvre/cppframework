@@ -1,4 +1,3 @@
-#include  "Core/Factory.hh"
 #include  "Library/Collection/ByteArray.hpp"
 #include  "Core/Network/HTTP/Request.hh"
 #include  "Core/Network/HTTP/Response.hh"
@@ -6,13 +5,13 @@
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/UDP/SocketClient.hh"
 #include  "Core/Worker/Task.hh"
+#include  "Core/Factory.hh"
 
 void Core::Factory::init(void) {
   ByteArray::initPool("ByteArray");
 
   Core::Network::HTTP::Request::initPool("Core::Network::HTTP::Request");
   Core::Network::HTTP::Response::initPool("Core::Network::HTTP::Response");
-  Core::Network::TCP::Socket::initPool("Core::Network::TCP::Socket");
   Core::Network::TCP::SocketStream::initPool("Core::Network::TCP::SocketStream");
   Core::Network::UDP::SocketClient::initPool("Core::Network::TCP::SocketClient");
 
@@ -27,7 +26,6 @@ void Core::Factory::end(void) {
 
   Core::Network::HTTP::Request::destroyPool();
   Core::Network::HTTP::Response::destroyPool();
-  Core::Network::TCP::Socket::destroyPool();
   Core::Network::TCP::SocketStream::destroyPool();
   Core::Network::UDP::SocketClient::destroyPool();
 

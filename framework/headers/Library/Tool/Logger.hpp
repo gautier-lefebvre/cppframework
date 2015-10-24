@@ -105,7 +105,7 @@ public:
   template<typename T>
   void  log(const T &msg, Logger::Level level) {
     if (level >= this->_level) {
-      std::ostream& os = (this->_file != nullptr ? this->_file : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
+      std::ostream& os = (this->_file != nullptr ? *(this->_file) : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
 
       os << Date::getTime() << " -- ";
 

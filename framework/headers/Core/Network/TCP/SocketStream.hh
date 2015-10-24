@@ -2,6 +2,7 @@
 #define   __CORE_NETWORK_TCP_SOCKETSTREAM_HH__
 
 #include  "Library/Collection/ByteArray.hpp"
+#include  "Library/Factory/Pool.hpp"
 #include  "Core/Network/TCP/Socket.hh"
 
 namespace     Core {

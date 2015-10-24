@@ -13,8 +13,8 @@ namespace    Core {
     class    Manager :public Singleton<Core::Network::Manager>, public Threading::Lock, public AEndable {
       friend class Singleton<Core::Network::Manager>;
     public:
-      NotifiableThread _input;
-      NotifiableThread _output;
+      Threading::NotifiableThread _input;
+      Threading::NotifiableThread _output;
 
       Core::Network::TCP::Manager  _tcp;
       // Core::Network::UDP::Manager  _udp;

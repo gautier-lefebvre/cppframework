@@ -12,13 +12,16 @@
 #include  "Core/Event/Event.hh"
 #include  "Core/Event/IEventArgs.hh"
 
+namespace Threading {
+struct    NotifiableThread;
+}
+
 namespace       Core {
   namespace     Network {
-    struct      NotifiableThread;
 
     namespace   TCP {
       namespace EventArgs {
-        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<onAccept::SocketStreamArgs, 20, 10> {
+        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketStreamArgs, 20, 10> {
         public:
           Core::Network::TCP::SocketStream* socket;
 
@@ -29,6 +32,19 @@ namespace       Core {
           virtual void reinit(void);
           virtual void cleanup(void);
           void init(Core::Network::TCP::SocketStream*);
+        };
+
+        struct  SocketArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketArgs, 2, 1> {
+        public:
+          Core::Network::TCP::Socket* socket;
+
+        public:
+          SocketArgs(void);
+
+        public:
+          virtual void reinit(void);
+          virtual void cleanup(void);
+          void init(Core::Network::TCP::Socket*);
         };
       }
 
@@ -68,6 +84,7 @@ namespace       Core {
 
         public:
           RemoteConnection(const std::string&, uint16_t, Core::Network::TCP::SocketStream*);
+          virtual ~RemoteConnection();
         };
 
       public:
@@ -78,11 +95,11 @@ namespace       Core {
         ServerList     _servers;
         ConnectionList _connections;
 
-        NotifiableThread& _input;
-        NotifiableThread& _output;
+        Threading::NotifiableThread& _input;
+        Threading::NotifiableThread& _output;
 
       public:
-        Manager(NotifiableThread&, NotifiableThread&);
+        Manager(Threading::NotifiableThread&, Threading::NotifiableThread&);
         virtual ~Manager(void);
 
       public:
@@ -110,8 +127,9 @@ namespace       Core {
         void recv(fd_set&);
 
       private:
-        void __onIOException(Core::Event::Event*, Core::Network::TCP::SocketStream*, const std::string&) const;
+        void __onIOException(Core::Event::Event*, Core::Network::TCP::SocketStream*, const std::string&);
         void __fireEvent(Core::Event::Event*, Core::Network::TCP::SocketStream*) const;
+        void __fireEvent(Core::Event::Event*, Core::Network::TCP::Socket*) const;
       };
     }
   }

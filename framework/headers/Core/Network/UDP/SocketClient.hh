@@ -2,6 +2,7 @@
 #define   __CORE_NETWORK_UDP_SOCKETCLIENT_HH__
 
 #include  <sys/select.h>
+#include  <netinet/in.h>
 #include  <queue>
 #include  <utility>
 

@@ -3,15 +3,13 @@
 
 #include  <sys/select.h>
 
-#include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Factory/AFactored.hh"
-#include  "Library/Factory/Pool.hpp"
 #include  "Library/Threading/Lock.hpp"
 
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class   Socket :public Factory::AFactored, public Threading::Lock, public Factory::HasBasicPool<Core::Network::TCP::Socket, 5, 2> {
+      class   Socket :public Factory::AFactored, public Threading::Lock {
       protected:
         int _fd;
 

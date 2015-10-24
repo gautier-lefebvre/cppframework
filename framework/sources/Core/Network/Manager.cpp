@@ -7,7 +7,7 @@
 Core::Network::Manager::Manager(void):
   _input(),
   _output(),
-  _tcp(_input, _output),
+  _tcp(_input, _output)
   // _udp(_input, _output)
 {}
 
