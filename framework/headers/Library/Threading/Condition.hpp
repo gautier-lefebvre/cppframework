@@ -113,6 +113,17 @@ namespace  Threading {
      */
     virtual ~Notifiable(void) {}
   };
+
+  /**
+   *  \class NotifiableThread Library/Threading/Condition.hpp
+   *  \brief A struct containing a pointer to a thread, and a Condition.
+   *
+   *  I'm not using Notifiable<std::thread*> because I'm not sure of everything this implies.
+   */
+  struct   NotifiableThread {
+    std::thread*         thread;
+    Threading::Condition condition;
+  };
 }
 
 #endif    /* __LIBRARY_THREADING_CONDITION_HPP__ */

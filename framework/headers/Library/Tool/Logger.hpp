@@ -3,8 +3,9 @@
 
 #include  <map>
 #include  <string>
-#include  <sstream>
+#include  <fstream>
 #include  <iostream>
+#include  <sstream>
 
 #include  "Library/Collection/BidiMap.hpp"
 #include  "Library/DesignPattern/Singleton.hpp"
@@ -60,8 +61,9 @@ private:
   }; /*!< associates a level to a color. */
 
 private:
-  Logger::Level _level; /*!< Lowest level of logging. */
-  size_t        _offset; /*!< Current number of \t to write before printing the log. */
+  Logger::Level  _level; /*!< Lowest level of logging. */
+  size_t         _offset; /*!< Current number of \t to write before printing the log. */
+  std::ofstream* _file;
 
 private:
   /*! Deleted copy constructor of Logger. */
@@ -85,10 +87,17 @@ public:
    *  \brief Sets the lowest level of logging.
    *  \param level the lowest level of logging.
    */
-  void  setLevel(Logger::Level level);
+  void  init(Logger::Level level);
 
   /**
-   *  \brief Logs the message only if its level is greater or equal to the lowest debugging level.
+   *  \brief Sets the lowest level of logging and logging file path.
+   *  \param level the lowest level of logging.
+   *  \param filepath the filepath of the logging file.
+   */
+  void  init(Logger::Level level, const std::string& filepath);
+
+  /**
+   *  \brief Logs the message only if its level is greater or equal to the lowest debugging level. Prints the message inside the file if specified in \a init.
    *  Prints in a "hh:mm:ss:µµµµµµ -- msg" format.
    *  \param msg the message to log.
    *  \param level the logging level.
@@ -96,24 +105,21 @@ public:
   template<typename T>
   void  log(const T &msg, Logger::Level level) {
     if (level >= this->_level) {
-      std::stringstream ss;
-      ss << Date::getTime() << " -- ";
+      std::ostream& os = (this->_file != nullptr ? this->_file : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
+
+      os << Date::getTime() << " -- ";
+
       for (size_t i = 0 ; i < this->_offset ; ++i) {
-        ss << "\t";
+        os << "\t";
       }
+
       try {
-        ss << Logger::ColorToString.at(Logger::LevelToColor.at(level));
+        os << Logger::ColorToString.at(Logger::LevelToColor.at(level));
       } catch (const std::out_of_range&) {
-        ss << Logger::ColorToString.at(Logger::Color::NONE);
+        os << Logger::ColorToString.at(Logger::Color::NONE);
       }
-      ss << msg << Logger::ColorToString.at(Logger::Color::NONE) << std::endl;
-      if (level >= Logger::Level::ERROR) {
-        SCOPELOCK(this);
-        std::cerr << ss.str();
-      } else {
-        SCOPELOCK(this);
-        std::cout << ss.str();
-      }
+
+      os << msg << Logger::ColorToString.at(Logger::Color::NONE) << std::endl;
     }
   }
 
@@ -144,26 +150,30 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
   {Logger::Level::CRITICAL, std::string("CRITICAL")}
 }; /*!< Used to translate the enum Logging::Level to a string. */
 
-#ifdef     __DEBUG__
-# define    LOG(x, y)        Logger::get().log(x, y)
-# define    DEBUG(x)        Logger::get().log(x, Logger::Level::DEBUG)
-# define    INFO(x)          Logger::get().log(x, Logger::Level::INFO)
-# define    WARNING(x)        Logger::get().log(x, Logger::Level::WARNING)
-# define    ERROR(x)        Logger::get().log(x, Logger::Level::ERROR)
-# define    CRITICAL(x)        Logger::get().log(x, Logger::Level::CRITICAL)
-# define    LOGGER_SET_OFFSET(x)  Logger::get().setOffset(x)
-# define    LOGGER_ADD_OFFSET(x)  Logger::get().addOffset(x)
-# define    LOGGER_DEL_OFFSET(x)  Logger::get().delOffset(x)
+#ifdef   __DEBUG__
+# define LOG(x, y)              Logger::get().log((x), (y))
+# define DEBUG(x)               Logger::get().log((x), Logger::Level::DEBUG)
+# define INFO(x)                Logger::get().log((x), Logger::Level::INFO)
+# define WARNING(x)             Logger::get().log((x), Logger::Level::WARNING)
+# define ERROR(x)               Logger::get().log((x), Logger::Level::ERROR)
+# define CRITICAL(x)            Logger::get().log((x), Logger::Level::CRITICAL)
+# define LOGGER_SET_OFFSET(x)   Logger::get().setOffset((x))
+# define LOGGER_ADD_OFFSET(x)   Logger::get().addOffset((x))
+# define LOGGER_DEL_OFFSET(x)   Logger::get().delOffset((x))
+# define LOGGER_INIT(x)         Logger::get().init((x))
+# define LOGGER_INIT_FILE(x, y) Logger::get().init((x), y)
 #else
-# define    LOG(x, y)        (void)(x);(void)y
-# define    DEBUG(x)        (void)(x)
-# define    INFO(x)          (void)(x)
-# define    WARNING(x)        (void)(x)
-# define    ERROR(x)        (void)(x)
-# define    CRITICAL(x)        (void)(x)
-# define    LOGGER_SET_OFFSET(x)  (void)(x)
-# define    LOGGER_ADD_OFFSET(x)  (void)(x)
-# define    LOGGER_DEL_OFFSET(x)  (void)(x)
+# define LOG(x, y)              (void)(x);(void)(y)
+# define DEBUG(x)               (void)(x)
+# define INFO(x)                (void)(x)
+# define WARNING(x)             (void)(x)
+# define ERROR(x)               (void)(x)
+# define CRITICAL(x)            (void)(x)
+# define LOGGER_SET_OFFSET(x)   (void)(x)
+# define LOGGER_ADD_OFFSET(x)   (void)(x)
+# define LOGGER_DEL_OFFSET(x)   (void)(x)
+# define LOGGER_INIT(x)         (void)(x)
+# define LOGGER_INIT_FILE(x, y) (void)(x);(void)(y)
 #endif    /* __DEBUG__ */
 
 

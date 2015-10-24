@@ -23,11 +23,11 @@ namespace     Core {
         virtual void  reinit(void);
 
       public:
-        void  init(void);
-        bool  hasDataToSend(void) const;
-        void  push(const void*, size_t);
-        void  recv(void);
-        void  send(void);
+        void    init(void);
+        bool    hasDataToSend(void) const;
+        void    push(const void*, size_t);
+        ssize_t recv(void);
+        ssize_t send(void);
 
       public:
         size_t  getData(const std::function<size_t (ByteArray&, ByteArray&)>&, ByteArray&);

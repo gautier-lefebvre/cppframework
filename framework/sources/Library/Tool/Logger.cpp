@@ -4,14 +4,31 @@
 Logger::Logger(void):
   Threading::Lock(),
   _level(Logger::Level::DEBUG),
-  _offset(0)
+  _offset(0),
+  _file(nullptr)
 {}
 
-Logger::~Logger(void) {}
+Logger::~Logger(void) {
+  if (this->_file != nullptr) {
+    delete this->_file;
+  }
+  this->_file = nullptr;
+}
 
-void  Logger::setLevel(Logger::Level level) {
+void  Logger::init(Logger::Level level) {
   SCOPELOCK(this);
   this->_level = level;
+}
+
+void  Logger::init(Logger::Level level, const std::string& filepath) {
+  SCOPELOCK(this);
+
+  if (this->_file != nullptr) {
+    delete this->_file;
+  }
+
+  this->_level = level;
+  this->_file = new std::ofstream(filepath);
 }
 
 void  Logger::setOffset(size_t off) {

@@ -6,24 +6,18 @@
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
 #include  "Core/Network/TCP/Manager.hh"
-#include  "Core/Network/UDP/Manager.hh"
+// #include  "Core/Network/UDP/Manager.hh"
 
 namespace    Core {
   namespace  Network {
-    class  Manager :public Singleton<Core::Network::Manager>, public Threading::Lock, public AEndable {
+    class    Manager :public Singleton<Core::Network::Manager>, public Threading::Lock, public AEndable {
       friend class Singleton<Core::Network::Manager>;
-    private:
-      struct NotifiableThread {
-        std::thread*       thread;
-        Threading::Condition  condition;
-      };
-
     public:
-      Core::Network::TCP::Manager  _tcp;
-      Core::Network::UDP::Manager  _udp;
-
       NotifiableThread _input;
       NotifiableThread _output;
+
+      Core::Network::TCP::Manager  _tcp;
+      // Core::Network::UDP::Manager  _udp;
 
     private:
       Manager(const Manager&) = delete;
@@ -38,8 +32,15 @@ namespace    Core {
       virtual void end(void);
 
     public:
+      void init(void); // <- signal(SIGPIPE, SIG_IGN), and create threads
+
+    private:
+      void inputRoutine(void);
+      void outputRoutine(void);
+
+    public:
       Core::Network::TCP::Manager& getTCP(void);
-      Core::Network::UDP::Manager& getUDP(void);
+      // Core::Network::UDP::Manager& getUDP(void);
     };
   }
 }

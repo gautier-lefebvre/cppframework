@@ -47,12 +47,15 @@ void  Core::Network::TCP::SocketStream::push(const void* buffer, size_t size) {
   }
 }
 
-void    Core::Network::TCP::SocketStream::recv(void) {
+ssize_t Core::Network::TCP::SocketStream::recv(void) {
   SCOPELOCK(this);
+
   if (this->_input->full()) {
     throw Core::Network::Exception("recv: buffer is full");
   }
+
   ssize_t ret = ::recv(this->_fd, this->_input->atEnd(), this->_input->availableSpace(), 0);
+
   if (ret == -1) {
     throw Core::Network::Exception(std::string("recv: ") + strerror(errno));
   } else if (ret == 0) {
@@ -60,16 +63,21 @@ void    Core::Network::TCP::SocketStream::recv(void) {
   } else if (ret > 0) {
     this->_input->moveEnd(static_cast<size_t>(ret));
   }
+
+  return ret;
 }
 
-void    Core::Network::TCP::SocketStream::send(void) {
+ssize_t Core::Network::TCP::SocketStream::send(void) {
   SCOPELOCK(this);
   ssize_t ret = ::send(this->_fd, this->_output->atStart(), this->_output->getSize(), MSG_NOSIGNAL);
+
   if (ret == -1) {
     throw Core::Network::Exception(std::string("send: ") + strerror(errno));
   } else if (ret > 0) {
     this->_output->clearStart(static_cast<size_t>(ret));
   }
+
+  return ret;
 }
 
 size_t  Core::Network::TCP::SocketStream::getData(const std::function<size_t (ByteArray&, ByteArray&)>& dataGetter, ByteArray& dest) {
