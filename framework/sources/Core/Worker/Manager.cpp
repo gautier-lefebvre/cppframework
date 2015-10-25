@@ -75,8 +75,11 @@ void  Core::Worker::Manager::add(const Core::Event::Event* event, Core::Event::I
   }
 }
 
-void  Core::Worker::Manager::add(void) {
-
+void  Core::Worker::Manager::add(const std::function<void (const Core::Network::HTTP::Response*)>& cb, const std::function<void (void)>& cl, Core::Network::HTTP::Response* resp) {
+  if (resp != nullptr) {
+    Core::Worker::HTTPTask* httpTask = Core::Worker::HTTPTask::getFromPool(cb, cl, resp);
+    this->add(httpTask);
+  }
 }
 
 void  Core::Worker::Manager::add(Core::Worker::ATask* task, const std::chrono::steady_clock::time_point& timepoint) {

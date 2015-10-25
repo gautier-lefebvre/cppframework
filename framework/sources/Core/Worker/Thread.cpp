@@ -181,9 +181,14 @@ void  Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec
 
   if (httpTask) {
     if (exec) {
-      // must implement http
+      if (httpTask->_callback) {
+        httpTask->_callback(httpTask->_response);
+      }
+    } else {
+      if (httpTask->_cleanup) {
+        httpTask->_cleanup();
+      }
     }
-
     Core::Worker::HTTPTask::returnToPool(httpTask);
   } else {
     CRITICAL("Cant reinterpret_cast an HTTPTask");

@@ -46,7 +46,10 @@ void  Core::Worker::EventTask::init(const Core::Event::Event* ebase, Core::Event
  */
 
 Core::Worker::HTTPTask::HTTPTask(void):
-  Core::Worker::ATask(Core::Worker::ATask::Source::HTTP_CALLBACK)
+  Core::Worker::ATask(Core::Worker::ATask::Source::HTTP_CALLBACK),
+  _callback(nullptr),
+  _cleanup(nullptr),
+  _response(nullptr)
 {}
 
 Core::Worker::HTTPTask::~HTTPTask(void) {
@@ -54,9 +57,15 @@ Core::Worker::HTTPTask::~HTTPTask(void) {
 }
 
 void  Core::Worker::HTTPTask::reinit(void) {
+  this->_callback = nullptr;
+  this->_cleanup = nullptr;
+  this->_response = nullptr;
 }
 
-void  Core::Worker::HTTPTask::init(void) {
+void  Core::Worker::HTTPTask::init(const std::function<void (const Core::Network::HTTP::Response*)>& cb, const std::function<void (void)>& cl, Core::Network::HTTP::Response* resp) {
+  this->_callback = cb;
+  this->_cleanup = cl;
+  this->_response = resp;
 }
 
 /**

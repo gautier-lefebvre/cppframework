@@ -47,7 +47,7 @@ namespace    Core {
       void  add(Core::Worker::ATask*);
       void  add(Core::Worker::DelayedTask*);
       void  add(const Core::Event::Event*, Core::Event::IEventArgs*);
-      void  add(void); // set args from httptask::init
+      void  add(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
       void  add(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
       void  add(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);
       void  add(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&, bool startNow = true);

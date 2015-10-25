@@ -2,10 +2,12 @@
 #define    __CORE_WORKER_TASK_HH__
 
 #include  <chrono>
+#include  <functional>
 
 #include  "Library/Factory/Pool.hpp"
 #include  "Core/Event/Event.hh"
 #include  "Core/Event/IEventArgs.hh"
+#include  "Core/Network/HTTP/Response.hh"
 
 namespace    Core {
   namespace  Worker {
@@ -33,9 +35,9 @@ namespace    Core {
 
     class  EventTask :public ATask, public Factory::HasBasicPool<Core::Worker::EventTask, 100, 20> {
     public:
-      std::chrono::steady_clock::time_point  _eventCreation;
-      const Core::Event::Event*        _event;
-      Core::Event::IEventArgs*        _args;
+      std::chrono::steady_clock::time_point _eventCreation;
+      const Core::Event::Event* _event;
+      Core::Event::IEventArgs*  _args;
 
     public:
       EventTask(void);
@@ -50,7 +52,9 @@ namespace    Core {
 
     class  HTTPTask :public ATask, public Factory::HasBasicPool<Core::Worker::HTTPTask, 20, 5> {
     public:
-      // set http args
+      std::function<void (const Core::Network::HTTP::Response*)> _callback;
+      std::function<void (void)> _cleanup;
+      Core::Network::HTTP::Response* _response;
 
     public:
       HTTPTask(void);
@@ -60,14 +64,14 @@ namespace    Core {
       virtual void reinit(void);
 
     public:
-      void init(void); // same
+      void init(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*); // same
     };
 
     class  PeriodicTask :public ATask, public Factory::HasBasicPool<Core::Worker::PeriodicTask, 10, 2> {
     public:
-      std::function<void (void)>  _callback;
-      std::function<void (void)>  _clean;
-      std::chrono::steady_clock::duration  _interval;
+      std::function<void (void)> _callback;
+      std::function<void (void)> _clean;
+      std::chrono::steady_clock::duration _interval;
       bool  _off;
 
     public:
