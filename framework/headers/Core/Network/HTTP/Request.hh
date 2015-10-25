@@ -12,10 +12,15 @@ namespace     Core {
       struct  Request :public AMessage, public Factory::HasBasicPool<Core::Network::HTTP::Request, 10, 2> {
         std::string method;
         std::string url;
-        bool    secure;
+        bool secure;
         std::function<void (const Core::Network::HTTP::Response *)> success;
         std::function<void (const Core::Network::HTTP::Response *)> error;
         std::function<void (void)> clean;
+
+        struct {
+          bool isFile;
+          std::string filepath;
+        } file;
 
         Request(void);
         virtual ~Request(void);

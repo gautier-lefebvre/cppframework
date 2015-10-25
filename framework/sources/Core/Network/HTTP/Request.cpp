@@ -7,17 +7,20 @@ Core::Network::HTTP::Request::Request(void):
   secure(false),
   success(nullptr),
   error(nullptr),
-  clean(nullptr)
+  clean(nullptr),
+  file({false, ""})
 {}
 
 Core::Network::HTTP::Request::~Request(void) {}
 
 void  Core::Network::HTTP::Request::reinit(void) {
   this->Core::Network::HTTP::AMessage::reinit();
-  this->method = "";
-  this->url = "";
-  this->secure = false;
+  this->method  = "";
+  this->url     = "";
+  this->secure  = false;
   this->success = nullptr;
-  this->error = nullptr;
-  this->clean = nullptr;
+  this->error   = nullptr;
+  this->clean   = nullptr;
+  this->file.isFile = false;
+  this->file.filepath = "";
 }

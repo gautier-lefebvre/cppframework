@@ -1,4 +1,7 @@
 #include  <curl/curl.h>
+#include  <sys/stat.h>
+#include  <stdio.h>
+#include  <unistd.h>
 #include  <cstring>
 
 #include  "Library/Tool/Converter.hpp"
@@ -166,6 +169,8 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
   uint16_t    port;
   CURL*       handle = curl_easy_init();
   curl_slist  *headers = NULL, *tmp;
+  struct stat file_info;
+  FILE*       file;
 
   try {
     if (!handle) {
@@ -185,10 +190,22 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
     // set port
     curl_easy_setopt(handle, CURLOPT_PORT, static_cast<long>(port));
 
-    // if body -> set body
+    // if body -> set body / else if file -> set filepath
     if (request->body->getSize() > 0) {
       curl_easy_setopt(handle, CURLOPT_POSTFIELDS, request->body->getBytes());
       curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, request->body->getSize());
+    } else if (request->file.isFile) {
+      curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
+      curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_callback);
+
+      if (stat(request->file.filepath.c_str(), &file_info)) {
+        throw Core::Network::Exception("Invalid file to upload");
+      } else if ((file = fopen(request->file.filepath.c_str(), "rb"))) {
+        throw Core::Network::Exception("Could not open file to upload");
+      }
+
+      curl_easy_setopt(handle, CURLOPT_READDATA, file);
+      curl_easy_setopt(handle, CURLOPT_INFILESIZE_LARGE, (curl_off_t)file_info.st_size);
     }
 
     // choose method
@@ -196,6 +213,8 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
       curl_easy_setopt(handle, CURLOPT_HTTPGET, 1L);
     } else if (request->method == "POST") {
       curl_easy_setopt(handle, CURLOPT_POST, 1L);
+    } else if (request->method == "PUT") {
+      curl_easy_setopt(handle, CURLOPT_PUT, 1L);
     } else if (request->method == "HEAD") {
       curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
     } else {
