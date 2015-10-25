@@ -4,39 +4,20 @@
 #include  "Core/Network/Exception.hh"
 
 Core::Network::UDP::SocketClient::SocketClient(void):
-  Factory::AFactored(),
-  Threading::Lock(),
-  _addr(),
-  _info(std::make_pair(0, 0)),
-  _input(std::make_pair(std::queue<ByteArray*>(), 0)),
-  _output(std::make_pair(std::queue<ByteArray*>(), 0))
+  Core::Network::UDP::ASocketIO(),
+  _info(std::make_pair(0, 0))
 {}
 
 Core::Network::UDP::SocketClient::~SocketClient(void) {}
 
 void  Core::Network::UDP::SocketClient::reinit(void) {
-  // reinit socket address
-  memset(&(this->_addr), 0, sizeof(sockaddr_in));
+  SCOPELOCK(this);
+
+  this->Core::Network::UDP::ASocketIO::reinit();
 
   // reinit socket information
   this->_info.first = 0;
   this->_info.second = 0;
-
-  // reinit received datagrams
-  // send back all bytearrays to pool
-  while (!this->_input.first.empty()) {
-    ByteArray::returnToPool(this->_input.first.front());
-    this->_input.first.pop();
-  }
-  this->_input.second = 0;
-
-  // reinit datagrams to send
-  // send back all bytearrays to pool
-  while (!this->_output.first.empty()) {
-    ByteArray::returnToPool(this->_output.first.front());
-    this->_output.first.pop();
-  }
-  this->_output.second = 0;
 }
 
 void  Core::Network::UDP::SocketClient::init(const sockaddr_in& addr) {
@@ -47,32 +28,21 @@ void  Core::Network::UDP::SocketClient::init(const sockaddr_in& addr) {
   }
 }
 
-bool  Core::Network::UDP::SocketClient::hasDataToSend(void) const {
-  return !this->_output.first.empty();
-}
+ByteArray*  Core::Network::UDP::ASocketIO::getData(void) {
+  SCOPELOCK(this);
 
-void  Core::Network::UDP::SocketClient::push(ByteArray* datagram) {
-  if (datagram->getSize() + this->_output.second > Core::Network::UDP::SocketClient::BUFFER_SIZE) {
-    throw Core::Network::Exception("push: buffer is full");
-  } else {
-    this->_output.first.push(datagram);
-    this->_output.second += datagram->getSize();
-  }
-}
-
-ByteArray*  Core::Network::UDP::SocketClient::nextDatagram(void) {
-  if (this->_output.first.empty()) {
-    return nullptr;
-  } else {
+  if (!(this->_output.first.empty())) {
     ByteArray* datagram = this->_output.first.front();
     this->_output.first.pop();
     this->_output.second -= datagram->getSize();
     return datagram;
+  } else {
+    return nullptr;
   }
 }
 
 void  Core::Network::UDP::SocketClient::received(ByteArray* datagram) {
-  if (datagram->getSize() + this->_input.second > Core::Network::UDP::SocketClient::BUFFER_SIZE) {
+  if (datagram->getSize() + this->_input.second > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
     throw Core::Network::Exception("recvfrom: buffer is full");
   } else {
     this->_input.first.push(datagram);

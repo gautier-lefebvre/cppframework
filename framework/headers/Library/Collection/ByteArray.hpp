@@ -162,8 +162,9 @@ public:
    *  \a resize is more explicit, \a init is only meant to be used by the Pool.
    *
    *  \param size the number of bytes of the new ByteArray.
+   *  \param force if \a true, the ByteArray will be resized even if the current maximum size is higher than \a size.
    */
-  void  init(size_t size);
+  void  init(size_t size, bool force = false);
 
   /**
    *  \brief Seeks a sequence of bytes inside the ByteArray.
@@ -199,6 +200,7 @@ public:
     if (resize) {
       this->resize(this->_size + size, false, true);
     }
+
     if (size > this->availableSpace()) {
       throw std::out_of_range("ByteArray: full");
     } else {

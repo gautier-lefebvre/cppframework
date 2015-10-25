@@ -10,9 +10,14 @@
 namespace     Core {
   namespace   Network {
     namespace UDP {
+
+      /**
+       *  Server socket
+       */
       class SocketServer :public Factory::IFactored, public Threading::Lock {
       private:
         int _fd;
+        ByteArray* _buffer;
 
       public:
         SocketServer(void);
@@ -22,13 +27,14 @@ namespace     Core {
         virtual void reinit(void);
 
       public:
+        void  init(void);
         void  socket(void);
         void  close(void);
         void  bind(uint16_t);
 
       public:
-        ByteArray*  recvfrom(struct sockaddr&);
-        void    sendto(SocketClient*);
+        ByteArray* recvfrom(struct sockaddr&);
+        ssize_t  sendto(SocketClient*);
 
       public:
         void  addToSet(fd_set&, int&) const;
@@ -38,4 +44,4 @@ namespace     Core {
   }
 }
 
-#endif    /* __CORE_NETWORK_UDP_SOCKETSERVER_HH__ */
+#endif  /* __CORE_NETWORK_UDP_SOCKETSERVER_HH__ */

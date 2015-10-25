@@ -13,7 +13,7 @@
 #include  "Core/Event/IEventArgs.hh"
 
 namespace Threading {
-struct    NotifiableThread;
+  struct  NotifiableThread;
 }
 
 namespace       Core {
@@ -50,7 +50,7 @@ namespace       Core {
 
       class     Manager {
       public:
-        struct  ServerClients :public Threading::Lock {
+        struct  Server :public Threading::Lock {
         public:
           uint16_t port;
           Core::Network::TCP::Socket* server;
@@ -66,12 +66,12 @@ namespace       Core {
           } events;
 
         public:
-          ServerClients(uint16_t, Core::Network::TCP::Socket*, const std::set<uint32_t>& = {}, const std::set<uint32_t>& = {});
-          virtual ~ServerClients();
+          Server(uint16_t, Core::Network::TCP::Socket*, const std::set<uint32_t>& = {}, const std::set<uint32_t>& = {});
+          virtual ~Server(void);
         };
 
       public:
-        struct  RemoteConnection :public Threading::Lock {
+        struct  Client :public Threading::Lock {
         public:
           std::string hostname;
           uint16_t port;
@@ -83,17 +83,17 @@ namespace       Core {
           } events;
 
         public:
-          RemoteConnection(const std::string&, uint16_t, Core::Network::TCP::SocketStream*);
-          virtual ~RemoteConnection();
+          Client(const std::string&, uint16_t, Core::Network::TCP::SocketStream*);
+          virtual ~Client(void);
         };
 
       public:
-        typedef Threading::Lockable<std::list<ServerClients>>    ServerList;
-        typedef Threading::Lockable<std::list<RemoteConnection>> ConnectionList;
+        typedef Threading::Lockable<std::list<Server>> ServerList;
+        typedef Threading::Lockable<std::list<Client>> ClientList;
 
       private:
-        ServerList     _servers;
-        ConnectionList _connections;
+        ServerList _servers;
+        ClientList _clients;
 
         Threading::NotifiableThread& _input;
         Threading::NotifiableThread& _output;
@@ -106,15 +106,15 @@ namespace       Core {
         void clear(void);
 
       public:
-        const ServerClients& bind(uint16_t, const std::set<uint32_t>& = {}, const std::set<uint32_t>& = {});
+        const Server& bind(uint16_t, const std::set<uint32_t>& = {}, const std::set<uint32_t>& = {});
         void close(uint16_t);
-        void close(const ServerClients&);
+        void close(const Server&);
         void blacklist(uint16_t, uint32_t);
 
       public:
-        const RemoteConnection& connect(const std::string&, uint16_t);
+        const Client& connect(const std::string&, uint16_t);
         void close(const std::string&, uint16_t);
-        void close(const RemoteConnection&);
+        void close(const Client&);
 
       public:
         void push(Core::Network::TCP::SocketStream*, const void*, size_t);

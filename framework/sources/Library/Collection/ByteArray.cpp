@@ -69,8 +69,8 @@ void  ByteArray::resize(size_t size, bool force, bool keep) {
   }
 }
 
-void  ByteArray::init(size_t size) {
-  this->resize(size);
+void  ByteArray::init(size_t size, bool force) {
+  this->resize(size, force);
 }
 
 const uint8_t*  ByteArray::getBytes(void) const {

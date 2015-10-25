@@ -8,7 +8,7 @@
 
 Core::Network::TCP::Manager::Manager(Threading::NotifiableThread& input, Threading::NotifiableThread& output):
   _servers(),
-  _connections(),
+  _clients(),
   _input(input),
   _output(output)
 {}
@@ -19,37 +19,37 @@ void Core::Network::TCP::Manager::clear(void) {
   // close every server
   {
     SCOPELOCK(&(this->_servers));
-    for (auto serv_it = this->_servers.begin(); serv_it != this->_servers.end() ; ++serv_it) {
-      for (auto& client : (*serv_it).clients) {
+    for (auto server_it = this->_servers.begin(); server_it != this->_servers.end() ; ++server_it) {
+      for (auto& client : (*server_it).clients) {
         // fire onClientClosed event
-        this->__fireEvent((*serv_it).events.onClientClosed, client);
+        this->__fireEvent((*server_it).events.onClientClosed, client);
         // close client
         Core::Network::TCP::SocketStream::returnToPool(client);
       }
       // fire onClosed event
-      this->__fireEvent((*serv_it).events.onClosed, (*serv_it).server);
+      this->__fireEvent((*server_it).events.onClosed, (*server_it).server);
       // close server
-      delete (*serv_it).server;
+      delete (*server_it).server;
       // remove server
-      serv_it = this->_servers.erase(serv_it);
+      server_it = this->_servers.erase(server_it);
     }
   }
 
   // close every connection
   {
-    SCOPELOCK(&(this->_connections));
-    for (auto conn_it = this->_connections.begin(); conn_it != this->_connections.end() ; ++conn_it) {
+    SCOPELOCK(&(this->_clients));
+    for (auto client_it = this->_clients.begin(); client_it != this->_clients.end() ; ++client_it) {
       // fire onClosed event
-      this->__fireEvent((*conn_it).events.onClosed, (*conn_it).socket);
+      this->__fireEvent((*client_it).events.onClosed, (*client_it).socket);
       // close connection
-      Core::Network::TCP::SocketStream::returnToPool((*conn_it).socket);
+      Core::Network::TCP::SocketStream::returnToPool((*client_it).socket);
       // remove connection
-      conn_it = this->_connections.erase(conn_it);
+      client_it = this->_clients.erase(client_it);
     }
   }
 }
 
-const Core::Network::TCP::Manager::ServerClients& Core::Network::TCP::Manager::bind(uint16_t port, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist) {
+const Core::Network::TCP::Manager::Server& Core::Network::TCP::Manager::bind(uint16_t port, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist) {
   Core::Network::TCP::Socket* socket = new Core::Network::TCP::Socket();
 
   try {
@@ -61,7 +61,7 @@ const Core::Network::TCP::Manager::ServerClients& Core::Network::TCP::Manager::b
     throw e;
   }
 
-  const Core::Network::TCP::Manager::ServerClients* server = nullptr;
+  const Core::Network::TCP::Manager::Server* server = nullptr;
 
   {
     SCOPELOCK(&(this->_servers));
@@ -81,30 +81,30 @@ void Core::Network::TCP::Manager::close(uint16_t port) {
   SCOPELOCK(&(this->_servers));
 
   // find the server
-  auto serv_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const Core::Network::TCP::Manager::ServerClients& elem) -> bool { return elem.port == port; });
+  auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
+    [&] (const Core::Network::TCP::Manager::Server& elem) -> bool { return elem.port == port; });
 
   // if found
-  if (serv_it != this->_servers.end()) {
-    for (auto& client : (*serv_it).clients) {
+  if (server_it != this->_servers.end()) {
+    for (auto& client : (*server_it).clients) {
       // fire onClientClosed event
-      this->__fireEvent((*serv_it).events.onClientClosed, client);
+      this->__fireEvent((*server_it).events.onClientClosed, client);
       // send client back to pool
       Core::Network::TCP::SocketStream::returnToPool(client);
     }
 
     // fire server close event
-    this->__fireEvent((*serv_it).events.onClosed, (*serv_it).server);
+    this->__fireEvent((*server_it).events.onClosed, (*server_it).server);
     // close server
-    delete (*serv_it).server;
+    delete (*server_it).server;
 
     // remove server
-    this->_servers.erase(serv_it);
+    this->_servers.erase(server_it);
     return;
   }
 }
 
-void Core::Network::TCP::Manager::close(const Core::Network::TCP::Manager::ServerClients& server) {
+void Core::Network::TCP::Manager::close(const Core::Network::TCP::Manager::Server& server) {
   this->close(server.port);
 }
 
@@ -112,17 +112,17 @@ void Core::Network::TCP::Manager::blacklist(uint16_t port, uint32_t addr) {
   SCOPELOCK(&(this->_servers));
 
   // find the server
-  auto serv_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const Core::Network::TCP::Manager::ServerClients& elem) -> bool { return elem.port == port; });
+  auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
+    [&] (const Core::Network::TCP::Manager::Server& elem) -> bool { return elem.port == port; });
 
   // if found
-  if (serv_it != this->_servers.end()) {
-    (*serv_it).blacklist.insert(addr);
+  if (server_it != this->_servers.end()) {
+    (*server_it).blacklist.insert(addr);
     return;
   }
 }
 
-const Core::Network::TCP::Manager::RemoteConnection& Core::Network::TCP::Manager::connect(const std::string& hostname, uint16_t port) {
+const Core::Network::TCP::Manager::Client& Core::Network::TCP::Manager::connect(const std::string& hostname, uint16_t port) {
   Core::Network::TCP::SocketStream* socket = Core::Network::TCP::SocketStream::getFromPool();
 
   try {
@@ -133,12 +133,12 @@ const Core::Network::TCP::Manager::RemoteConnection& Core::Network::TCP::Manager
     throw e;
   }
 
-  const Core::Network::TCP::Manager::RemoteConnection* connection = nullptr;
+  const Core::Network::TCP::Manager::Client* connection = nullptr;
 
   {
-    SCOPELOCK(&(this->_connections));
-    this->_connections.emplace_back(hostname, port, socket);
-    connection = &(this->_connections.back());
+    SCOPELOCK(&(this->_clients));
+    this->_clients.emplace_back(hostname, port, socket);
+    connection = &(this->_clients.back());
   }
 
   {
@@ -150,26 +150,26 @@ const Core::Network::TCP::Manager::RemoteConnection& Core::Network::TCP::Manager
 }
 
 void Core::Network::TCP::Manager::close(const std::string& hostname, uint16_t port) {
-  SCOPELOCK(&(this->_connections));
+  SCOPELOCK(&(this->_clients));
 
   // find the connection
-  auto conn_it = std::find_if(this->_connections.begin(), this->_connections.end(),
-    [&] (const Core::Network::TCP::Manager::RemoteConnection& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
+  auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
+    [&] (const Core::Network::TCP::Manager::Client& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
 
   // if found
-  if (conn_it != this->_connections.end()) {
+  if (client_it != this->_clients.end()) {
     // fire close event
-    this->__fireEvent((*conn_it).events.onClosed, (*conn_it).socket);
+    this->__fireEvent((*client_it).events.onClosed, (*client_it).socket);
     // close socket
-    Core::Network::TCP::SocketStream::returnToPool((*conn_it).socket);
+    Core::Network::TCP::SocketStream::returnToPool((*client_it).socket);
 
     // remove server
-    this->_connections.erase(conn_it);
+    this->_clients.erase(client_it);
     return;
   }
 }
 
-void Core::Network::TCP::Manager::close(const Core::Network::TCP::Manager::RemoteConnection& connection) {
+void Core::Network::TCP::Manager::close(const Core::Network::TCP::Manager::Client& connection) {
   this->close(connection.hostname, connection.port);
 }
 
@@ -198,13 +198,13 @@ void Core::Network::TCP::Manager::push(Core::Network::TCP::SocketStream* socket,
 
       // find connection
       {
-        SCOPELOCK(&(this->_connections));
-        auto conn_it = std::find_if(this->_connections.begin(), this->_connections.end(),
-          [&] (const Core::Network::TCP::Manager::RemoteConnection& elem) -> bool { return elem.socket == socket; });
+        SCOPELOCK(&(this->_clients));
+        auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
+          [&] (const Core::Network::TCP::Manager::Client& elem) -> bool { return elem.socket == socket; });
 
-        if (conn_it != this->_connections.end()) {
-          this->__onIOException((*conn_it).events.onClosed, socket, e.what());
-          this->_connections.erase(conn_it);
+        if (client_it != this->_clients.end()) {
+          this->__onIOException((*client_it).events.onClosed, socket, e.what());
+          this->_clients.erase(client_it);
           return;
         }
       }
@@ -238,8 +238,8 @@ void Core::Network::TCP::Manager::fillSetRead(fd_set& fdset, int& fdmax, uint32_
   }
 
   {
-    SCOPELOCK(&(this->_connections));
-    for (auto& connection : this->_connections) {
+    SCOPELOCK(&(this->_clients));
+    for (auto& connection : this->_clients) {
       connection.socket->addToSet(fdset, fdmax);
       nb++;
     }
@@ -260,8 +260,8 @@ void Core::Network::TCP::Manager::fillSetWrite(fd_set& fdset, int& fdmax, uint32
   }
 
   {
-    SCOPELOCK(&(this->_connections));
-    for (auto& connection : this->_connections) {
+    SCOPELOCK(&(this->_clients));
+    for (auto& connection : this->_clients) {
       if (connection.socket->hasDataToSend()) {
         connection.socket->addToSet(fdset, fdmax);
         nb++;
@@ -291,17 +291,17 @@ void Core::Network::TCP::Manager::send(fd_set& set) {
   }
 
   {
-    SCOPELOCK(&(this->_connections));
-    for (auto conn_it = this->_connections.begin() ; conn_it != this->_connections.end() ; ++conn_it) {
-      if ((*conn_it).socket->isset(set)) {
+    SCOPELOCK(&(this->_clients));
+    for (auto client_it = this->_clients.begin() ; client_it != this->_clients.end() ; ++client_it) {
+      if ((*client_it).socket->isset(set)) {
         try {
-          (*conn_it).socket->send();
+          (*client_it).socket->send();
         } catch (const Core::Network::Exception& e) {
           // fire closed event + close connection
-          this->__onIOException((*conn_it).events.onClosed, (*conn_it).socket, e.what());
+          this->__onIOException((*client_it).events.onClosed, (*client_it).socket, e.what());
 
           // remove connection
-          conn_it = this->_connections.erase(conn_it);
+          client_it = this->_clients.erase(client_it);
         }
       }
     }
@@ -362,21 +362,21 @@ void Core::Network::TCP::Manager::recv(fd_set& set) {
   }
 
   {
-    SCOPELOCK(&(this->_connections));
-    for (auto conn_it = this->_connections.begin() ; conn_it != this->_connections.end() ; ++conn_it) {
-      if ((*conn_it).socket->isset(set)) {
+    SCOPELOCK(&(this->_clients));
+    for (auto client_it = this->_clients.begin() ; client_it != this->_clients.end() ; ++client_it) {
+      if ((*client_it).socket->isset(set)) {
         try {
           // receive data
-          (*conn_it).socket->recv();
+          (*client_it).socket->recv();
 
           // fire onReceivedData event
-          this->__fireEvent((*conn_it).events.onReceivedData, (*conn_it).socket);
+          this->__fireEvent((*client_it).events.onReceivedData, (*client_it).socket);
         } catch (const Core::Network::Exception& e) {
           // fire onClosed event + close socket
-          this->__onIOException((*conn_it).events.onClosed, (*conn_it).socket, e.what());
+          this->__onIOException((*client_it).events.onClosed, (*client_it).socket, e.what());
 
           // remove connection
-          conn_it = this->_connections.erase(conn_it);
+          client_it = this->_clients.erase(client_it);
         }
       }
     }
@@ -402,10 +402,10 @@ void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::N
 }
 
 /**
- *  ServerClients
+ *  Server
  */
 
-Core::Network::TCP::Manager::ServerClients::ServerClients(uint16_t port, Core::Network::TCP::Socket* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
+Core::Network::TCP::Manager::Server::Server(uint16_t port, Core::Network::TCP::Socket* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
   Threading::Lock(),
   port(port),
   server(server),
@@ -426,7 +426,7 @@ Core::Network::TCP::Manager::ServerClients::ServerClients(uint16_t port, Core::N
   eventManager.registerEvent(this->events.onClosed);
 }
 
-Core::Network::TCP::Manager::ServerClients::~ServerClients(void) {
+Core::Network::TCP::Manager::Server::~Server(void) {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
   eventManager.unregisterEvent(this->events.onAccept);
   eventManager.unregisterEvent(this->events.onReceivedData);
@@ -435,10 +435,10 @@ Core::Network::TCP::Manager::ServerClients::~ServerClients(void) {
 }
 
 /**
- *  RemoteConnection
+ *  Client
  */
 
-Core::Network::TCP::Manager::RemoteConnection::RemoteConnection(const std::string& hostname, uint16_t port, Core::Network::TCP::SocketStream* socket):
+Core::Network::TCP::Manager::Client::Client(const std::string& hostname, uint16_t port, Core::Network::TCP::SocketStream* socket):
   hostname(hostname),
   port(port),
   socket(socket),
@@ -452,7 +452,7 @@ Core::Network::TCP::Manager::RemoteConnection::RemoteConnection(const std::strin
   eventManager.registerEvent(this->events.onClosed);
 }
 
-Core::Network::TCP::Manager::RemoteConnection::~RemoteConnection(void) {
+Core::Network::TCP::Manager::Client::~Client(void) {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClosed);
