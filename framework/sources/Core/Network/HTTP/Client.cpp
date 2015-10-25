@@ -20,12 +20,10 @@ void  Core::Network::HTTP::Client::end(void) {
   SCOPELOCK(this);
   if (!(this->mustEnd())) {
     this->mustEnd(true);
-
     for (auto &connection : this->_connections) {
       connection->end();
       delete connection;
     }
-
     curl_global_cleanup();
     sk_SSL_COMP_free(SSL_COMP_get_compression_methods());
   }
@@ -40,16 +38,13 @@ void  Core::Network::HTTP::Client::init(const std::string& user_agent) {
 
 Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHostPort(const std::string& host, uint16_t port, uint16_t secureport, bool create) {
   SCOPELOCK(this);
-
   for (auto &connection : this->_connections) {
     if (connection->getHost() == host && connection->getPort() == port && connection->getSecurePort() == secureport) {
       return connection;
     }
   }
-
   if (create) {
     Core::Network::HTTP::Connection *connection = nullptr;
-
     try {
       connection = new Core::Network::HTTP::Connection(host, port, secureport, this->_userAgent);
       this->_connections.push_back(connection);
