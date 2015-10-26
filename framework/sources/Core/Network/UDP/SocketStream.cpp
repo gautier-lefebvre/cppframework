@@ -1,12 +1,8 @@
 #include  "Core/Network/UDP/SocketStream.hh"
 
 Core::Network::UDP::SocketStream::SocketStream(void):
-  Threading::Lock(),
-  Factory::AFactored(),
-  _fd(-1),
-  _input(std::make_pair(std::queue<ByteArray*>(), 0)),
-  _output(std::make_pair(std::queue<ByteArray*>(), 0)),
-  _buffer(nullptr)
+  Core::Network::UDP::ASocketIO(),
+  Core::Network::UDP::ASocket()
 {}
 
 Core::Network::UDP::SocketStream::~SocketStream(void) {
@@ -15,12 +11,8 @@ Core::Network::UDP::SocketStream::~SocketStream(void) {
 
 void Core::Network::UDP::SocketStream::reinit(void) {
   SCOPELOCK(this);
-
   this->Core::Network::UDP::ASocketIO::reinit();
-
-  this->close();
-  ByteArray::returnToPool(this->_buffer);
-  this->_buffer = nullptr;
+  this->Core::Network::UDP::ASocket::reinit();
 }
 
 void Core::Network::UDP::SocketStream::init(const std::string& hostname, uint16_t port) {
@@ -37,21 +29,6 @@ void Core::Network::UDP::SocketStream::init(const std::string& hostname, uint16_
   this->_addr.sin_family = AF_INET;
 
   this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
-}
-
-void Core::Network::UDP::SocketStream::socket(void) {
-  SCOPELOCK(this);
-  this->reinit();
-  if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-    throw Core::Network::Exception(std::string("socket: ") + strerror(errno));
-  }
-}
-
-void Core::Network::UDP::SocketStream::close(void) {
-  if (this->_fd != -1) {
-    ::close(this->_fd);
-  }
-  this->_fd = -1;
 }
 
 ssize_t Core::Network::UDP::SocketStream::sendto(void) {

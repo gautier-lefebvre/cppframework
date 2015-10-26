@@ -2,43 +2,17 @@
 #include  "Core/Network/UDP/SocketClient.hh"
 
 Core::Network::UDP::SocketServer::SocketServer(void):
-  Factory::AFactored(),
-  Threading::Lock(),
-  _fd(-1)
+  Core::Network::UDP::ASocket()
 {}
 
 Core::Network::UDP::SocketServer::~SocketServer(void) {
   this->reinit();
 }
 
-void Core::Network::UDP::SocketServer::reinit(void) {
-  SCOPELOCK(this);
-  this->close();
-
-  ByteArray::returnToPool(this->_buffer);
-  this->_buffer = nullptr;
-}
-
 void Core::Network::UDP::SocketServer::init(void) {
   SCOPELOCK(this);
   this->reinit();
   this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
-}
-
-void Core::Network::UDP::SocketServer::socket(void) {
-  SCOPELOCK(this);
-  this->reinit();
-  if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-    throw Core::Network::Exception(std::string("socket: ") + strerror(errno));
-  }
-}
-
-void Core::Network::UDP::SocketServer::close(void) {
-  SCOPELOCK(this);
-  if (this->_fd != -1) {
-    ::close(this->_fd);
-  }
-  this->_fd = -1;
 }
 
 void  Core::Network::UDP::SocketServer::bind(uint16_t port) const {
@@ -86,6 +60,8 @@ ByteArray*  Core::Network::UDP::SocketServer::recvfrom(struct sockaddr_in& addr)
 
   if (ret < 0) {
     throw Core::Network::Exception(std::string("recvfrom: ") + strerror(errno));
+  } else if (ret > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
+    throw Core::Network::Exception(std::string("recvfrom: received a datagram bigger than the buffer size (discarded)"));
   }
 
   // copy buffer to datagram resized to the number of bytes read.
@@ -93,13 +69,4 @@ ByteArray*  Core::Network::UDP::SocketServer::recvfrom(struct sockaddr_in& addr)
   datagram->push(this->_buffer->atStart(), ret, false);
 
   return datagram;
-}
-
-void Core::Network::UDP::SocketServer::addToSet(fd_set& set, int& max) const {
-  FD_SET(this->_fd, &set);
-  max = MAX(max, this->_fd);
-}
-
-bool  Core::Network::UDP::SocketServer::isset(fd_set& set) const {
-  return (FD_ISSET(this->_fd, &set) != 0);
 }

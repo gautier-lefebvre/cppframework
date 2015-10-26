@@ -17,7 +17,7 @@ namespace    Core {
       Threading::NotifiableThread _output;
 
       Core::Network::TCP::Manager  _tcp;
-      // Core::Network::UDP::Manager  _udp;
+      Core::Network::UDP::Manager  _udp;
 
     private:
       Manager(const Manager&) = delete;
@@ -40,7 +40,7 @@ namespace    Core {
 
     public:
       Core::Network::TCP::Manager& getTCP(void);
-      // Core::Network::UDP::Manager& getUDP(void);
+      Core::Network::UDP::Manager& getUDP(void);
     };
   }
 }

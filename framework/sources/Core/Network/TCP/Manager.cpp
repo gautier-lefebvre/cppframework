@@ -312,7 +312,7 @@ void Core::Network::TCP::Manager::recv(fd_set& set) {
   {
     SCOPELOCK(&(this->_servers));
     for (auto& server : this->_servers) {
-      // accept new clients (except if in blacklist or if not in accept list it not empty)
+      // accept new clients (except if in blacklist or if not in accept list if not empty)
       if (server.server->isset(set)) {
         Core::Network::TCP::SocketStream* client = Core::Network::TCP::SocketStream::getFromPool();
         try {

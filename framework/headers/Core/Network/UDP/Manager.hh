@@ -15,9 +15,50 @@ namespace Threading {
   struct  NotifiableThread;
 }
 
-namespace     Core {
-  namespace   Network {
-    namespace UDP {
+namespace       Core {
+  namespace     Network {
+    namespace   UDP {
+      namespace EventArgs {
+        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketStreamArgs, 20, 10> {
+        public:
+          Core::Network::UDP::SocketStream* socket;
+
+        public:
+          SocketStreamArgs(void);
+
+        public:
+          virtual void reinit(void);
+          virtual void cleanup(void);
+          void init(Core::Network::UDP::SocketStream*);
+        };
+
+        struct  SocketClientArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketClientArgs, 2, 1> {
+        public:
+          Core::Network::UDP::SocketClient* socket;
+
+        public:
+          SocketClientArgs(void);
+
+        public:
+          virtual void reinit(void);
+          virtual void cleanup(void);
+          void init(Core::Network::UDP::SocketClient*);
+        };
+
+        struct  SocketServerArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketServerArgs, 2, 1> {
+        public:
+          Core::Network::UDP::SocketServer* socket;
+
+        public:
+          SocketServerArgs(void);
+
+        public:
+          virtual void reinit(void);
+          virtual void cleanup(void);
+          void init(Core::Network::UDP::SocketServer*);
+        };
+      }
+
       class   Manager {
       public:
         struct  Server :public Threading::Lock {
@@ -29,7 +70,7 @@ namespace     Core {
           std::set<uint32_t> blacklist;
 
           struct Events {
-            Core::Event::Event* onAccept;
+            Core::Event::Event* onNewClient;
             Core::Event::Event* onReceivedData;
             Core::Event::Event* onClientClosed;
             Core::Event::Event* onClosed;
@@ -53,7 +94,7 @@ namespace     Core {
           } events;
 
         public:
-          Client(const std::string&, uint16_t, Core::Network::TCP::SocketStream*);
+          Client(const std::string&, uint16_t, Core::Network::UDP::SocketStream*);
           virtual ~Client(void);
         };
 
@@ -76,6 +117,32 @@ namespace     Core {
         void clear(void);
 
       public:
+        const Server& bind(uint16_t, const std::set<uint32_t>& = {}, const std::set<uint32_t>& = {});
+        void close(uint16_t);
+        void close(const Server&);
+        void blacklist(uint16_t, uint32_t);
+
+      public:
+        const Client& connect(const std::string&, uint16_t);
+        void close(const std::string&, uint16_t);
+        void close(const Client&);
+
+      public:
+        void push(Core::Network::UDP::ASocketIO*, const void*, size_t);
+        void push(Core::Network::UDP::ASocketIO*, const ByteArray*);
+
+      public:
+        void fillSetRead(fd_set&, int&, uint32_t&);
+        void fillSetWrite(fd_set&, int&, uint32_t&);
+        void send(fd_set&);
+        void recv(fd_set&);
+
+      private:
+        void __onIOException(Core::Event::Event*, Core::Network::UDP::SocketClient*, const std::string&);
+        void __onIOException(Core::Event::Event*, Core::Network::UDP::SocketStream*, const std::string&);
+        void __fireEvent(Core::Event::Event*, Core::Network::UDP::SocketStream*) const;
+        void __fireEvent(Core::Event::Event*, Core::Network::UDP::SocketClient*) const;
+        void __fireEvent(Core::Event::Event*, Core::Network::UDP::SocketServer*) const;
       };
     }
   }

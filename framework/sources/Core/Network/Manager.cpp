@@ -7,8 +7,8 @@
 Core::Network::Manager::Manager(void):
   _input(),
   _output(),
-  _tcp(_input, _output)
-  // _udp(_input, _output)
+  _tcp(_input, _output),
+  _udp(_input, _output)
 {}
 
 Core::Network::Manager::~Manager(void) {
@@ -54,6 +54,8 @@ void Core::Network::Manager::end(void) {
 
     // close every TCP servers / connections
     this->_tcp.clear();
+    // close every UDP servers / connections
+    this->_udp.clear();
   }
 }
 
@@ -80,6 +82,7 @@ void Core::Network::Manager::inputRoutine(void) {
 
     // fill set
     this->_tcp.fillSetRead(rset, rmax, nb);
+    this->_udp.fillSetRead(rset, rmax, nb);
 
     // if no socket to read on -> wait for a socket to be added
     if (!nb) {
@@ -97,6 +100,7 @@ void Core::Network::Manager::inputRoutine(void) {
 
     // read available sockets
     this->_tcp.recv(rset);
+    this->_udp.recv(rset);
   }
 }
 
@@ -113,6 +117,7 @@ void Core::Network::Manager::outputRoutine(void) {
 
     // fill set
     this->_tcp.fillSetWrite(wset, wmax, nb);
+    this->_udp.fillSetWrite(wset, wmax, nb);
 
     // if no data to send -> wait for data to send
     if (!nb) {
@@ -126,5 +131,6 @@ void Core::Network::Manager::outputRoutine(void) {
 
     // write available sockets
     this->_tcp.send(wset);
+    this->_udp.send(wset);
   }
 }

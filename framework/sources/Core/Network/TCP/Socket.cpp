@@ -28,6 +28,7 @@ void  Core::Network::TCP::Socket::reinit(void) {
 void  Core::Network::TCP::Socket::socket(void) {
   SCOPELOCK(this);
   this->reinit();
+
   if ((this->_fd = ::socket(AF_INET, SOCK_STREAM, 0)) == -1) {
     throw Core::Network::Exception(std::string("socket: ") + strerror(errno));
   }
@@ -35,9 +36,11 @@ void  Core::Network::TCP::Socket::socket(void) {
 
 void  Core::Network::TCP::Socket::close(void) {
   SCOPELOCK(this);
+
   if (this->_fd != -1) {
     ::close(this->_fd);
   }
+
   this->_fd = -1;
 }
 
@@ -87,24 +90,29 @@ uint32_t  Core::Network::TCP::Socket::accept(Core::Network::TCP::Socket* socket)
   if ((socket->_fd = ::accept(this->_fd, reinterpret_cast<sockaddr*>(&sin), &size)) == -1) {
     throw Core::Network::Exception(std::string("accept: ") + strerror(errno));
   }
+
   return static_cast<uint32_t>(sin.sin_addr.s_addr);
 }
 
 uint32_t  Core::Network::TCP::Socket::getpeername(void) const {
   sockaddr_in sin;
   socklen_t size = sizeof(sockaddr_in);
+
   if (::getpeername(this->_fd, reinterpret_cast<sockaddr*>(&sin), &size) == -1) {
     throw Core::Network::Exception(std::string("getpeername: ") + strerror(errno));
   }
+
   return static_cast<uint32_t>(sin.sin_addr.s_addr);
 }
 
 uint32_t  Core::Network::TCP::Socket::getsockname(void) const {
   sockaddr_in sin;
   socklen_t size = sizeof(sockaddr_in);
+
   if (::getsockname(this->_fd, reinterpret_cast<sockaddr*>(&sin), &size) == -1) {
     throw Core::Network::Exception(std::string("getsockname: ") + strerror(errno));
   }
+
   return static_cast<uint32_t>(sin.sin_addr.s_addr);
 }
 
