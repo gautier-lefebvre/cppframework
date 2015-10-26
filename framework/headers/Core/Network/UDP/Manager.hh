@@ -6,7 +6,9 @@
 
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
+#include  "Library/Factory/Pool.hpp"
 #include  "Core/Event/Event.hh"
+#include  "Core/Event/IEventArgs.hh"
 #include  "Core/Network/UDP/SocketServer.hh"
 #include  "Core/Network/UDP/SocketClient.hh"
 #include  "Core/Network/UDP/SocketStream.hh"

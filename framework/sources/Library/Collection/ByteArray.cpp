@@ -73,6 +73,10 @@ void  ByteArray::init(size_t size, bool force) {
   this->resize(size, force);
 }
 
+void  ByteArray::init(const void* data, size_t size) {
+	this->push(data, size, true);
+}
+
 const uint8_t*  ByteArray::getBytes(void) const {
   return (this->_bytearray);
 }

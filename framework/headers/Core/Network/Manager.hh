@@ -6,7 +6,7 @@
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
 #include  "Core/Network/TCP/Manager.hh"
-// #include  "Core/Network/UDP/Manager.hh"
+#include  "Core/Network/UDP/Manager.hh"
 
 namespace    Core {
   namespace  Network {

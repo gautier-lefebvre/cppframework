@@ -1,4 +1,7 @@
+#include  <netdb.h>
+
 #include  "Core/Network/UDP/SocketStream.hh"
+#include  "Core/Network/Exception.hh"
 
 Core::Network::UDP::SocketStream::SocketStream(void):
   Core::Network::UDP::ASocketIO(),
@@ -43,7 +46,7 @@ ssize_t Core::Network::UDP::SocketStream::sendto(void) {
   ByteArray::returnToPool(datagram);
 
   if (ret < 0) {
-    throw Core::Network::Exception(std::string("sendto: " + strerror(errno)));
+    throw Core::Network::Exception(std::string("sendto: ") + strerror(errno));
   }
 
   return ret;
@@ -64,7 +67,8 @@ ssize_t  Core::Network::UDP::SocketStream::recvfrom(void) {
   }
 
   // copy buffer to datagram resized to the number of bytes read.
-  datagram = ByteArray::getFromPool(ret, true);
+  bool force = true;
+  datagram = ByteArray::getFromPool(ret, force);
   datagram->push(this->_buffer->atStart(), ret, false);
 
   // add datagram to datagram queue

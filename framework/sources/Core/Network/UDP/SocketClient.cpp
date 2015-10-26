@@ -28,7 +28,7 @@ void  Core::Network::UDP::SocketClient::init(const sockaddr_in& addr) {
   }
 }
 
-ByteArray*  Core::Network::UDP::ASocketIO::getData(void) {
+ByteArray*  Core::Network::UDP::SocketClient::nextDatagram(void) {
   SCOPELOCK(this);
 
   if (!(this->_output.first.empty())) {

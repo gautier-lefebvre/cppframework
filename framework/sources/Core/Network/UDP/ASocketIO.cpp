@@ -1,4 +1,5 @@
 #include  "Core/Network/UDP/ASocketIO.hh"
+#include  "Core/Network/Exception.hh"
 
 const size_t Core::Network::UDP::ASocketIO::BUFFER_SIZE = 32768;
 
@@ -32,9 +33,6 @@ void Core::Network::UDP::ASocketIO::reinit(void) {
     ByteArray::returnToPool(bytearray);
   }
 
-  this->_input.first.clear();
-  this->_output.first.clear();
-
   this->_input.second  = 0;
   this->_output.second = 0;
 }
@@ -46,7 +44,7 @@ bool  Core::Network::UDP::ASocketIO::hasDataToSend(void) const {
 void  Core::Network::UDP::ASocketIO::push(ByteArray* datagram) {
   SCOPELOCK(this);
 
-  if (this->_output.second + data->getSize() > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
+  if (this->_output.second + datagram->getSize() > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
     throw Core::Network::Exception("ASocketIO::push: buffer maximum size reached");
   }
 

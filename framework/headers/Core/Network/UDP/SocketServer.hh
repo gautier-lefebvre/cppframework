@@ -13,7 +13,7 @@ namespace     Core {
       /**
        *  Server socket
        */
-      class SocketServer :public ASocket {
+      class SocketServer :public ASocket, public Factory::HasBasicPool<Core::Network::UDP::SocketServer, 2, 1>  {
       public:
         SocketServer(void);
         virtual ~SocketServer(void);
@@ -23,7 +23,7 @@ namespace     Core {
         void  bind(uint16_t);
 
       public:
-        ByteArray* recvfrom(struct sockaddr&);
+        ByteArray* recvfrom(struct sockaddr_in&);
         ssize_t  sendto(SocketClient*);
       };
     }

@@ -174,21 +174,25 @@ void Core::Network::UDP::Manager::close(const Core::Network::UDP::Manager::Clien
 
 void Core::Network::UDP::Manager::push(Core::Network::UDP::ASocketIO* socket, const void* data, size_t size) {
   if (socket != nullptr) {
+  	ByteArray* datagram = ByteArray::getFromPool(data, size);
+
     try {
-      socket->push(data, size);
+      socket->push(datagram);
 
       {
         SCOPELOCK(&(this->_output.condition));
         this->_output.condition.notify();
       }
     } catch (const Core::Network::Exception& e) {
+    	ByteArray::returnToPool(datagram);
+
       // find server
       {
         SCOPELOCK(&(this->_servers));
         for (auto& server : this->_servers) {
           auto client_it = std::find(server.clients.begin(), server.clients.end(), socket);
           if (client_it != server.clients.end()) {
-            this->__onIOException(server.events.onClientClosed, socket, e.what());
+            this->__onIOException(server.events.onClientClosed, reinterpret_cast<Core::Network::UDP::SocketClient*>(socket), e.what());
             server.clients.erase(client_it);
             return;
           }
@@ -202,7 +206,7 @@ void Core::Network::UDP::Manager::push(Core::Network::UDP::ASocketIO* socket, co
           [&] (const Core::Network::UDP::Manager::Client& elem) -> bool { return elem.socket == socket; });
 
         if (client_it != this->_clients.end()) {
-          this->__onIOException((*client_it).events.onClosed, socket, e.what());
+          this->__onIOException((*client_it).events.onClosed, reinterpret_cast<Core::Network::UDP::SocketStream*>(socket), e.what());
           this->_clients.erase(client_it);
           return;
         }
@@ -276,7 +280,7 @@ void Core::Network::UDP::Manager::send(fd_set& set) {
         for (auto client_it = server.clients.begin() ; client_it != server.clients.end() ; ++client_it) {
           if ((*client_it)->hasDataToSend()) {
             try {
-              server->sendto(*client_it);
+              server.server->sendto(*client_it);
             } catch (const Core::Network::Exception& e) {
               // fire client closed event + close client
               this->__onIOException(server.events.onClientClosed, *client_it, e.what());
@@ -326,7 +330,7 @@ void Core::Network::UDP::Manager::recv(fd_set& set) {
 
         // find client
         auto client_it = std::find_if(server.clients.begin(), server.clients.end(),
-          [&] (const Core::Network::UDP::SocketClient*& socket) -> bool { return *socket == addr; });
+          [&] (const Core::Network::UDP::SocketClient* socket) -> bool { return *socket == addr; });
 
         if (success) {
           try {
@@ -336,7 +340,7 @@ void Core::Network::UDP::Manager::recv(fd_set& set) {
             if (client_it != server.clients.end()) {
               (*client_it)->received(datagram);
             } else {
-              uint32_t remote_ip = static_cast<uint32_t>(sin.sin_addr.s_addr);
+              uint32_t remote_ip = static_cast<uint32_t>(addr.sin_addr.s_addr);
 
               // if accept list is not empty and remote ip not in it
               if (!(server.accept.empty()) && std::find(server.accept.begin(), server.accept.end(), remote_ip) == server.accept.end()) {
@@ -404,7 +408,6 @@ void Core::Network::UDP::Manager::recv(fd_set& set) {
 void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Core::Network::UDP::SocketClient* socket, const std::string&) {
   // fire closed event
   this->__fireEvent(event, socket);
-
   // close socket
   Core::Network::UDP::SocketClient::returnToPool(socket);
 }
@@ -412,24 +415,29 @@ void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Cor
 void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Core::Network::UDP::SocketStream* socket, const std::string&) {
   // fire closed event
   this->__fireEvent(event, socket);
-
   // close socket
   Core::Network::UDP::SocketStream::returnToPool(socket);
 }
 
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketStream* socket) const {
-  Core::Network::UDP::EventArgs::SocketStreamArgs* ssargs = Core::Network::UDP::EventArgs::SocketStreamArgs::getFromPool(socket);
-  Core::Event::Manager::get().fireEventSync(event, ssargs);
+	if (event && socket) {
+	  Core::Network::UDP::EventArgs::SocketStreamArgs* ssargs = Core::Network::UDP::EventArgs::SocketStreamArgs::getFromPool(socket);
+	  Core::Event::Manager::get().fireEventSync(event, ssargs);
+	}
 }
 
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketServer* socket) const {
-  Core::Network::UDP::EventArgs::SocketServerArgs* ssargs = Core::Network::UDP::EventArgs::SocketServerArgs::getFromPool(socket);
-  Core::Event::Manager::get().fireEventSync(event, ssargs);
+	if (event && socket) {
+	  Core::Network::UDP::EventArgs::SocketServerArgs* ssargs = Core::Network::UDP::EventArgs::SocketServerArgs::getFromPool(socket);
+	  Core::Event::Manager::get().fireEventSync(event, ssargs);
+	}
 }
 
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketClient* socket) const {
-  Core::Network::UDP::EventArgs::SocketClientArgs* scargs = Core::Network::UDP::EventArgs::SocketClientArgs::getFromPool(socket);
-  Core::Event::Manager::get().fireEventSync(event, scargs);
+	if (event && socket) {
+	  Core::Network::UDP::EventArgs::SocketClientArgs* scargs = Core::Network::UDP::EventArgs::SocketClientArgs::getFromPool(socket);
+	  Core::Event::Manager::get().fireEventSync(event, scargs);
+	}
 }
 
 /**
@@ -526,7 +534,7 @@ void Core::Network::UDP::EventArgs::SocketServerArgs::init(Core::Network::UDP::S
 }
 
 void Core::Network::UDP::EventArgs::SocketServerArgs::cleanup(void) {
-  Core::Network::UDP::EventArgs::SocketStreamArgs::returnToPool(this);
+  Core::Network::UDP::EventArgs::SocketServerArgs::returnToPool(this);
 }
 
 /**
@@ -546,5 +554,5 @@ void Core::Network::UDP::EventArgs::SocketClientArgs::init(Core::Network::UDP::S
 }
 
 void Core::Network::UDP::EventArgs::SocketClientArgs::cleanup(void) {
-  Core::Network::UDP::EventArgs::SocketStreamArgs::returnToPool(this);
+  Core::Network::UDP::EventArgs::SocketClientArgs::returnToPool(this);
 }

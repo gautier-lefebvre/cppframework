@@ -1,5 +1,6 @@
 #include  "Core/Network/UDP/SocketServer.hh"
 #include  "Core/Network/UDP/SocketClient.hh"
+#include  "Core/Network/Exception.hh"
 
 Core::Network::UDP::SocketServer::SocketServer(void):
   Core::Network::UDP::ASocket()
@@ -15,7 +16,7 @@ void Core::Network::UDP::SocketServer::init(void) {
   this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
 }
 
-void  Core::Network::UDP::SocketServer::bind(uint16_t port) const {
+void  Core::Network::UDP::SocketServer::bind(uint16_t port) {
   if (port == 80) {
     throw Core::Network::Exception("bind: cannot bind port 80");
   }
@@ -39,12 +40,12 @@ ssize_t Core::Network::UDP::SocketServer::sendto(SocketClient* client) {
     return 0;
   }
 
-  ssize_t ret = ::sendto(this->_fd, datagram->getBytes(), datagram->getSize(), MSG_NOSIGNAL, reinterpret_cast<sockaddr*>(&(client->socketAddress())), sizeof(sockaddr_in));
+  ssize_t ret = ::sendto(this->_fd, datagram->getBytes(), datagram->getSize(), MSG_NOSIGNAL, reinterpret_cast<const sockaddr*>(&(client->socketAddress())), sizeof(sockaddr_in));
 
   ByteArray::returnToPool(datagram);
 
   if (ret < 0) {
-    throw Core::Network::Exception(std::string("sendto: " + strerror(errno)));
+    throw Core::Network::Exception(std::string("sendto: ") + strerror(errno));
   }
 
   return ret;
@@ -60,13 +61,16 @@ ByteArray*  Core::Network::UDP::SocketServer::recvfrom(struct sockaddr_in& addr)
 
   if (ret < 0) {
     throw Core::Network::Exception(std::string("recvfrom: ") + strerror(errno));
-  } else if (ret > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
+  } else if (static_cast<size_t>(ret) > Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
     throw Core::Network::Exception(std::string("recvfrom: received a datagram bigger than the buffer size (discarded)"));
   }
 
   // copy buffer to datagram resized to the number of bytes read.
-  datagram = ByteArray::getFromPool(ret, true);
-  datagram->push(this->_buffer->atStart(), ret, false);
+  size_t size = static_cast<size_t>(ret);
+  bool resize = true;
+
+  datagram = ByteArray::getFromPool(size, resize);
+  datagram->push(this->_buffer->atStart(), size, false);
 
   return datagram;
 }

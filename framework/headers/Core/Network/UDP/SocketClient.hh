@@ -2,7 +2,6 @@
 #define   __CORE_NETWORK_UDP_SOCKETCLIENT_HH__
 
 #include  <sys/select.h>
-#include  <netinet/in.h>
 
 #include  "Library/Factory/Pool.hpp"
 #include  "Core/Network/UDP/ASocketIO.hh"

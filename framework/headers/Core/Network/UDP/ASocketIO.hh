@@ -3,6 +3,7 @@
 
 #include  <queue>
 #include  <utility>
+#include  <netinet/in.h>
 
 #include  "Library/Collection/ByteArray.hpp"
 #include  "Library/Threading/Lock.hpp"
@@ -11,17 +12,18 @@
 namespace     Core {
   namespace   Network {
     namespace UDP {
-      class   ASocketIO: public Threading::Lock, public Factory::AFactored {
+      class   ASocketIO: public virtual Threading::Lock, public virtual Factory::AFactored {
       protected:
         sockaddr_in _addr;
         std::pair<std::queue<ByteArray*>, size_t> _input;
         std::pair<std::queue<ByteArray*>, size_t> _output;
 
+      public:
         static const size_t BUFFER_SIZE;
 
       public:
-        SocketIO(void);
-        virtual ~SocketIO(void);
+        ASocketIO(void);
+        virtual ~ASocketIO(void);
 
       public:
         virtual void reinit(void);

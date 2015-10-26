@@ -167,6 +167,14 @@ public:
   void  init(size_t size, bool force = false);
 
   /**
+   *  \brief Copies data. Resizes the ByteArray if not enough space.
+   *
+   *  \param ptr a pointer to the start of the data.
+   *  \param size the size of the data.
+   */
+  void  init(const void* ptr, size_t size);
+
+  /**
    *  \brief Seeks a sequence of bytes inside the ByteArray.
    *  \param ptr the start of the sequence to seek.
    *  \param size the number of bytes of the sequence to seek.
