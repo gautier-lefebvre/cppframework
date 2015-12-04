@@ -4,6 +4,8 @@
 #include  "Core/Network/TCP/Socket.hh"
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/UDP/SocketClient.hh"
+#include  "Core/Network/UDP/SocketStream.hh"
+#include  "Core/Network/UDP/SocketServer.hh"
 #include  "Core/Worker/Task.hh"
 #include  "Core/Factory.hh"
 
@@ -13,7 +15,9 @@ void Core::Factory::init(void) {
   Core::Network::HTTP::Request::initPool("Core::Network::HTTP::Request");
   Core::Network::HTTP::Response::initPool("Core::Network::HTTP::Response");
   Core::Network::TCP::SocketStream::initPool("Core::Network::TCP::SocketStream");
-  Core::Network::UDP::SocketClient::initPool("Core::Network::TCP::SocketClient");
+  Core::Network::UDP::SocketClient::initPool("Core::Network::UDP::SocketClient");
+  Core::Network::UDP::SocketStream::initPool("Core::Network::UDP::SocketStream");
+  Core::Network::UDP::SocketServer::initPool("Core::Network::UDP::SocketServer");
 
   Core::Worker::EventTask::initPool("Core::Worker::EventTask");
   Core::Worker::HTTPTask::initPool("Core::Worker::HTTPTask");
@@ -28,6 +32,8 @@ void Core::Factory::end(void) {
   Core::Network::HTTP::Response::destroyPool();
   Core::Network::TCP::SocketStream::destroyPool();
   Core::Network::UDP::SocketClient::destroyPool();
+  Core::Network::UDP::SocketStream::destroyPool();
+  Core::Network::UDP::SocketServer::destroyPool();
 
   Core::Worker::EventTask::destroyPool();
   Core::Worker::HTTPTask::destroyPool();
