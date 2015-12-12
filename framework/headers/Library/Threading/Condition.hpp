@@ -12,7 +12,7 @@ namespace  Threading {
    *  \class Condition Library/Threading/Condition.hpp
    *  \brief A condition variable (synchronization primitive) using a reentrant lock (or recursive mutex).
    */
-  class  Condition :public Threading::Lock {
+  class  Condition :public Threading::Lockable {
   private:
     std::condition_variable_any _condvar; /*!< the basic condition variable. */
 
@@ -92,31 +92,31 @@ namespace  Threading {
   };
 
   /**
-   *  \class Notifiable Library/Threading/Condition.hpp
+   *  \class TNotifiable Library/Threading/Condition.hpp
    *  \brief A templated class to use when setting an object notifiable.
-   *  Can be useful for notifying object of the STL, like `Threading::Notifiable<std::list<int>>`.
+   *  Can be useful for notifying object of the STL, like `Threading::TNotifiable<std::list<int>>`.
    */
   template<class C>
-  class  Notifiable :public C, public Threading::Condition {
+  class  TNotifiable :public C, public Threading::Condition {
   public:
     /**
-     *  \brief Default constructor of Notifiable.
+     *  \brief Default constructor of TNotifiable.
      *  \params args the arguments which will be passed to the constructor of the templated class.
      */
     template<typename... Args>
-    Notifiable(const Args&... args):
+    TNotifiable(const Args&... args):
       C(args...),
       Threading::Condition()
     {}
 
     /**
-     *  \brief Destructor of Notifiable.
+     *  \brief Destructor of TNotifiable.
      */
-    virtual ~Notifiable(void) {}
+    virtual ~TNotifiable(void) {}
   };
 
   /**
-   *  \class NotifiableThread Library/Threading/Condition.hpp
+   *  \class TNotifiableThread Library/Threading/Condition.hpp
    *  \brief A struct containing a pointer to a thread, and a Condition.
    *
    *  I'm not using Notifiable<std::thread*> because I'm not sure of everything this implies.

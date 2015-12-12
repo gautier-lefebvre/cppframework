@@ -8,7 +8,7 @@
 namespace     Core {
   namespace   Network {
     namespace UDP {
-      class   ASocket :public virtual Threading::Lock, public virtual Factory::AFactored {
+      class   ASocket :public virtual Threading::Lockable, public virtual Factory::AFactored {
       protected:
         int _fd;
         ByteArray* _buffer;

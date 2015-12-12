@@ -12,7 +12,7 @@ const std::map<Core::Worker::ATask::Source, Core::Worker::Thread::WorkerHandler>
 };
 
 Core::Worker::Thread::Thread(size_t id, Core::Worker::Thread::Assignment assignment):
-  Threading::Lock(),
+  Threading::Lockable(),
   AEndable(),
   _id(id),
   _thread(nullptr)

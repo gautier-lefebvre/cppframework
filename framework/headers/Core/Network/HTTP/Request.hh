@@ -9,7 +9,7 @@
 namespace     Core {
   namespace   Network {
     namespace HTTP {
-      struct  Request :public AMessage, public Factory::HasBasicPool<Core::Network::HTTP::Request, 10, 2> {
+      struct  Request :public AMessage, public Factory::TPooled<Core::Network::HTTP::Request, 10, 2> {
         std::string method;
         std::string url;
         bool secure;

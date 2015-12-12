@@ -406,7 +406,7 @@ void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::N
  */
 
 Core::Network::TCP::Manager::Server::Server(uint16_t port, Core::Network::TCP::Socket* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
-  Threading::Lock(),
+  Threading::Lockable(),
   port(port),
   server(server),
   clients(),

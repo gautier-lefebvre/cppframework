@@ -2,7 +2,7 @@
 #include  "Library/Tool/Macro.hh"
 
 Logger::Logger(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   _level(Logger::Level::DEBUG),
   _offset(0),
   _file(nullptr)

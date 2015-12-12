@@ -16,7 +16,7 @@ namespace  Factory {
    *  \brief a templated pool to store objects without having to dynamically create them.
    */
   template<class C>
-  class  Pool :public Threading::Lock {
+  class  Pool :public Threading::Lockable {
   private:
     std::queue<C*> _pool; /*!< the collection of objects. */
     size_t         _hydrate; /*!< the number of objects to create when the pool is empty. */
@@ -32,7 +32,7 @@ namespace  Factory {
      *  \param classname the stored objects' classname.
      */
     Pool(size_t size, size_t hydrate, const std::string &classname):
-      Threading::Lock::Lock(),
+      Threading::Lockable(),
       _pool(),
       _hydrate(hydrate),
       _name(classname) {
@@ -122,12 +122,12 @@ namespace  Factory {
   };
 
   /**
-   *  \class BasicPool Library/Factory/Pool.hpp
+   *  \class TPooled Library/Factory/Pool.hpp
    *  \brief A base class for all objects pools.
    *  Base classes are intended to be singleton, otherwise this class is useless and Pool could be used.
    */
   template<class C, size_t O, size_t H>
-  class HasBasicPool {
+  class TPooled {
   protected:
     static Factory::Pool<C>* _pool; /*!< the pool of objects. */
     static const size_t POOL_ORIGINAL_SIZE = O;
@@ -182,6 +182,6 @@ namespace  Factory {
 }
 
 template<class C, size_t O, size_t H>
-Factory::Pool<C>*  Factory::HasBasicPool<C, O, H>::_pool = nullptr;
+Factory::Pool<C>*  Factory::TPooled<C, O, H>::_pool = nullptr;
 
 #endif    /* __LIBRARY_FACTORY_POOL_HPP__ */

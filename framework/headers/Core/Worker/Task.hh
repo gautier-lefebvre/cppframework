@@ -33,7 +33,7 @@ namespace    Core {
       Source  getSource(void) const;
     };
 
-    class  EventTask :public ATask, public Factory::HasBasicPool<Core::Worker::EventTask, 100, 20> {
+    class  EventTask :public ATask, public Factory::TPooled<Core::Worker::EventTask, 100, 20> {
     public:
       std::chrono::steady_clock::time_point _eventCreation;
       const Core::Event::Event* _event;
@@ -50,7 +50,7 @@ namespace    Core {
       void init(const Core::Event::Event*, Core::Event::IEventArgs*);
     };
 
-    class  HTTPTask :public ATask, public Factory::HasBasicPool<Core::Worker::HTTPTask, 20, 5> {
+    class  HTTPTask :public ATask, public Factory::TPooled<Core::Worker::HTTPTask, 20, 5> {
     public:
       std::function<void (const Core::Network::HTTP::Response*)> _callback;
       std::function<void (void)> _cleanup;
@@ -67,7 +67,7 @@ namespace    Core {
       void init(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*); // same
     };
 
-    class  PeriodicTask :public ATask, public Factory::HasBasicPool<Core::Worker::PeriodicTask, 10, 2> {
+    class  PeriodicTask :public ATask, public Factory::TPooled<Core::Worker::PeriodicTask, 10, 2> {
     public:
       std::function<void (void)> _callback;
       std::function<void (void)> _clean;
@@ -86,7 +86,7 @@ namespace    Core {
       void  stop(bool);
     };
 
-    class  DelayedTask :public Factory::AFactored, public Factory::HasBasicPool<Core::Worker::DelayedTask, 50, 10> {
+    class  DelayedTask :public Factory::AFactored, public Factory::TPooled<Core::Worker::DelayedTask, 50, 10> {
     public:
       ATask*  _task;
       std::chrono::steady_clock::time_point  _timePoint;

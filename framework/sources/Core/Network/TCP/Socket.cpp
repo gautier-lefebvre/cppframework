@@ -12,7 +12,7 @@
 
 Core::Network::TCP::Socket::Socket(void):
   Factory::AFactored(),
-  Threading::Lock(),
+  Threading::Lockable(),
   _fd(-1)
 {}
 

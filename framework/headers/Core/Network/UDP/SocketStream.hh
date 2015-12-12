@@ -12,7 +12,7 @@ namespace     Core {
       /**
        *  Socket "client" (!= client of a server socket)
        */
-      class   SocketStream: public ASocketIO, public ASocket, public Factory::HasBasicPool<Core::Network::UDP::SocketStream, 2, 1> {
+      class   SocketStream: public ASocketIO, public ASocket, public Factory::TPooled<Core::Network::UDP::SocketStream, 2, 1> {
       public:
         SocketStream(void);
         virtual ~SocketStream(void);

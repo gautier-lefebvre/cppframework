@@ -9,7 +9,7 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class   Socket :public Factory::AFactored, public Threading::Lock {
+      class   Socket :public Factory::AFactored, public Threading::Lockable {
       protected:
         int _fd;
 

@@ -10,24 +10,24 @@
 namespace   Threading {
 
   /**
-   *  \class Lock Library/Threading/Lock.hpp
+   *  \class Lockable Library/Threading/Lock.hpp
    *  \brief A reentrant lock class.
    */
-  class  Lock {
+  class  Lockable {
   protected:
     std::recursive_mutex _lock; /*!< the mutex used for locking */
 
   public:
     /**
-     *  \brief Constructor of Lock.
+     *  \brief Constructor of Lockable.
      *  Inits the mutex.
      */
-    Lock(void);
+    Lockable(void);
 
     /**
-     *  \brief Destructor of Lock.
+     *  \brief Destructor of Lockable.
      */
-    virtual ~Lock(void);
+    virtual ~Lockable(void);
 
   public:
     /**
@@ -42,36 +42,36 @@ namespace   Threading {
   };
 
   /**
-   *  \class Lockable Library/Threading/Lock.hpp
+   *  \class TLockable Library/Threading/Lock.hpp
    *  \brief A templated class to use when setting an object lockable.
-   *  Can be useful for locking object of the STL, like `Threading::Lockable<std::list<int>>`.
+   *  Can be useful for locking object of the STL, like `Threading::TLockable<std::list<int>>`.
    */
   template<class C>
-  class  Lockable :public C, public Threading::Lock {
+  class  TLockable :public C, public Threading::Lockable {
   public:
     /**
-     *  \brief Copy constructor of Lockable.
-     *  \param oth the Lockable object to copy.
+     *  \brief Copy constructor of TLockable.
+     *  \param oth the TLockable object to copy.
      */
-    Lockable(const Lockable<C>& oth):
+    TLockable(const TLockable<C>& oth):
       C(oth),
-      Threading::Lock()
+      Threading::Lockable()
     {}
 
     /**
-     *  \brief Default constructor of Lockable.
+     *  \brief Default constructor of TLockable.
      *  \params args the arguments which will be passed to the constructor of the templated class.
      */
     template<typename... Args>
-    Lockable(const Args&... args):
+    TLockable(const Args&... args):
       C(args...),
-      Threading::Lock()
+      Threading::Lockable()
     {}
 
     /**
-     *  \brief Destructor of Lockable.
+     *  \brief Destructor of TLockable.
      */
-    virtual ~Lockable(void) {}
+    virtual ~TLockable(void) {}
   };
 
   /**
@@ -187,10 +187,10 @@ namespace   Threading {
   };
 }
 
-typedef std::lock_guard<Threading::Lock> ScopeLock;
-typedef std::lock_guard<std::mutex>      ScopeLockMutex;
+typedef std::lock_guard<Threading::Lockable> ScopeLock;
+typedef std::lock_guard<std::mutex>          ScopeLockMutex;
 
-#define SCOPELOCK(x)       std::lock_guard<Threading::Lock> lockguard(*(x));
-#define SCOPELOCK_MUTEX(x) std::lock_guard<std::mutex>      lockguard_mutex(x);
+#define SCOPELOCK(x)       std::lock_guard<Threading::Lockable> lockguard(*(x));
+#define SCOPELOCK_MUTEX(x) std::lock_guard<std::mutex>          lockguard_mutex(x);
 
 #endif    /* __LIBRARY_THREADING_LOCK_HPP__ */

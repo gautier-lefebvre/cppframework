@@ -4,7 +4,7 @@
 const size_t Core::Network::UDP::ASocketIO::BUFFER_SIZE = 32768;
 
 Core::Network::UDP::ASocketIO::ASocketIO(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   Factory::AFactored(),
   _addr(),
   _input(std::make_pair(std::queue<ByteArray*>(), 0)),

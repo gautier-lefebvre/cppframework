@@ -12,7 +12,7 @@
 #include  "Core/Network/Exception.hh"
 
 Core::Network::HTTP::Connection::Connection(const std::string& host, uint16_t port, uint16_t sport, const std::string& user_agent):
-  Threading::Lock(),
+  Threading::Lockable(),
   AEndable(),
   _host(host),
   _port(port),

@@ -2,7 +2,7 @@
 #include  "Core/Exception.hh"
 
 Core::Worker::Manager::Manager(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   AEndable(),
   _pendingTasks(),
   _delayedTasks([] (const Core::Worker::DelayedTask *a, const Core::Worker::DelayedTask *b) -> bool { return *a < *b; }),

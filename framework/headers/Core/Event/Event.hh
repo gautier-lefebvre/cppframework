@@ -12,7 +12,7 @@ namespace   Core {
       APP
     };
 
-    class Event :public Factory::AFactored, public Factory::HasBasicPool<Core::Event::Event, 50, 10> {
+    class Event :public Factory::AFactored, public Factory::TPooled<Core::Event::Event, 50, 10> {
     private:
       Source _source;
 

@@ -16,7 +16,7 @@
  *  \class Logger Library/Tool/Logger.hpp
  *  \brief A singleton object used for logging.
  */
-class Logger :public Singleton<Logger>, public Threading::Lock {
+class Logger :public Singleton<Logger>, public Threading::Lockable {
   friend class Singleton<Logger>;
 public:
   /*! Logging levels. */
@@ -162,6 +162,7 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
 # define LOGGER_DEL_OFFSET(x)   Logger::get().delOffset((x))
 # define LOGGER_INIT(x)         Logger::get().init((x))
 # define LOGGER_INIT_FILE(x, y) Logger::get().init((x), y)
+# define LOGGER_DESTROY         Logger::destroy()
 #else
 # define LOG(x, y)              (void)(x);(void)(y)
 # define DEBUG(x)               (void)(x)
@@ -174,6 +175,7 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
 # define LOGGER_DEL_OFFSET(x)   (void)(x)
 # define LOGGER_INIT(x)         (void)(x)
 # define LOGGER_INIT_FILE(x, y) (void)(x);(void)(y)
+# define LOGGER_DESTROY         (void)
 #endif    /* __DEBUG__ */
 
 

@@ -13,7 +13,7 @@ namespace     Core {
       /**
        *  Client of a server socket
        */
-      class   SocketClient :public ASocketIO, public Factory::HasBasicPool<Core::Network::UDP::SocketClient, 100, 20> {
+      class   SocketClient :public ASocketIO, public Factory::TPooled<Core::Network::UDP::SocketClient, 100, 20> {
       private:
         std::pair<uint32_t, uint16_t> _info; // IP, port
 

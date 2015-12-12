@@ -5,6 +5,9 @@
 #include  "Core/Network/Exception.hh"
 
 Core::Network::Manager::Manager(void):
+  Threading::Lockable(),
+  AEndable(),
+  Initializable(),
   _input(),
   _output(),
   _tcp(_input, _output),
@@ -60,12 +63,25 @@ void Core::Network::Manager::end(void) {
 }
 
 void Core::Network::Manager::init(void) {
-  // ignore SIGPIPE (recv and send will return error)
-  signal(SIGPIPE, SIG_IGN);
+  if (!this->isInitialized()) {
+    // only execute this once.
+    this->isInitialized(false);
 
-  // create IO threads
-  this->_input.thread  = new std::thread(&Core::Network::Manager::inputRoutine, this);
-  this->_output.thread = new std::thread(&Core::Network::Manager::outputRoutine, this);
+    // ignore SIGPIPE (recv and send will return error)
+    signal(SIGPIPE, SIG_IGN);
+
+    // create IO threads
+    this->_input.thread  = new std::thread(&Core::Network::Manager::inputRoutine, this);
+    this->_output.thread = new std::thread(&Core::Network::Manager::outputRoutine, this);
+  }
+}
+
+void Core::Network::Manager::endTCP(void) {
+  this->_tcp.clear();
+}
+
+void Core::Network::Manager::endUDP(void) {
+  this->_udp.clear();
 }
 
 void Core::Network::Manager::inputRoutine(void) {

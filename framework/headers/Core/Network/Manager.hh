@@ -3,6 +3,7 @@
 
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
+#include  "Library/Property/Initializable.hpp"
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
 #include  "Core/Network/TCP/Manager.hh"
@@ -10,7 +11,7 @@
 
 namespace    Core {
   namespace  Network {
-    class    Manager :public Singleton<Core::Network::Manager>, public Threading::Lock, public AEndable {
+    class    Manager :public Singleton<Core::Network::Manager>, public Threading::Lockable, public AEndable, public Initializable {
       friend class Singleton<Core::Network::Manager>;
     public:
       Threading::NotifiableThread _input;
@@ -32,7 +33,7 @@ namespace    Core {
       virtual void end(void);
 
     public:
-      void init(void); // <- signal(SIGPIPE, SIG_IGN), and create threads
+      void init(void);
 
     private:
       void inputRoutine(void);

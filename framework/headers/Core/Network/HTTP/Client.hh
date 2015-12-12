@@ -11,12 +11,15 @@ namespace     Core {
     namespace HTTP {
       class Client:
         public Singleton<Core::Network::HTTP::Client>,
-        public Threading::Lock,
+        public Threading::Lockable,
         public AEndable {
         friend class Singleton<Core::Network::HTTP::Client>;
       private:
-        std::string         _userAgent;
-        std::vector<Connection*>  _connections;
+        std::string _userAgent;
+        std::vector<Connection*> _connections;
+
+      public:
+        static const std::string defaultUserAgent;
 
       private:
         Client(const Client&) = delete;

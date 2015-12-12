@@ -1,16 +1,16 @@
 #include  "Library/Threading/Lock.hpp"
 
-Threading::Lock::Lock(void):
+Threading::Lockable::Lockable(void):
   _lock()
 {}
 
-Threading::Lock::~Lock(void) {}
+Threading::Lockable::~Lockable(void) {}
 
-void  Threading::Lock::lock(void) {
+void  Threading::Lockable::lock(void) {
   this->_lock.lock();
 }
 
-void  Threading::Lock::unlock(void) {
+void  Threading::Lockable::unlock(void) {
   this->_lock.unlock();
 }
 

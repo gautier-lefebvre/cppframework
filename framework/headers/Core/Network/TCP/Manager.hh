@@ -21,7 +21,7 @@ namespace       Core {
 
     namespace   TCP {
       namespace EventArgs {
-        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketStreamArgs, 20, 10> {
+        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketStreamArgs, 20, 10> {
         public:
           Core::Network::TCP::SocketStream* socket;
 
@@ -34,7 +34,7 @@ namespace       Core {
           void init(Core::Network::TCP::SocketStream*);
         };
 
-        struct  SocketArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketArgs, 2, 1> {
+        struct  SocketArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketArgs, 2, 1> {
         public:
           Core::Network::TCP::Socket* socket;
 
@@ -50,11 +50,11 @@ namespace       Core {
 
       class     Manager {
       public:
-        struct  Server :public Threading::Lock {
+        struct  Server :public Threading::Lockable {
         public:
           uint16_t port;
           Core::Network::TCP::Socket* server;
-          Threading::Lockable<std::list<Core::Network::TCP::SocketStream*>> clients;
+          Threading::TLockable<std::list<Core::Network::TCP::SocketStream*>> clients;
           std::set<uint32_t> accept;
           std::set<uint32_t> blacklist;
 
@@ -71,7 +71,7 @@ namespace       Core {
         };
 
       public:
-        struct  Client :public Threading::Lock {
+        struct  Client :public Threading::Lockable {
         public:
           std::string hostname;
           uint16_t port;
@@ -88,8 +88,8 @@ namespace       Core {
         };
 
       public:
-        typedef Threading::Lockable<std::list<Server>> ServerList;
-        typedef Threading::Lockable<std::list<Client>> ClientList;
+        typedef Threading::TLockable<std::list<Server>> ServerList;
+        typedef Threading::TLockable<std::list<Client>> ClientList;
 
       private:
         ServerList _servers;

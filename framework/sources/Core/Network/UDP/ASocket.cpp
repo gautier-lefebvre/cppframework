@@ -7,7 +7,7 @@
 #include  "Core/Network/Exception.hh"
 
 Core::Network::UDP::ASocket::ASocket(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   Factory::AFactored(),
   _fd(-1),
   _buffer(nullptr)

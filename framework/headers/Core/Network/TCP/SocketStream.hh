@@ -8,7 +8,7 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
-      class   SocketStream :public Socket, public Factory::HasBasicPool<Core::Network::TCP::SocketStream, 100, 20> {
+      class   SocketStream :public Socket, public Factory::TPooled<Core::Network::TCP::SocketStream, 100, 20> {
       protected:
         ByteArray*  _input;
         ByteArray*  _output;

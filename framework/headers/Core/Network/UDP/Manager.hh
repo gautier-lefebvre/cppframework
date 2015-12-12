@@ -21,7 +21,7 @@ namespace       Core {
   namespace     Network {
     namespace   UDP {
       namespace EventArgs {
-        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketStreamArgs, 20, 10> {
+        struct  SocketStreamArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketStreamArgs, 20, 10> {
         public:
           Core::Network::UDP::SocketStream* socket;
 
@@ -34,7 +34,7 @@ namespace       Core {
           void init(Core::Network::UDP::SocketStream*);
         };
 
-        struct  SocketClientArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketClientArgs, 2, 1> {
+        struct  SocketClientArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketClientArgs, 2, 1> {
         public:
           Core::Network::UDP::SocketClient* socket;
 
@@ -47,7 +47,7 @@ namespace       Core {
           void init(Core::Network::UDP::SocketClient*);
         };
 
-        struct  SocketServerArgs :public Core::Event::IEventArgs, public Factory::HasBasicPool<EventArgs::SocketServerArgs, 2, 1> {
+        struct  SocketServerArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketServerArgs, 2, 1> {
         public:
           Core::Network::UDP::SocketServer* socket;
 
@@ -63,11 +63,11 @@ namespace       Core {
 
       class   Manager {
       public:
-        struct  Server :public Threading::Lock {
+        struct  Server :public Threading::Lockable {
         public:
           uint16_t port;
           Core::Network::UDP::SocketServer* server;
-          Threading::Lockable<std::list<Core::Network::UDP::SocketClient*>> clients;
+          Threading::TLockable<std::list<Core::Network::UDP::SocketClient*>> clients;
           std::set<uint32_t> accept;
           std::set<uint32_t> blacklist;
 
@@ -84,7 +84,7 @@ namespace       Core {
         };
 
       public:
-        struct  Client :public Threading::Lock {
+        struct  Client :public Threading::Lockable {
         public:
           std::string hostname;
           uint16_t port;
@@ -101,8 +101,8 @@ namespace       Core {
         };
 
       public:
-        typedef Threading::Lockable<std::list<Server>> ServerList;
-        typedef Threading::Lockable<std::list<Client>> ClientList;
+        typedef Threading::TLockable<std::list<Server>> ServerList;
+        typedef Threading::TLockable<std::list<Client>> ClientList;
 
       private:
         ServerList _servers;

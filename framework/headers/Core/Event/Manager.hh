@@ -10,7 +10,7 @@
 
 namespace    Core {
   namespace  Event {
-    class  Manager :public Singleton<Core::Event::Manager>, public Threading::Lock {
+    class  Manager :public Singleton<Core::Event::Manager>, public Threading::Lockable {
       friend class Singleton<Core::Event::Manager>;
     private:
       std::unordered_map<const Core::Event::Event*, Core::Event::EventInfo>  _events;

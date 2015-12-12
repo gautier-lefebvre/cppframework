@@ -12,7 +12,7 @@
 namespace     Core {
   namespace   Network {
     namespace UDP {
-      class   ASocketIO: public virtual Threading::Lock, public virtual Factory::AFactored {
+      class   ASocketIO: public virtual Threading::Lockable, public virtual Factory::AFactored {
       protected:
         sockaddr_in _addr;
         std::pair<std::queue<ByteArray*>, size_t> _input;

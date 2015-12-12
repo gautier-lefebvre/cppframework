@@ -445,7 +445,7 @@ void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::N
  */
 
 Core::Network::UDP::Manager::Server::Server(uint16_t port, Core::Network::UDP::SocketServer* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
-  Threading::Lock(),
+  Threading::Lockable(),
   port(port),
   server(server),
   clients(),

@@ -12,7 +12,7 @@
 namespace     Core {
   namespace   Network {
     namespace HTTP {
-      class Connection :public Threading::Lock, public AEndable {
+      class Connection :public Threading::Lockable, public AEndable {
       private:
         struct upload_object {
           const uint8_t*  ptr;
@@ -25,7 +25,7 @@ namespace     Core {
         uint16_t  _secureport;
         std::string _userAgent;
         std::thread *_thread;
-        Threading::Notifiable<std::queue<Core::Network::HTTP::Request*>>  _pendingRequests;
+        Threading::TNotifiable<std::queue<Core::Network::HTTP::Request*>>  _pendingRequests;
 
       public:
         Connection(const std::string &, uint16_t, uint16_t, const std::string& user_agent);

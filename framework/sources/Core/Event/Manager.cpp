@@ -4,7 +4,7 @@
 #include  "Core/Worker/Thread.hh"
 
 Core::Event::Manager::Manager(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   _events()
 {}
 

@@ -13,7 +13,7 @@ namespace     Core {
       /**
        *  Server socket
        */
-      class SocketServer :public ASocket, public Factory::HasBasicPool<Core::Network::UDP::SocketServer, 2, 1>  {
+      class SocketServer :public ASocket, public Factory::TPooled<Core::Network::UDP::SocketServer, 2, 1>  {
       public:
         SocketServer(void);
         virtual ~SocketServer(void);

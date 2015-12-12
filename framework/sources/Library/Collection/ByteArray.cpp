@@ -6,7 +6,7 @@
 
 ByteArray::ByteArray(size_t s):
   Factory::AFactored(),
-  Threading::Lock(),
+  Threading::Lockable(),
   _bytearray(new uint8_t[s]),
   _size(0),
   _sizemax(s) {

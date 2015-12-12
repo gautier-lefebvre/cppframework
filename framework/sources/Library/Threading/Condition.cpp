@@ -1,7 +1,7 @@
 #include  "Library/Threading/Condition.hpp"
 
 Threading::Condition::Condition(void):
-  Threading::Lock(),
+  Threading::Lockable(),
   _condvar()
 {}
 

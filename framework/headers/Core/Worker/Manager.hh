@@ -15,11 +15,11 @@
 
 namespace    Core {
   namespace  Worker {
-    class  Manager :public Singleton<Core::Worker::Manager>, public Threading::Lock, public AEndable {
+    class  Manager :public Singleton<Core::Worker::Manager>, public Threading::Lockable, public AEndable {
       friend class Singleton<Core::Worker::Manager>;
     public:
-      typedef Threading::Notifiable<std::queue<Core::Worker::ATask*>>  TaskQueue;
-      typedef Threading::Notifiable<std::priority_queue<Core::Worker::DelayedTask*, std::vector<Core::Worker::DelayedTask*>, std::function<bool (const Core::Worker::DelayedTask*, const Worker::DelayedTask*)>>>  DelayedTaskQueue;
+      typedef Threading::TNotifiable<std::queue<Core::Worker::ATask*>>  TaskQueue;
+      typedef Threading::TNotifiable<std::priority_queue<Core::Worker::DelayedTask*, std::vector<Core::Worker::DelayedTask*>, std::function<bool (const Core::Worker::DelayedTask*, const Worker::DelayedTask*)>>>  DelayedTaskQueue;
 
     private:
       TaskQueue        _pendingTasks;

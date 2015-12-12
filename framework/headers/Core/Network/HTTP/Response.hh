@@ -6,7 +6,7 @@
 namespace     Core {
   namespace   Network {
     namespace HTTP {
-      struct  Response :public AMessage, public Factory::HasBasicPool<Core::Network::HTTP::Response, 10, 2> {
+      struct  Response :public AMessage, public Factory::TPooled<Core::Network::HTTP::Response, 10, 2> {
         enum class  Status {
           CONTINUE                        = 100,
           SWITCHING_PROTOCOLS             = 101,
