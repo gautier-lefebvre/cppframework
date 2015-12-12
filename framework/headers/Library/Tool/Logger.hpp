@@ -175,7 +175,7 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
 # define LOGGER_DEL_OFFSET(x)   (void)(x)
 # define LOGGER_INIT(x)         (void)(x)
 # define LOGGER_INIT_FILE(x, y) (void)(x);(void)(y)
-# define LOGGER_DESTROY         (void)
+# define LOGGER_DESTROY         ;
 #endif    /* __DEBUG__ */
 
 

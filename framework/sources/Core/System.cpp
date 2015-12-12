@@ -37,7 +37,7 @@ void Core::System::cleanup(void) {
   Core::Network::HTTP::Client::destroy();
   Core::Network::Manager::destroy();
   Core::Worker::Manager::destroy();
-  LOGGER_DESTROY();
+  LOGGER_DESTROY;
 
   // destroy core factory
   Core::Factory::get().end();
@@ -102,7 +102,7 @@ void Core::System::endUDP(void) {
   SCOPELOCK(this);
   if (this->_modulesInitialized.at(Core::System::Modules::UDP)) {
     Core::Network::Manager::get().endUDP();
-    this->_modulesInitialized[Core::System::Modules::TCP] = false;
+    this->_modulesInitialized[Core::System::Modules::UDP] = false;
 
     // if TCP was not init or already ended -> end network manager
     if (!this->_modulesInitialized.at(Core::System::Modules::TCP)) {
@@ -129,15 +129,15 @@ void Core::System::endWorkerThreads() {
 
 void Core::System::initLogger(Logger::Level level) {
   SCOPELOCK(this);
-  if (!this->_modulesInitialized.at(Core::System::Modules::UDP)) {
-    LOGGER_SET_LEVEL(level);
+  if (!this->_modulesInitialized.at(Core::System::Modules::LOGGER)) {
+    LOGGER_INIT(level);
     this->_modulesInitialized[Core::System::Modules::LOGGER] = true;
   }
 }
 
 void Core::System::run(void) {
   // default config for workers (need at least 1 worker thread)
-  this->initWorkers(1, false);
+  this->initWorkerThreads(1, false);
 
   // wait for sigint
   SCOPELOCK(&(this->_endCondition));

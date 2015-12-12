@@ -34,6 +34,8 @@ namespace    Core {
 
     public:
       void init(void);
+      void endTCP(void);
+      void endUDP(void);
 
     private:
       void inputRoutine(void);

@@ -8,6 +8,7 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp      \
             $(LIBRARYDIR)Encryption/XOR.cpp            \
             $(LIBRARYDIR)Factory/AFactored.cpp         \
             $(LIBRARYDIR)Property/AEndable.cpp         \
+            $(LIBRARYDIR)Property/Initializable.cpp    \
             $(LIBRARYDIR)ThirdParty/json.cpp           \
             $(LIBRARYDIR)ThirdParty/sha512.cpp         \
             $(LIBRARYDIR)Threading/Condition.cpp       \
@@ -23,6 +24,7 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp      \
 COREDIR=    $(SRCDIR)Core/
 CORESRC=    $(COREDIR)Exception.cpp                    \
             $(COREDIR)Factory.cpp                      \
+            $(COREDIR)System.cpp                       \
             $(COREDIR)Event/Event.cpp                  \
             $(COREDIR)Event/EventInfo.cpp              \
             $(COREDIR)Event/Manager.cpp                \
@@ -58,7 +60,6 @@ LDPTHREAD=  -lpthread
 LDFLAGS=    $(LDPTHREAD) -lssl -lcrypto -lcurl
 
 CXXFLAGS=   -Iheaders/ -std=c++11 -W -Wall -Wextra -Werror
-# CXXFLAGS+=  -c -fPIC # dynamic library
 
 CXX=        g++
 
@@ -72,20 +73,23 @@ debug:      compile
 nodebug:    compile
 
 compile:    $(OBJ)
-						@$(CXX) -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
-						# @$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+			@$(CXX) -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+
+dll:		CXXFLAGS += -c -fPIC
+dll:		$(OBJ)
+			@$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
 
 %.o:        %.cpp
-						@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
+			@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
 
 clean:
-						@rm -f $(OBJ) && echo "Objects removed"
+			@rm -f $(OBJ) && echo "Objects removed"
 
 clean_dep:
-						@rm -f $(DEPS) && echo "Dependencies removed"
+			@rm -f $(DEPS) && echo "Dependencies removed"
 
 fclean:     clean clean_dep
-						@rm -f $(NAME) && echo "Executable removed"
+			@rm -f $(NAME) && echo "Executable removed"
 
 re:         fclean all
 

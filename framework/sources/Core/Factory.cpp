@@ -1,4 +1,3 @@
-#include  "Core/Factory.hh"
 #include  "Library/Collection/ByteArray.hpp"
 #include  "Core/Network/HTTP/Request.hh"
 #include  "Core/Network/HTTP/Response.hh"
@@ -8,6 +7,7 @@
 #include  "Core/Network/UDP/SocketStream.hh"
 #include  "Core/Network/UDP/SocketServer.hh"
 #include  "Core/Worker/Task.hh"
+#include  "Core/Factory.hh"
 
 Core::Factory::Factory(void):
   Initializable(),

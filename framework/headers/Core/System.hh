@@ -13,7 +13,7 @@ namespace Core {
   class   System :public Threading::Lockable, public AEndable {
   private:
     enum  Modules {
-      HTTP_CLIENT,
+      HTTP,
       UDP,
       TCP,
       WORKERS,
