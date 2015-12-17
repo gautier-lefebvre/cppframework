@@ -42,11 +42,16 @@ void  Core::Network::HTTP::Client::init(const std::string& user_agent) {
 
 Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHostPort(const std::string& host, uint16_t port, uint16_t secureport, bool create) {
   SCOPELOCK(this);
+
+  // if connection found -> return connection
   for (auto &connection : this->_connections) {
     if (connection->getHost() == host && connection->getPort() == port && connection->getSecurePort() == secureport) {
       return connection;
     }
   }
+
+  // if connection not found and can create -> create new connection
+  // else -> return nullptr
   if (create) {
     Core::Network::HTTP::Connection *connection = nullptr;
     try {

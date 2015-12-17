@@ -42,7 +42,7 @@ namespace     Core {
         void      addRequest(Core::Network::HTTP::Request*);
 
       private:
-        void      sendRequest(const Core::Network::HTTP::Request*) const;
+        Response* sendRequest(const Core::Network::HTTP::Request*) const;
         void      routine(void);
         Response* exec(const Core::Network::HTTP::Request*) const;
 

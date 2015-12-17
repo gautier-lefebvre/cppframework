@@ -34,6 +34,7 @@ void  Core::Network::HTTP::Connection::end(void) {
       this->_end = true;
       this->_pendingRequests.notify_all();
     }
+
     if (this->_thread) {
       try {
         this->_thread->join();
@@ -42,10 +43,18 @@ void  Core::Network::HTTP::Connection::end(void) {
         ERROR(e.what());
       }
     }
+
     {
       ScopeLock slrequest(this->_pendingRequests);
       while (!(this->_pendingRequests.empty())) {
-        Core::Network::HTTP::Request::returnToPool(this->_pendingRequests.front());
+        Core::Network::HTTP::Request* request = this->_pendingRequests.front();
+        if (request->asynchronous.isAsynchronous) {
+          Core::Network::HTTP::Request::returnToPool(request);
+        } else {
+          ScopeLock slsync(request->asynchronous.lock);
+          request->asynchronous.isValid = false;
+          request->asynchronous.lock.notify();
+        }
         this->_pendingRequests.pop();
       }
     }
@@ -75,6 +84,10 @@ uint16_t      Core::Network::HTTP::Connection::getSecurePort(void) const {
 
 void  Core::Network::HTTP::Connection::addRequest(::Core::Network::HTTP::Request *request) {
   if (request != nullptr) {
+    if (!request->asynchronous.isAsynchronous) {
+      request->asynchronous.isValid = true;
+    }
+
     SCOPELOCK(&(this->_pendingRequests));
     this->_pendingRequests.push(request);
     this->_pendingRequests.notify();
@@ -97,13 +110,29 @@ void  Core::Network::HTTP::Connection::routine(void) {
     }
 
     if (request != nullptr) {
-      this->sendRequest(request);
-      Core::Network::HTTP::Request::returnToPool(request);
+      Core::Network::HTTP::Response* response = this->sendRequest(request);
+
+      if (request->asynchronous.isAsynchronous) {
+        // asynchronous request
+        // add http task and return request to pool
+        if (response->status >= 400) {
+          Core::Worker::Manager::get().add(request->error, request->clean, response);
+        } else {
+          Core::Worker::Manager::get().add(request->success, request->clean, response);
+        }
+        Core::Network::HTTP::Request::returnToPool(request);
+      } else {
+        // synchronous request -> wake request
+        SCOPELOCK(&(request->asynchronous.lock));
+        request->asynchronous.response = response;
+        request->asynchronous.isValid = true;
+        request->asynchronous.lock.notify();
+      }
     }
   }
 }
 
-void  Core::Network::HTTP::Connection::sendRequest(const ::Core::Network::HTTP::Request *request) const {
+Core::Network::HTTP::Response*  Core::Network::HTTP::Connection::sendRequest(const ::Core::Network::HTTP::Request *request) const {
   Core::Network::HTTP::Response *response = nullptr;
 
   try {
@@ -114,11 +143,7 @@ void  Core::Network::HTTP::Connection::sendRequest(const ::Core::Network::HTTP::
     response->reason = e.what();
   }
 
-  if (response->status >= 400) {
-    Core::Worker::Manager::get().add(request->error, request->clean, response);
-  } else {
-    Core::Worker::Manager::get().add(request->success, request->clean, response);
-  }
+  return response;
 }
 
 size_t  Core::Network::HTTP::Connection::read_callback(void *data, size_t size, size_t nmemb, void *userdata) {
@@ -160,7 +185,6 @@ size_t  Core::Network::HTTP::Connection::write_callback(void *data, size_t size,
   response->body->push(reinterpret_cast<const uint8_t*>(data), size * nmemb, true);
   return size * nmemb;
 }
-
 
 Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
   Core::Network::HTTP::Response *response = Core::Network::HTTP::Response::getFromPool();
@@ -269,15 +293,3 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
     throw Core::Network::Exception(e.what());
   }
 }
-
-// if () { /* to upload data */
-//   Core::Network::HTTP::Connection::upload_object ul;
-//   ul.ptr = request->body->getBuffer();
-//   ul.length = request->body->getSize();
-//   /* curl_easy_setopt(handle, CURLOPT_PUT, 1L); */
-//   curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
-//   curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
-//   curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_callback);
-//   curl_easy_setopt(handle, CURLOPT_READDATA, &ul);
-//   curl_easy_setopt(handle, CURLOPT_INFILESIZE, static_cast<long>(ul.length));
-// }
