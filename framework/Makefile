@@ -17,6 +17,7 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp      \
             $(LIBRARYDIR)Tool/Date.cpp                 \
             $(LIBRARYDIR)Tool/Logger.cpp               \
             $(LIBRARYDIR)Tool/Random.cpp               \
+            $(LIBRARYDIR)Tool/Signal.cpp               \
             $(LIBRARYDIR)Tool/String.cpp               \
             $(LIBRARYDIR)Tool/TypeChecker.cpp          \
             $(LIBRARYDIR)Exception.cpp

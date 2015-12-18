@@ -1,5 +1,6 @@
 #include  "Core/System.hh"
 #include  "Library/Tool/Logger.hpp"
+#include  "Library/Tool/Signal.hh"
 #include  "Core/Network/HTTP/Client.hh"
 #include  "Core/Network/Manager.hh"
 #include  "Core/Worker/Manager.hh"
@@ -37,6 +38,7 @@ void Core::System::cleanup(void) {
   Core::Network::HTTP::Client::destroy();
   Core::Network::Manager::destroy();
   Core::Worker::Manager::destroy();
+  Signal::destroy();
   LOGGER_DESTROY;
 
   // destroy core factory
