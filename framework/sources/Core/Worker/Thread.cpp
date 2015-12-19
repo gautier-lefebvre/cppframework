@@ -160,6 +160,10 @@ void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exe
           WARNING(e.what());
         }
       }
+      // if not unregistered but in the pool -> unregister now
+      else if (!eventTask->_event->isValid()) {
+        Core::Event::Manager::get().unregisterEvent(eventTask->_event);
+      }
 
       // return the arguments and its attributes to their factory
       if (eventTask->_args) {

@@ -54,148 +54,7 @@ Another object can subscribe to a registered event, and provide a callback metho
 
 Be careful though, you should NEVER declare an event that would be fired upon destruction of your object, since they are always executed asynchronously, which means after your object would have been destroyed (is that english ?). Anyway, the address of your event would be invalid.
 
-You must always unregister your events before destroying them.
-
-Below, an example:
-- MyClass creates a list and 2 events: one which will be fired when a value is inserted in the list, and one which is fired when the list is cleared.
-- MyClass registers its events.
-- MySubscriber creates an instance of MyClass and subscribes to the event onInsert, providing a callback method.
-- MyClass fires the events in methods `clear` and `insert`, passing a struct inheriting from Core::Event::IEventArgs and containing the value inserted for the latter.
-- MySubscriber prints the value inserted in the callback method.
-
-(Note: this is deprecated (mostly the pool part is simplified, and you can also fire events synchronously))
-```
-#include <list>
-#include <iostream> // to print
-
-#include "Library/Factory/Pool.hpp" // for BasicPool
-#include "Core/Event/Event.hh" // for events
-#include "Core/Event/IEventArgs.hh" // for events
-#include "Core/Worker/Manager.hh" // to fire events
-
-class MyClass {
-	std::list<int> _mylist; // this is just for the example
-
-public:
-	// declare some events about the object (here, on the list)
-	struct {
-		Core::Event::Event onInsert; // on inserting an object in the list
-		Core::Event::Event onClear; // on clearing the list
-	} events;
-
-	// declare event arguments
-	// this is what is sent to a subscriber upon firing an event
-	struct onInsertArguments :public Core::Event::IEventArgs {
-		// for example, we send the inserted value as argument
-		int value;
-
-		// must implement from IEventArgs (before sending back to pool)
-		// this implementation is useless ofc
-		virtual void reinit(void) { this->value = 0; }
-
-		// since we use a pool, we can declare a method init (you don't have to)
-		void init(int v) {
-			this->value = v;
-		}
-
-		// you should always use a pool for event arguments, but that's up to you
-		struct Pool :public Factory::BasicPool<onInsertArguments> {
-			const size_t ORIGINAL_SIZE = 10; // number of elements in the pool at start
-			const size_t HYDRATE_SIZE = 2; // number of elements constructed when the pool is empty
-
-			void init(void) {
-				// create the pool
-				this->initPool(MyClass::onInsertArguments::Pool::ORIGINAL_SIZE,
-				MyClass::onInsertArguments::Pool::HYDRATE_SIZE,
-				"MyClass::onInsertArguments");
-			}
-		};
-	};
-
-public:
-	MyClass(void): _mylist(), events() {
-		// register events
-		// you can do it anywhere, you just need to register them before any object can subscribe to it, and before you can fire them
-		Core::Event::Manager::get().register(
-			&(this->events.onInsert), // your event
-			[] (Core::Event::IEventArgs* ptr) -> void {
-				// this is a cleaning function
-				// since we used a pool for the arguments, we will send them back to the pool
-				// if you don't use a pool, you can just delete it
-
-				// reinterpret the args
-				MyClass::onInsertedArguments* args = reinterpret_cast<MyClass::onInsertedArguments*>(ptr);
-
-				// you can assert that this is safe, as long as you always pass this type of argument when firing
-				if (args) {
-					// send the args back to the pool
-					MyClass::onInsertedArguments::Pool::get().remove(args);
-				}
-			}
-		);
-
-		// there are no arguments to onClear, so no cleaning function needed
-		Core::Event::Manager::get().register(&(this->events.onClear), nullptr);
-	}
-
-	~MyClass(void) {
-		// we unregister our events
-		Core::Event::Manager::get().unregister(&(this->events.onInsert));
-		Core::Event::Manager::get().unregister(&(this->events.onClear));
-	}
-
-	void insert(int value) {
-		// insert in list
-		this->_mylist.push_back(value);
-
-		// fire event
-		Core::Worker::Manager::get().add(
-			&(this->events.onInsert), // what event is fired
-			MyClass::onInsertArguments::Pool::get().create(value) // we create the event arguments
-			// the pool will call the "init" method of onInsertArguments with whatever arguments we send to the "create" method of the Pool
-		);
-	}
-
-	void clear(void) {
-		this->_mylist.clear();
-
-		// fire event
-		Core::Worker::Manager::get().add(
-			&(this->events.onClear), // the event fired
-			nullptr // no arguments
-		);
-	}
-};
-
-void MySubscriber {
-private:
-	MyClass a; // we declare an instance of our class (somewhere)
-
-public:
-	MySubscriber():
-		a() // events are registered here
-	{
-		// we subscribe to the event onInsert
-		Core::Event::Manager::get().subscribe(
-			&(a.events.onInsert), // the event we subscribe to
-			std::bind(&MySubscriber::onInsertCallback, this) // the callback (a callable taking a "const Core::Event::IEventArgs*" as arg and returning void)
-		);
-	}
-
-	// this is called when the event onInsert is fired
-	// although remember that this is not done right at the moment that you fire it from MyClass
-	// it will be queued to the worker threads and called later
-	void onInsertCallback(const Core::Event::IEventArgs *ptr) {
-		// reinterpret the arguments
-		const MyClass::onInsertArguments* args = reinterpret_cast<const MyClass::onInsertArguments*>(ptr);
-
-		if (args) {
-			std::cout << "Just inserted " << args->value << std::endl;
-		}
-	}
-};
-
-```
+You must always unregister your events before destroying them, to prevent a launched asynchronous event to be executed after the event was destroyed. It can either end up with a segfault if you deleted the event, undefined behaviour if you didn't. If you at least returned the event to the pool, it will be unregistered instead of being executed.
 
 #### delayed events
 
@@ -216,9 +75,9 @@ Based on the modules you activate and the number of workers you choose, you will
 
 ## third party
 
-Code from third parties:
-- [jsoncpp](https://github.com/open-source-parsers/jsoncpp).
-- [utfcpp](http://sourceforge.net/projects/utfcpp/).
-- [reader-writer lock with writer priority](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/) (from python).
-- [SHA-512](http://www.zedwood.com/article/cpp-sha512-function).
+Third party libraries and functions:
+- [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
+- [utfcpp](http://sourceforge.net/projects/utfcpp/)
+- [reader-writer lock with writer priority](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/) (from python)
+- [SHA-512](http://www.zedwood.com/article/cpp-sha512-function)
 - [cppformat](http://cppformat.github.io/latest/)
