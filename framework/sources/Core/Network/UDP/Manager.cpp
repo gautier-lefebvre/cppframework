@@ -422,21 +422,21 @@ void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Cor
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketStream* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketStreamArgs* ssargs = Core::Network::UDP::EventArgs::SocketStreamArgs::getFromPool(socket);
-	  Core::Event::Manager::get().fireEventSync(event, ssargs);
+    event->fireSync(ssargs);
 	}
 }
 
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketServer* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketServerArgs* ssargs = Core::Network::UDP::EventArgs::SocketServerArgs::getFromPool(socket);
-	  Core::Event::Manager::get().fireEventSync(event, ssargs);
+    event->fireSync(ssargs);
 	}
 }
 
 void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketClient* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketClientArgs* scargs = Core::Network::UDP::EventArgs::SocketClientArgs::getFromPool(socket);
-	  Core::Event::Manager::get().fireEventSync(event, scargs);
+    event->fireSync(scargs);
 	}
 }
 

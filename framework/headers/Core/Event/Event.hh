@@ -3,6 +3,7 @@
 
 #include  "Library/Factory/AFactored.hh"
 #include  "Library/Factory/Pool.hpp"
+#include  "Core/Event/IEventArgs.hh"
 
 namespace   Core {
   namespace Event {
@@ -25,6 +26,8 @@ namespace   Core {
 
     public:
       void init(Source);
+      void fireAsync(Core::Event::IEventArgs*) const;
+      void fireSync(Core::Event::IEventArgs*) const;
 
     public:
       Source getSource(void) const;

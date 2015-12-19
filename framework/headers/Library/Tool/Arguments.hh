@@ -6,7 +6,6 @@
 #include  <list>
 #include  <functional>
 
-
 /**
  *  \class Arguments Library/Tool/Arguments.hh
  *  \brief Parses the program arguments.

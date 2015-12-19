@@ -393,12 +393,12 @@ void Core::Network::TCP::Manager::__onIOException(Core::Event::Event* event, Cor
 
 void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::TCP::SocketStream* socket) const {
   Core::Network::TCP::EventArgs::SocketStreamArgs* ssargs = Core::Network::TCP::EventArgs::SocketStreamArgs::getFromPool(socket);
-  Core::Event::Manager::get().fireEventSync(event, ssargs);
+  event->fireSync(ssargs);
 }
 
 void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::TCP::Socket* socket) const {
   Core::Network::TCP::EventArgs::SocketArgs* sargs = Core::Network::TCP::EventArgs::SocketArgs::getFromPool(socket);
-  Core::Event::Manager::get().fireEventSync(event, sargs);
+  event->fireSync(sargs);
 }
 
 /**
