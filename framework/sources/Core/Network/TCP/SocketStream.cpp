@@ -2,6 +2,7 @@
 #include  <sys/socket.h>
 #include  <errno.h>
 #include  <cstring>
+#include  <string>
 
 #include  "Library/Tool/Logger.hpp"
 #include  "Core/Network/TCP/SocketStream.hh"
@@ -81,7 +82,31 @@ ssize_t Core::Network::TCP::SocketStream::send(void) {
   return ret;
 }
 
-size_t  Core::Network::TCP::SocketStream::getData(const std::function<size_t (ByteArray&, ByteArray&)>& dataGetter, ByteArray& dest) {
+size_t  Core::Network::TCP::SocketStream::extractData(const std::function<size_t (const ByteArray&)>& callback, ByteArray* dest) {
   SCOPELOCK(this);
-  return dataGetter(*(this->_input), dest);
+  size_t size;
+
+  if ((size = callback(*(this->_input))) != std::string::npos) {
+    dest->resize(this->_input->getSize());
+    dest->moveEnd(this->_input->extract(dest->atStart(), size));
+  }
+
+  return size;
+}
+
+size_t  Core::Network::TCP::SocketStream::getData(const std::function<size_t (const ByteArray&)>& callback, ByteArray* dest) {
+  SCOPELOCK(this);
+  size_t size;
+
+  if ((size = callback(*(this->_input))) != std::string::npos) {
+    dest->resize(this->_input->getSize());
+    dest->moveEnd(this->_input->get(dest->atStart(), size));
+  }
+
+  return size;
+}
+
+size_t  Core::Network::TCP::SocketStream::seekData(const std::function<size_t (const ByteArray&)>& callback) {
+  SCOPELOCK(this);
+  return callback(*(this->_input));
 }

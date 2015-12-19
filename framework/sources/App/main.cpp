@@ -35,11 +35,9 @@ int main(int ac, char ** av) {
     const Core::Network::TCP::EventArgs::SocketStreamArgs* ssargs = reinterpret_cast<const Core::Network::TCP::EventArgs::SocketStreamArgs*>(args);
 
     ByteArray* bytearray = ByteArray::getFromPool();
-    ssargs->socket->getData([] (ByteArray& from, ByteArray& to) -> size_t {
-      to.resize(from.getSize());
-      to.moveEnd(from.get(to.atStart(), from.getSize()));
-      return to.getSize();
-    }, *bytearray);
+    ssargs->socket->extractData([] (const ByteArray& data) -> size_t {
+      return data.getSize() > 0 ? data.getSize() : std::string::npos;
+    }, bytearray);
 
     INFO("Received: ");
     INFO(*bytearray);

@@ -31,7 +31,26 @@ namespace     Core {
         ssize_t send(void);
 
       public:
-        size_t  getData(const std::function<size_t (ByteArray&, ByteArray&)>&, ByteArray&);
+        /**
+         *  \brief Gets the first message from the input buffer and removes it.
+         *  \param callback a function which takes the input buffer as parameter. This function must return the number of bytes of the first valid message found, or std::npos if not found.
+         *  \param dest the buffer into which the message will be stored. It will be resized if necessary.
+         */
+        size_t  extractData(const std::function<size_t (const ByteArray&)>& callback, ByteArray* dest);
+
+        /**
+         *  \brief Gets the data from the input buffer but does not remove it.
+         *  \param callback a function which takes the input buffer as parameter. This function must return the number of bytes of the first valid message found, or std::npos if not found.
+         *  \param dest the buffer into which the message will be stored. It will be resized if necessary.
+         */
+        size_t  getData(const std::function<size_t (const ByteArray&)>& callback, ByteArray* dest);
+
+        /**
+         *  \brief Finds the size of the first valid message in bytes.
+         *  \param callback a function which takes the input buffer as parameter. This function must return the number of bytes of the first valid message found, or std::npos if not found.
+         *  \returns the result of the callback.
+         */
+        size_t  seekData(const std::function<size_t (const ByteArray&)>& callback);
       };
     }
   }

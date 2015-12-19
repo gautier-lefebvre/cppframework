@@ -97,7 +97,7 @@ uint8_t*  ByteArray::atIndex(size_t idx) {
 }
 
 void    ByteArray::moveEnd(size_t off) {
-  if (this->_size + off < this->_sizemax) {
+  if (this->_size + off <= this->_sizemax) {
     this->_size += off;
   } else {
     throw std::out_of_range("ByteArray::moveEnd : the offset is too high");
@@ -130,13 +130,11 @@ size_t    ByteArray::find(const void* ptr, size_t size, size_t start_idx) const 
   return std::string::npos;
 }
 
-size_t    ByteArray::get(void *ptr, size_t size, size_t offset, bool remove) {
+size_t    ByteArray::extract(void *ptr, size_t size, size_t offset) {
   size_t  tomove = MIN(size, this->_size - offset);
   memcpy(ptr, this->_bytearray + offset, tomove);
-  if (remove) {
-    memmove(this->_bytearray + offset, this->_bytearray + tomove + offset, this->_size - offset - tomove);
-    this->_size -= tomove;
-  }
+  memmove(this->_bytearray + offset, this->_bytearray + tomove + offset, this->_size - offset - tomove);
+  this->_size -= tomove;
   return tomove;
 }
 

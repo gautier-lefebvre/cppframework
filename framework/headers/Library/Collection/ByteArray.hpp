@@ -184,15 +184,21 @@ public:
   size_t  find(const void* ptr, size_t size, size_t start = 0) const;
 
   /**
-   *  \brief Copies data from the start of the ByteArray.
+   *  \brief Copies data from the start of the ByteArray and removes it from this ByteArray.
    *  \param ptr a pointer to which the data must be copied.
    *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
    *  \param offset the index of the byte where the copy must start.
-   *  \param remove if true, the ByteArray will be cleared of the data copied to \a ptr.
    *  \return the number of bytes copied.
    */
-  size_t  get(void* ptr, size_t size, size_t offset = 0, bool remove = true);
+  size_t  extract(void* ptr, size_t size, size_t offset = 0);
 
+  /**
+   *  \brief Copies data from the start of the ByteArray and keeps it in this ByteArray.
+   *  \param ptr a pointer to which the data must be copied.
+   *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
+   *  \param offset the index of the byte where the copy must start.
+   *  \return the number of bytes copied.
+   */
   size_t  get(void* ptr, size_t size, size_t offset = 0) const;
 
 public:

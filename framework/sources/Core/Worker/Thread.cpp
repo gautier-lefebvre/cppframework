@@ -156,8 +156,8 @@ void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exe
             }
           }
 
-        } catch (const std::out_of_range&) {
-          WARNING("Unregistered event");
+        } catch (const std::out_of_range& e) {
+          WARNING(e.what());
         }
       }
 

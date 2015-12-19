@@ -425,7 +425,6 @@ Core::Network::TCP::Manager::Server::Server(uint16_t port, Core::Network::TCP::S
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
-  DEBUG(this->events.onAccept);
   eventManager.registerEvent(this->events.onAccept);
   eventManager.registerEvent(this->events.onReceivedData);
   eventManager.registerEvent(this->events.onClientClosed);
