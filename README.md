@@ -52,9 +52,11 @@ Any object you create can declare some events. The object providing the events m
 
 Another object can subscribe to a registered event, and provide a callback method which will be called whenever the event is fired.
 
-Be careful though, you should NEVER declare an event that would be fired upon destruction of your object, since they are always executed asynchronously, which means after your object would have been destroyed (is that english ?). Anyway, the address of your event would be invalid.
+Be careful though, you must NEVER fire an asynchronous event upon destruction of your object, otherwise said event will be executed after your object is destroyed, making it impossible to unregister the event.
 
-You must always unregister your events before destroying them, to prevent a launched asynchronous event to be executed after the event was destroyed. It can either end up with a segfault if you deleted the event, undefined behaviour if you didn't. If you at least returned the event to the pool, it will be unregistered instead of being executed.
+You must always unregister your events before destroying them, to prevent a fired asynchronous event to be executed after the event was destroyed. It can either end up with a segfault if you deleted the event, undefined behaviour if you didn't. If you at least returned the event to the pool, it will be unregistered instead of being executed.
+
+Events can now be fired synchronously, but you'd better be sure of what you are doing, it stops the execution of the calling thread to execute the callback, so keep the operations to a minimum. If the operation is heavy you can always prepare a new task in the event callback, add it to the task queue and execute the operation in the task callback.
 
 #### delayed events
 
