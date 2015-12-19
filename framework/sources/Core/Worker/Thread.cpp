@@ -1,3 +1,4 @@
+#include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Logger.hpp"
 #include  "Core/Event/Manager.hh"
@@ -27,7 +28,7 @@ Core::Worker::Thread::Thread(size_t id, Core::Worker::Thread::Assignment assignm
   if (routine != nullptr) {
     this->_thread = new std::thread(routine, this);
   } else {
-    // throw Core::Exception("Invalid assignment for worker {0}", this->_id); // need fastformat
+    throw Core::Exception(fmt::format("Invalid assignment for worker {0}", this->_id));
   }
 }
 

@@ -211,13 +211,14 @@ Based on the modules you activate and the number of workers you choose, you will
 - TCP module: 2 threads.
 - UDP module: 2 threads (if both TCP and UDP is activated, they will use the same threads).
 - HTTP module: 1 thread for each remote server.
-- Timeout events: 1 thread.
+- Delayed events: 1 thread.
 - Worker: at least 1 thread.
 
 ## third party
 
 Code from third parties:
-- the *jsoncpp* library available [here](https://github.com/open-source-parsers/jsoncpp).
-- the *utf8* library available [here](http://sourceforge.net/projects/utfcpp/).
-- *reader-writer lock with writer priority*, translated from python [here](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/).
-- an implementation of the *SHA-512* hashing function found [here](http://www.zedwood.com/article/cpp-sha512-function).
+- [jsoncpp](https://github.com/open-source-parsers/jsoncpp).
+- [utfcpp](http://sourceforge.net/projects/utfcpp/).
+- [reader-writer lock with writer priority](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/) (from python).
+- [SHA-512](http://www.zedwood.com/article/cpp-sha512-function).
+- [cppformat](http://cppformat.github.io/latest/)

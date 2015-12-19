@@ -1,3 +1,5 @@
+#include "Library/ThirdParty/cppformat/format.hh"
+#include "Library/Tool/Logger.hpp"
 #include "Library/Tool/Signal.hh"
 
 const BidiMap<Signal::Type, int> Signal::SignalTypeToInt = {
@@ -8,7 +10,7 @@ static void my_signal_handler(int signum) {
   try {
     Signal::get().handle(signum);
   } catch (const std::out_of_range&) {
-    // @todo format
+    CRITICAL(fmt::format("The signal [signum = {0}] was caught but could not be handled. This is not supposed to happen.", signum));
   }
 }
 
