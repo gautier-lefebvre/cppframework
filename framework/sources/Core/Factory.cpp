@@ -1,6 +1,7 @@
 #include  "Library/Collection/ByteArray.hpp"
 #include  "Core/Network/HTTP/Request.hh"
 #include  "Core/Network/HTTP/Response.hh"
+#include  "Core/Network/TCP/Manager.hh"
 #include  "Core/Network/TCP/Socket.hh"
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/UDP/SocketClient.hh"
@@ -25,9 +26,13 @@ void Core::Factory::init(void) {
 
     ByteArray::initPool("ByteArray");
 
+    Core::Event::Event::initPool("Core::Event::Event");
+
     Core::Network::HTTP::Request::initPool("Core::Network::HTTP::Request");
     Core::Network::HTTP::Response::initPool("Core::Network::HTTP::Response");
     Core::Network::TCP::SocketStream::initPool("Core::Network::TCP::SocketStream");
+    Core::Network::TCP::EventArgs::SocketArgs::initPool("Core::Network::TCP::EventArgs::SocketArgs");
+    Core::Network::TCP::EventArgs::SocketStreamArgs::initPool("Core::Network::TCP::EventArgs::SocketStreamArgs");
     Core::Network::UDP::SocketClient::initPool("Core::Network::UDP::SocketClient");
     Core::Network::UDP::SocketStream::initPool("Core::Network::UDP::SocketStream");
     Core::Network::UDP::SocketServer::initPool("Core::Network::UDP::SocketServer");
@@ -46,9 +51,13 @@ void Core::Factory::end(void) {
 
     ByteArray::destroyPool();
 
+    Core::Event::Event::destroyPool();
+
     Core::Network::HTTP::Request::destroyPool();
     Core::Network::HTTP::Response::destroyPool();
     Core::Network::TCP::SocketStream::destroyPool();
+    Core::Network::TCP::EventArgs::SocketArgs::destroyPool();
+    Core::Network::TCP::EventArgs::SocketStreamArgs::destroyPool();
     Core::Network::UDP::SocketClient::destroyPool();
     Core::Network::UDP::SocketStream::destroyPool();
     Core::Network::UDP::SocketServer::destroyPool();

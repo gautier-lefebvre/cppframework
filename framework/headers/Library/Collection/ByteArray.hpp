@@ -191,9 +191,9 @@ public:
    *  \param remove if true, the ByteArray will be cleared of the data copied to \a ptr.
    *  \return the number of bytes copied.
    */
-  size_t  get(void* ptr, size_t size, size_t offset, bool remove = true);
+  size_t  get(void* ptr, size_t size, size_t offset = 0, bool remove = true);
 
-  size_t  get(void* ptr, size_t size, size_t offset) const;
+  size_t  get(void* ptr, size_t size, size_t offset = 0) const;
 
 public:
   /**

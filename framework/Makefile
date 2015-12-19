@@ -9,8 +9,8 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp            \
             $(LIBRARYDIR)Factory/AFactored.cpp               \
             $(LIBRARYDIR)Property/AEndable.cpp               \
             $(LIBRARYDIR)Property/Initializable.cpp          \
-            $(LIBRARYDIR)ThirdParty/cppformat/format.cc      \
-            $(LIBRARYDIR)ThirdParty/cppformat/posix.cc       \
+            $(LIBRARYDIR)ThirdParty/cppformat/format.cpp     \
+            $(LIBRARYDIR)ThirdParty/cppformat/posix.cpp      \
             $(LIBRARYDIR)ThirdParty/json.cpp                 \
             $(LIBRARYDIR)ThirdParty/sha512.cpp               \
             $(LIBRARYDIR)Threading/Condition.cpp             \

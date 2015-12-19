@@ -163,7 +163,7 @@ size_t    ByteArray::getSize(void) const {
 }
 
 size_t    ByteArray::getSizeMax(void) const {
-  return (this->_sizemax);
+  return this->_sizemax;
 }
 
 bool    ByteArray::empty(void) const {

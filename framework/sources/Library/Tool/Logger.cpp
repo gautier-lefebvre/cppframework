@@ -1,5 +1,7 @@
-#include  "Library/Tool/Logger.hpp"
-#include  "Library/Tool/Macro.hh"
+#ifdef    __DEBUG__
+
+# include  "Library/Tool/Logger.hpp"
+# include  "Library/Tool/Macro.hh"
 
 Logger::Logger(void):
   Threading::Lockable(),
@@ -45,3 +47,5 @@ void  Logger::delOffset(size_t off) {
   SCOPELOCK(this);
   this->_offset -= MIN(off, this->_offset);
 }
+
+#endif    /* __DEBUG__ */

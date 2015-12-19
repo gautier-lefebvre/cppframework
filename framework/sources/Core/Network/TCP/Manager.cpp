@@ -2,6 +2,7 @@
 
 #include  "Library/Tool/Macro.hh"
 #include  "Library/Threading/Condition.hpp"
+#include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Core/Network/TCP/Manager.hh"
 #include  "Core/Network/Exception.hh"
 #include  "Core/Event/Manager.hh"
@@ -56,6 +57,7 @@ const Core::Network::TCP::Manager::Server& Core::Network::TCP::Manager::bind(uin
     socket->socket();
     socket->bind(port);
     socket->listen(1024);
+    INFO(fmt::format("TCP: listening on port {0}", port));
   } catch (const Core::Network::Exception& e) {
     delete socket;
     throw e;
@@ -328,6 +330,9 @@ void Core::Network::TCP::Manager::recv(fd_set& set) {
             throw Core::Network::Exception("Blacklisted IP attempted to connect");
           }
 
+          // get bytearrays from pool
+          client->init();
+
           // add client
           server.clients.push_back(client);
 
@@ -420,6 +425,7 @@ Core::Network::TCP::Manager::Server::Server(uint16_t port, Core::Network::TCP::S
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
+  DEBUG(this->events.onAccept);
   eventManager.registerEvent(this->events.onAccept);
   eventManager.registerEvent(this->events.onReceivedData);
   eventManager.registerEvent(this->events.onClientClosed);
@@ -432,6 +438,11 @@ Core::Network::TCP::Manager::Server::~Server(void) {
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClientClosed);
   eventManager.unregisterEvent(this->events.onClosed);
+
+  Core::Event::Event::returnToPool(this->events.onAccept);
+  Core::Event::Event::returnToPool(this->events.onReceivedData);
+  Core::Event::Event::returnToPool(this->events.onClientClosed);
+  Core::Event::Event::returnToPool(this->events.onClosed);
 }
 
 /**
@@ -439,6 +450,7 @@ Core::Network::TCP::Manager::Server::~Server(void) {
  */
 
 Core::Network::TCP::Manager::Client::Client(const std::string& hostname, uint16_t port, Core::Network::TCP::SocketStream* socket):
+  Threading::Lockable(),
   hostname(hostname),
   port(port),
   socket(socket),
@@ -456,6 +468,9 @@ Core::Network::TCP::Manager::Client::~Client(void) {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClosed);
+
+  Core::Event::Event::returnToPool(this->events.onReceivedData);
+  Core::Event::Event::returnToPool(this->events.onClosed);
 }
 
 /**

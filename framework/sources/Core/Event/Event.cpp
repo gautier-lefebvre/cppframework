@@ -15,11 +15,11 @@ void Core::Event::Event::reinit(void) {
   this->_source = Core::Event::Source::UNSET;
 }
 
-void Core::Event::fireAsync(Core::Event::IEventArgs* args) const {
+void Core::Event::Event::fireAsync(Core::Event::IEventArgs* args) const {
   Core::Event::Manager::get().fireEventAsync(this, args);
 }
 
-void Core::Event::fireSync(Core::Event::IEventArgs* args) const {
+void Core::Event::Event::fireSync(Core::Event::IEventArgs* args) const {
   Core::Event::Manager::get().fireEventSync(this, args);
 }
 

@@ -150,3 +150,6 @@ void Core::Network::Manager::outputRoutine(void) {
     this->_udp.send(wset);
   }
 }
+
+Core::Network::TCP::Manager& Core::Network::Manager::getTCP(void) { return this->_tcp; }
+Core::Network::UDP::Manager& Core::Network::Manager::getUDP(void) { return this->_udp; }

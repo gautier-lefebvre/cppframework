@@ -471,6 +471,11 @@ Core::Network::UDP::Manager::Server::~Server(void) {
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClientClosed);
   eventManager.unregisterEvent(this->events.onClosed);
+
+  Core::Event::Event::returnToPool(this->events.onNewClient);
+  Core::Event::Event::returnToPool(this->events.onReceivedData);
+  Core::Event::Event::returnToPool(this->events.onClientClosed);
+  Core::Event::Event::returnToPool(this->events.onClosed);
 }
 
 /**
@@ -495,6 +500,9 @@ Core::Network::UDP::Manager::Client::~Client(void) {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClosed);
+
+  Core::Event::Event::returnToPool(this->events.onReceivedData);
+  Core::Event::Event::returnToPool(this->events.onClosed);
 }
 
 /**

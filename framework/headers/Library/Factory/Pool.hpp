@@ -5,6 +5,7 @@
 #include  <utility>
 #include  <string>
 
+#include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Tool/Logger.hpp"
 #include  "Library/Tool/Converter.hpp"
@@ -37,9 +38,9 @@ namespace  Factory {
       _hydrate(hydrate),
       _name(classname) {
       if (!size) {
-        throw Exception(classname + ": Pool original size must be greater than 0");
+        throw Exception(fmt::format("{0}: Pool original size must be greater than 0", classname));
       } else if (!hydrate) {
-        throw Exception(classname + ": Pool hydrate size must be greater than 0");
+        throw Exception(fmt::format("{0}: Pool hydrate size must be greater than 0", classname));
       } else {
         this->hydrate(size);
       }
@@ -52,6 +53,7 @@ namespace  Factory {
      */
     virtual ~Pool(void) {
       SCOPELOCK(this);
+      DEBUG(fmt::format("{0}: emptying pool, size is {1}", this->_name, StringOfSize(this->_pool.size())));
       while (!(this->_pool.empty())) {
         delete this->_pool.front();
         this->_pool.pop();
@@ -89,9 +91,10 @@ namespace  Factory {
      *  Will reinit the object and set its validity to false.
      *  If the \a element is nullptr, does nothing.
      *  \param element the object to put back into the pool.
+     *  \param force true if the object is certified valid to be put into the pool. A null object still won't be added.
      */
-    void  push(C* element) {
-      if (element != nullptr && element->isValid()) {
+    void  push(C* element, bool force = false) {
+      if (element != nullptr && (force || element->isValid())) {
         element->reinit();
         element->isValid(false);
         {
@@ -112,11 +115,11 @@ namespace  Factory {
       try {
         for (size_t i = 0 ; i < size ; ++i) {
           C* element = new C();
-          this->push(element);
+          this->push(element, true);
         }
-        DEBUG(this->_name + ": adding " + StringOfSize(size) + " items into the pool");
+        DEBUG(fmt::format("{0}: adding {1} items to the pool", this->_name, size));
       } catch (const std::bad_alloc&) {
-        throw Exception(this->_name + ": Memory exhausted while hydrating pool");
+        throw Exception(fmt::format("{0}: Memory exhausted while hydrating pool", this->_name));
       }
     }
   };

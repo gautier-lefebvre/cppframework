@@ -3,6 +3,7 @@
 #include  <errno.h>
 #include  <cstring>
 
+#include  "Library/Tool/Logger.hpp"
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/Exception.hh"
 
