@@ -68,6 +68,16 @@ void  Core::Worker::Manager::add(Core::Worker::DelayedTask* delayedTask) {
   }
 }
 
+void  Core::Worker::Manager::add(const std::function<void (void)>& cb) {
+  Core::Worker::SimpleTask *simpleTask = Core::Worker::SimpleTask::getFromPool(cb);
+  this->add(simpleTask);
+}
+
+void  Core::Worker::Manager::add(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+  Core::Worker::SimpleTask *simpleTask = Core::Worker::SimpleTask::getFromPool(cb, cl);
+  this->add(simpleTask);
+}
+
 void  Core::Worker::Manager::add(const Core::Event::Event* event, Core::Event::IEventArgs* args) {
   if (event != nullptr) {
     Core::Worker::EventTask* eventTask = Core::Worker::EventTask::getFromPool(event, args);

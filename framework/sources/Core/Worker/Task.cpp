@@ -16,6 +16,35 @@ Core::Worker::ATask::Source Core::Worker::ATask::getSource(void) const {
 }
 
 /**
+ *  SimpleTask
+ */
+
+Core::Worker::SimpleTask::SimpleTask(void):
+  Core::Worker::ATask(Core::Worker::ATask::Source::SIMPLE),
+  _callback(nullptr),
+  _cleanup(nullptr)
+{}
+
+Core::Worker::SimpleTask::~SimpleTask(void) {
+  this->reinit();
+}
+
+void  Core::Worker::SimpleTask::reinit(void) {
+  this->_callback = nullptr;
+  this->_cleanup = nullptr;
+}
+
+void  Core::Worker::SimpleTask::init(const std::function<void (void)>& cb) {
+  this->_callback = cb;
+  this->_cleanup = nullptr;
+}
+
+void  Core::Worker::SimpleTask::init(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+  this->_callback = cb;
+  this->_cleanup = cl;
+}
+
+/**
  *  EventTask
  */
 

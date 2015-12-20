@@ -44,6 +44,7 @@ namespace  Core {
       void  delayedTasksRoutine(void);
 
     public:
+      static void  executeSimpleTask(Core::Worker::ATask*, bool exec = true);
       static void  executeEventTask(Core::Worker::ATask*, bool exec = true);
       static void  executeHTTPTask(Core::Worker::ATask*, bool exec = true);
       static void  executePeriodicTask(Core::Worker::ATask*, bool exec = true);

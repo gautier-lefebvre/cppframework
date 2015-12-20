@@ -46,6 +46,22 @@ namespace    Core {
       void  init(size_t nbWorkers, bool delayedTasks);
       void  add(Core::Worker::ATask*);
       void  add(Core::Worker::DelayedTask*);
+
+      /**
+       *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
+       *  Inits it with the callback funtion.
+       *  \param callback the callback of the SimpleTask object.
+       */
+      void  add(const std::function<void(void)>& callback);
+
+      /**
+       *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
+       *  Inits it with the callback and cleanup functions.
+       *  \param callback the callback function of the SimpleTask object.
+       *  \param cleanup the cleanup function of the SimpleTask object.
+       */
+      void  add(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup);
+
       void  add(const Core::Event::Event*, Core::Event::IEventArgs*);
       void  add(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
       void  add(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);

@@ -14,6 +14,7 @@ namespace    Core {
     class  ATask :public Factory::AFactored {
     public:
       enum class Source {
+        SIMPLE,
         EVENT,
         HTTP_CALLBACK,
         PERIODIC_TASK
@@ -31,6 +32,23 @@ namespace    Core {
 
     public:
       Source  getSource(void) const;
+    };
+
+    class  SimpleTask :public ATask, public Factory::TPooled<Core::Worker::SimpleTask, 15, 10> {
+    public:
+      std::function<void (void)> _callback;
+      std::function<void (void)> _cleanup;
+
+    public:
+      SimpleTask(void);
+      virtual ~SimpleTask(void);
+
+    public:
+      virtual void reinit(void);
+
+    public:
+      void init(const std::function<void (void)>& callback);
+      void init(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
     };
 
     class  EventTask :public ATask, public Factory::TPooled<Core::Worker::EventTask, 100, 20> {

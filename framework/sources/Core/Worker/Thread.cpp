@@ -7,6 +7,7 @@
 #include  "Core/Exception.hh"
 
 const std::map<Core::Worker::ATask::Source, Core::Worker::Thread::WorkerHandler> Core::Worker::Thread::TaskHandlerMap = {
+  {Core::Worker::ATask::Source::SIMPLE, &Core::Worker::Thread::executeSimpleTask},
   {Core::Worker::ATask::Source::EVENT, &Core::Worker::Thread::executeEventTask},
   {Core::Worker::ATask::Source::HTTP_CALLBACK, &Core::Worker::Thread::executeHTTPTask},
   {Core::Worker::ATask::Source::PERIODIC_TASK, &Core::Worker::Thread::executePeriodicTask}
@@ -130,13 +131,33 @@ void  Core::Worker::Thread::tasksRoutine(void) {
       try {
         handler = Core::Worker::Thread::TaskHandlerMap.at(task->getSource());
         (*handler)(task, true);
-      } catch (const std::out_of_range &) {
+      } catch (const std::out_of_range&) {
         WARNING("Unknown task");
         delete task;
       } catch (const std::exception& e) {
         CRITICAL(e.what());
       }
     }
+  }
+}
+
+void  Core::Worker::Thread::executeSimpleTask(Core::Worker::ATask* task, bool exec) {
+  Core::Worker::SimpleTask *simpleTask = reinterpret_cast<Core::Worker::SimpleTask*>(task);
+
+  if (simpleTask) {
+    try {
+      if (exec) {
+        simpleTask->_callback();
+      }
+      simpleTask->_cleanup();
+    } catch (const std::exception& e) {
+      Core::Worker::SimpleTask::returnToPool(simpleTask);
+      throw e;
+    }
+
+    Core::Worker::SimpleTask::returnToPool(simpleTask);
+  } else {
+    CRITICAL("Cant reinterpret_cast a SimpleTask");
   }
 }
 
