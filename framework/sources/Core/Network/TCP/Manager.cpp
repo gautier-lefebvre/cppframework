@@ -129,7 +129,10 @@ const Core::Network::TCP::Manager::Client& Core::Network::TCP::Manager::connect(
 
   try {
     socket->socket();
+    socket->init();
     socket->connect(hostname, port);
+
+    INFO(fmt::format("TCP: connected to {0}:{1}", hostname, port));
   } catch (const Core::Network::Exception& e) {
     Core::Network::TCP::SocketStream::returnToPool(socket);
     throw e;
