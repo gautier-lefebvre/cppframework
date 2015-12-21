@@ -7,6 +7,7 @@
 #include "Library/Tool/Signal.hh"
 #include "Core/System.hh"
 #include "Core/Exception.hh"
+#include "Core/Worker/Manager.hh"
 #include "Core/Network/Manager.hh"
 #include "Core/Network/HTTP/Client.hh"
 #include "Core/Event/Manager.hh"
@@ -141,8 +142,8 @@ static void http(Core::System* system) {
 }
 
 int main(int ac, char ** av) {
-  if ((ac != 2 && ac != 3 && ac != 4) || (std::string(av[1]) != "http" && std::string(av[1]) != "tcp" && std::string(av[1]) != "udp")) {
-    std::cerr << "usage: " << av[0] << " \"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
+  if ((ac != 2 && ac != 3 && ac != 4) || (std::string(av[1]) != "http" && std::string(av[1]) != "tcp" && std::string(av[1]) != "udp" && std::string(av[1]) != "delayed" && std::string(av[1]) != "periodic" && std::string(av[1]) != "simple")) {
+    std::cerr << "usage: " << av[0] << " \"http\"|\"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
     return -1;
   }
 
@@ -180,6 +181,16 @@ int main(int ac, char ** av) {
   } else if (protocol == "http") {
     system->initHTTP("test useragent");
     http(system);
+  } else if (protocol == "delayed") {
+    auto callback = [] (void) {
+      INFO("SimpleTask working");
+    };
+    Core::Worker::Manager::get().add(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::steady_clock::duration(std::chrono::seconds(2)));
+    system->run();
+  } else if (protocol == "periodic") {
+    system->run();
+  } else if (protocol == "simple") {
+    system->run();
   } else {
     std::cerr << "unknown protocol" << std::endl;
   }

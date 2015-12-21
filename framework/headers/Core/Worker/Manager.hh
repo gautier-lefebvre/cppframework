@@ -44,7 +44,15 @@ namespace    Core {
 
     public:
       void  init(size_t nbWorkers, bool delayedTasks);
+
+      /**
+       *  \brief Adds a Task to the task queue.
+       */
       void  add(Core::Worker::ATask*);
+
+      /**
+       *  \brief Adds a DelayedTask to the task queue.
+       */
       void  add(Core::Worker::DelayedTask*);
 
       /**
@@ -62,11 +70,34 @@ namespace    Core {
        */
       void  add(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup);
 
+      /**
+       *  \brief Adds an EventTask to the task queue.
+       */
       void  add(const Core::Event::Event*, Core::Event::IEventArgs*);
+
+      /**
+       *  \brief Adds an HTTPTask to the task queue.
+       */
       void  add(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
+
+      /**
+       *  \brief Adds a DelayedTask to the task queue.
+       */
       void  add(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
+
+      /**
+       *  \brief Adds a DelayedTask to the task queue.
+       */
       void  add(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);
+
+      /**
+       *  \brief Adds a PeriodicTask to the task queue.
+       */
       void  add(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&, bool startNow = true);
+
+      /**
+       *  \brief Adds a PeriodicTask to the task queue.
+       */
       void  add(Core::Worker::PeriodicTask*, bool startNow = true);
     };
   }
