@@ -128,6 +128,7 @@ const Core::Network::TCP::Manager::Client& Core::Network::TCP::Manager::connect(
   Core::Network::TCP::SocketStream* socket = Core::Network::TCP::SocketStream::getFromPool();
 
   try {
+    socket->init();
     socket->socket();
     socket->connect(hostname, port);
 

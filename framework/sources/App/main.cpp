@@ -10,60 +10,60 @@
 #include "Core/Network/Manager.hh"
 #include "Core/Event/Manager.hh"
 
-// static void tcpServer(Core::System* system, uint16_t port) {
-//   int i = 0;
+static void tcpServer(Core::System* system, uint16_t port) {
+  int i = 0;
 
-//   try {
-//     const Core::Network::TCP::Manager::Server& server = Core::Network::Manager::get().getTCP().bind(port);
+  try {
+    const Core::Network::TCP::Manager::Server& server = Core::Network::Manager::get().getTCP().bind(port);
 
-//     // on accept new socket callback
-//     Core::Event::Manager::get().subscribeToEvent(server.events.onAccept, [] (const Core::Event::IEventArgs *) {
-//       INFO("New client connected");
-//     }, &i);
+    // on accept new socket callback
+    Core::Event::Manager::get().subscribeToEvent(server.events.onAccept, [] (const Core::Event::IEventArgs *) {
+      INFO("New client connected");
+    }, &i);
 
-//     // on received data callback
-//     Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
-//       INFO("Received data");
-//     }, &i);
+    // on received data callback
+    Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+      INFO("Received data");
+    }, &i);
 
-//     // on client closed callback
-//     Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const Core::Event::IEventArgs *) {
-//       INFO("Client closed");
-//     }, &i);
+    // on client closed callback
+    Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const Core::Event::IEventArgs *) {
+      INFO("Client closed");
+    }, &i);
 
-//     // on server closed callback
-//     Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const Core::Event::IEventArgs *) {
-//       INFO("Server closed");
-//     }, &i);
+    // on server closed callback
+    Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const Core::Event::IEventArgs *) {
+      INFO("Server closed");
+    }, &i);
 
-//     system->run();
-//   } catch (const Core::Exception& e) {
-//     CRITICAL(e.what());
-//   }
-// }
+    system->run();
+  } catch (const Core::Exception& e) {
+    CRITICAL(e.what());
+  }
+}
 
-// static void tcpClient(Core::System* system, const std::string& hostname, uint16_t port) {
-//   try {
-//     int i = 0;
+static void tcpClient(Core::System* system, const std::string& hostname, uint16_t port) {
+  try {
+    int i = 0;
 
-//     const Core::Network::TCP::Manager::Client& client = Core::Network::Manager::get().getTCP().connect(hostname, port);
+    const Core::Network::TCP::Manager::Client& client = Core::Network::Manager::get().getTCP().connect(hostname, port);
 
-//     Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
-//       INFO("Received data");
-//     }, &i);
+    Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+      INFO("Received data");
+    }, &i);
 
-//     Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const Core::Event::IEventArgs *) {
-//       INFO("Connection closed");
-//     }, &i);
+    Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const Core::Event::IEventArgs *) {
+      INFO("Connection closed");
+    }, &i);
     
-//     Core::Network::Manager::get().getTCP().push(client.socket, (void*)"Hello", 5);
+    Core::Network::Manager::get().getTCP().push(client.socket, (void*)"Hello", 5);
 
-//     system->run();
+    system->run();
 
-//   } catch (const Core::Exception& e) {
-//     CRITICAL(e.what());
-//   }
-// }
+  } catch (const Core::Exception& e) {
+    CRITICAL(e.what());
+  }
+}
 
 static void udpServer(Core::System* system, uint16_t port) {
   int i = 0;
@@ -121,8 +121,8 @@ static void udpClient(Core::System* system, const std::string& hostname, uint16_
 }
 
 int main(int ac, char ** av) {
-  if (ac != 2 && ac != 3) {
-    std::cerr << "usage: " << av[0] << " HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
+  if ((ac != 3 && ac != 4) || (std::string(av[1]) != "tcp" && std::string(av[1]) != "udp")) {
+    std::cerr << "usage: " << av[0] << " \"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
     return -1;
   }
 
@@ -133,14 +133,32 @@ int main(int ac, char ** av) {
     return false;
   });
 
-  system->initUDP();
+  std::string protocol = av[1];
 
-  if (ac == 2) {
-    // tcp server
-    udpServer(system, StringToUInt16(av[1]));
+  if (protocol == "udp") {
+    system->initUDP();
+    if (ac == 3) {
+      // udp server
+      udpServer(system, StringToUInt16(av[2]));
+    } else if (ac == 4) {
+      // udp client
+      udpClient(system, av[2], StringToUInt16(av[3]));
+    } else {
+      std::cerr << "invalid nb of arguments" << std::endl;
+    }
+  } else if (protocol == "tcp") {
+    system->initTCP();
+    if (ac == 3) {
+      // tcp server
+      tcpServer(system, StringToUInt16(av[2]));
+    } else if (ac == 4) {
+      // tcp client
+      tcpClient(system, av[2], StringToUInt16(av[3]));
+    } else {
+      std::cerr << "invalid nb of arguments" << std::endl;
+    }
   } else {
-    // tcp client
-    udpClient(system, av[1], StringToUInt16(av[2]));
+    std::cerr << "unknown protocol" << std::endl;
   }
 
   delete system;

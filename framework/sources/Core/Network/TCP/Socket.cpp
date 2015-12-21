@@ -27,8 +27,6 @@ void  Core::Network::TCP::Socket::reinit(void) {
 
 void  Core::Network::TCP::Socket::socket(void) {
   SCOPELOCK(this);
-  this->reinit();
-
   if ((this->_fd = ::socket(AF_INET, SOCK_STREAM, 0)) == -1) {
     throw Core::Network::Exception(std::string("socket: ") + strerror(errno));
   }
