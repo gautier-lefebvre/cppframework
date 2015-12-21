@@ -182,10 +182,11 @@ int main(int ac, char ** av) {
     system->initHTTP("test useragent");
     http(system);
   } else if (protocol == "delayed") {
+    system->initWorkerThreads(1, true);
     auto callback = [] (void) {
       INFO("SimpleTask working");
     };
-    Core::Worker::Manager::get().add(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::steady_clock::duration(std::chrono::seconds(2)));
+    Core::Worker::Manager::get().add(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::seconds(2));
     system->run();
   } else if (protocol == "periodic") {
     system->run();
