@@ -193,7 +193,7 @@ int main(int ac, char ** av) {
     auto callback = [] (void) {
       INFO("Hello");
     };
-    Core::Worker::Manager::get().addPeriodicTask(callback, nullptr, std::chrono::seconds(1), true);
+    Core::Worker::Manager::get().addPeriodicTask(callback, nullptr, std::chrono::seconds(5), true);
     system->run();
   } else if (protocol == "simple") {
     auto callback = [] (void) {
