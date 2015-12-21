@@ -149,7 +149,9 @@ void  Core::Worker::Thread::executeSimpleTask(Core::Worker::ATask* task, bool ex
       if (exec) {
         simpleTask->_callback();
       }
-      simpleTask->_cleanup();
+      if (simpleTask->_cleanup) {
+        simpleTask->_cleanup();
+      }
     } catch (const std::exception& e) {
       Core::Worker::SimpleTask::returnToPool(simpleTask);
       throw e;

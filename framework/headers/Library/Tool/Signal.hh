@@ -28,7 +28,7 @@ private:
   virtual ~Signal(void);
 
 private:
-  std::unordered_map<int, std::function<void (void)>> callbacks;
+  std::unordered_map<int, std::function<bool (void)>> callbacks;
   std::unordered_map<int, struct sigaction*> oldcallbacks;
 
 public:
@@ -36,7 +36,7 @@ public:
    *  \brief Creates a callback and saves the default one.
    *  If the callback is nullptr and the signal was already handled, removes the old one and sets back the default.
    */
-  void setCallback(Signal::Type, const std::function<void (void)>&);
+  void setCallback(Signal::Type, const std::function<bool (void)>&);
 
   /** 
    *  \brief Removes a callback and sets back the default one.

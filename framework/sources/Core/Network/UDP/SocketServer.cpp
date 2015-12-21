@@ -12,7 +12,6 @@ Core::Network::UDP::SocketServer::~SocketServer(void) {
 
 void Core::Network::UDP::SocketServer::init(void) {
   SCOPELOCK(this);
-  this->reinit();
   this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
 }
 

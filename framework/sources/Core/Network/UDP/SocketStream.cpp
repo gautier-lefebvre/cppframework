@@ -20,7 +20,6 @@ void Core::Network::UDP::SocketStream::reinit(void) {
 
 void Core::Network::UDP::SocketStream::init(const std::string& hostname, uint16_t port) {
   SCOPELOCK(this);
-  this->reinit();
 
   hostent *hostinfo = gethostbyname(hostname.c_str());
   if (hostinfo == nullptr) {

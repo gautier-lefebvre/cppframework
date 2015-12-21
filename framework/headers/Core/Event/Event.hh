@@ -26,6 +26,8 @@ namespace   Core {
 
     public:
       void init(Source);
+
+    public:
       void fireAsync(Core::Event::IEventArgs*) const;
       void fireSync(Core::Event::IEventArgs*) const;
 

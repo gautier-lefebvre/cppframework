@@ -31,7 +31,7 @@ namespace       Core {
         public:
           virtual void reinit(void);
           virtual void cleanup(void);
-          void init(Core::Network::UDP::SocketStream*);
+          virtual void init(Core::Network::UDP::SocketStream*);
         };
 
         struct  SocketClientArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketClientArgs, 2, 1> {
@@ -44,7 +44,7 @@ namespace       Core {
         public:
           virtual void reinit(void);
           virtual void cleanup(void);
-          void init(Core::Network::UDP::SocketClient*);
+          virtual void init(Core::Network::UDP::SocketClient*);
         };
 
         struct  SocketServerArgs :public Core::Event::IEventArgs, public Factory::TPooled<EventArgs::SocketServerArgs, 2, 1> {
@@ -57,7 +57,7 @@ namespace       Core {
         public:
           virtual void reinit(void);
           virtual void cleanup(void);
-          void init(Core::Network::UDP::SocketServer*);
+          virtual void init(Core::Network::UDP::SocketServer*);
         };
       }
 

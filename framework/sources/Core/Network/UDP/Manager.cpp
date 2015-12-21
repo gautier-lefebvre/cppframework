@@ -1,7 +1,9 @@
 #include  <algorithm>
 
-#include  "Library/Tool/Macro.hh"
+#include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Library/Threading/Condition.hpp"
+#include  "Library/Tool/Converter.hpp"
+#include  "Library/Tool/Macro.hh"
 #include  "Core/Network/UDP/Manager.hh"
 #include  "Core/Network/Exception.hh"
 #include  "Core/Event/Manager.hh"
@@ -16,6 +18,7 @@ Core::Network::UDP::Manager::Manager(Threading::NotifiableThread& input, Threadi
 Core::Network::UDP::Manager::~Manager(void) {}
 
 void Core::Network::UDP::Manager::clear(void) {
+
   // close every server
   {
     SCOPELOCK(&(this->_servers));
@@ -53,8 +56,10 @@ const Core::Network::UDP::Manager::Server& Core::Network::UDP::Manager::bind(uin
   Core::Network::UDP::SocketServer* socket = Core::Network::UDP::SocketServer::getFromPool();
 
   try {
+    socket->init();
     socket->socket();
     socket->bind(port);
+    INFO(fmt::format("UDP: listening on port {0}", port));
   } catch (const Core::Network::Exception& e) {
     Core::Network::UDP::SocketServer::returnToPool(socket);
     throw e;
@@ -127,6 +132,7 @@ const Core::Network::UDP::Manager::Client& Core::Network::UDP::Manager::connect(
   try {
     socket->socket();
     socket->init(hostname, port);
+    INFO(fmt::format("UDP: prepared connection to {0}:{1}", hostname, port));
   } catch (const Core::Network::Exception& e) {
     Core::Network::UDP::SocketStream::returnToPool(socket);
     throw e;
@@ -177,6 +183,7 @@ void Core::Network::UDP::Manager::push(Core::Network::UDP::ASocketIO* socket, co
   	ByteArray* datagram = ByteArray::getFromPool(data, size);
 
     try {
+      DEBUG(fmt::format("Pushed a datagram of {0} bytes to the socket", size));
       socket->push(datagram);
 
       {

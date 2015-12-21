@@ -27,7 +27,7 @@ Signal::~Signal(void) {
   }
 }
 
-void Signal::setCallback(Signal::Type type, const std::function<void (void)>& callback) {
+void Signal::setCallback(Signal::Type type, const std::function<bool (void)>& callback) {
   SCOPELOCK(this);
   int signum = SignalTypeToInt.key.at(type);
 
@@ -61,7 +61,10 @@ void Signal::delCallback(Signal::Type type) {
     struct sigaction* old = (*iterator).second;
     sigaction(signum, old, nullptr);
     this->oldcallbacks.erase(iterator);
-    delete old;
+
+    if (old) {
+      delete old;
+    }
   }
 
   this->callbacks.erase(signum);
@@ -69,5 +72,7 @@ void Signal::delCallback(Signal::Type type) {
 
 void Signal::handle(int signum) {
   SCOPELOCK(this);
-  this->callbacks.at(signum)();
+  if (!this->callbacks.at(signum)()) {
+    this->delCallback(Signal::SignalTypeToInt.value.at(signum));
+  }
 }

@@ -27,7 +27,6 @@ void Core::Network::UDP::ASocket::reinit(void) {
 
 void Core::Network::UDP::ASocket::socket(void) {
   SCOPELOCK(this);
-  this->reinit();
   if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
     throw Core::Network::Exception(std::string("socket: ") + strerror(errno));
   }
