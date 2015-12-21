@@ -196,6 +196,10 @@ int main(int ac, char ** av) {
     Core::Worker::Manager::get().addPeriodicTask(callback, nullptr, std::chrono::seconds(1), true);
     system->run();
   } else if (protocol == "simple") {
+    auto callback = [] (void) {
+      INFO("SimpleTask :)");
+    };
+    Core::Worker::Manager::get().addSimpleTask(callback);
     system->run();
   } else {
     std::cerr << "unknown protocol" << std::endl;
