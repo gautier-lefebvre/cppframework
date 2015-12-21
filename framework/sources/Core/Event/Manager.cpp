@@ -35,7 +35,7 @@ void  Core::Event::Manager::unsubscribeFromEvent(const Core::Event::Event* event
 }
 
 void  Core::Event::Manager::fireEventAsync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {
-  Core::Worker::Manager::get().add(event, args);
+  Core::Worker::Manager::get().addEventTask(event, args);
 }
 
 void  Core::Event::Manager::fireEventSync(const Core::Event::Event* event, Core::Event::IEventArgs* args) const {

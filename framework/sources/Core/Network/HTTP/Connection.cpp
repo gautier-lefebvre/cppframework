@@ -116,9 +116,9 @@ void  Core::Network::HTTP::Connection::routine(void) {
         // asynchronous request
         // add http task and return request to pool
         if (response->status >= 400) {
-          Core::Worker::Manager::get().add(request->error, request->clean, response);
+          Core::Worker::Manager::get().addHTTPTask(request->error, request->clean, response);
         } else {
-          Core::Worker::Manager::get().add(request->success, request->clean, response);
+          Core::Worker::Manager::get().addHTTPTask(request->success, request->clean, response);
         }
         Core::Network::HTTP::Request::returnToPool(request);
       } else {

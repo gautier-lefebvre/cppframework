@@ -186,9 +186,14 @@ int main(int ac, char ** av) {
     auto callback = [] (void) {
       INFO("SimpleTask working");
     };
-    Core::Worker::Manager::get().add(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::seconds(2));
+    Core::Worker::Manager::get().addDelayedTask(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::seconds(2));
     system->run();
   } else if (protocol == "periodic") {
+    system->initWorkerThreads(1, true);
+    auto callback = [] (void) {
+      INFO("Hello");
+    };
+    Core::Worker::Manager::get().addPeriodicTask(callback, nullptr, std::chrono::seconds(1), true);
     system->run();
   } else if (protocol == "simple") {
     system->run();

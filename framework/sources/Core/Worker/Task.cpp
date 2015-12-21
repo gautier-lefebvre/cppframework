@@ -102,7 +102,7 @@ void  Core::Worker::HTTPTask::init(const std::function<void (const Core::Network
  */
 
 Core::Worker::PeriodicTask::PeriodicTask(void):
-  Core::Worker::ATask(Core::Worker::ATask::Source::EVENT),
+  Core::Worker::ATask(Core::Worker::ATask::Source::PERIODIC_TASK),
   _callback(nullptr),
   _clean(nullptr),
   _interval(),

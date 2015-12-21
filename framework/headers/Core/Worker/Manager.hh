@@ -48,19 +48,19 @@ namespace    Core {
       /**
        *  \brief Adds a Task to the task queue.
        */
-      void  add(Core::Worker::ATask*);
+      void  addTask(Core::Worker::ATask*);
 
       /**
        *  \brief Adds a DelayedTask to the task queue.
        */
-      void  add(Core::Worker::DelayedTask*);
+      void  addDelayedTask(Core::Worker::DelayedTask*);
 
       /**
        *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
        *  Inits it with the callback funtion.
        *  \param callback the callback of the SimpleTask object.
        */
-      void  add(const std::function<void(void)>& callback);
+      void  addSimpleTask(const std::function<void(void)>& callback);
 
       /**
        *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
@@ -68,37 +68,37 @@ namespace    Core {
        *  \param callback the callback function of the SimpleTask object.
        *  \param cleanup the cleanup function of the SimpleTask object.
        */
-      void  add(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup);
+      void  addSimpleTask(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup);
 
       /**
        *  \brief Adds an EventTask to the task queue.
        */
-      void  add(const Core::Event::Event*, Core::Event::IEventArgs*);
+      void  addEventTask(const Core::Event::Event*, Core::Event::IEventArgs*);
 
       /**
        *  \brief Adds an HTTPTask to the task queue.
        */
-      void  add(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
+      void  addHTTPTask(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
 
       /**
        *  \brief Adds a DelayedTask to the task queue.
        */
-      void  add(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
+      void  addDelayedTask(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
 
       /**
        *  \brief Adds a DelayedTask to the task queue.
        */
-      void  add(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);
+      void  addDelayedTask(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);
 
       /**
        *  \brief Adds a PeriodicTask to the task queue.
        */
-      void  add(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&, bool startNow = true);
+      void  addPeriodicTask(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&, bool startNow = true);
 
       /**
        *  \brief Adds a PeriodicTask to the task queue.
        */
-      void  add(Core::Worker::PeriodicTask*, bool startNow = true);
+      void  addPeriodicTask(Core::Worker::PeriodicTask*, bool startNow = true);
     };
   }
 }

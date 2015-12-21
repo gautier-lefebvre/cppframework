@@ -230,11 +230,13 @@ void  Core::Worker::Thread::executePeriodicTask(Core::Worker::ATask* task, bool 
 
   if (periodicTask) {
     if (exec == false || periodicTask->_off) {
-      periodicTask->_clean();
+      if (periodicTask->_clean) {
+        periodicTask->_clean();
+      }
       Core::Worker::PeriodicTask::returnToPool(periodicTask);
     } else {
       periodicTask->_callback();
-      Core::Worker::Manager::get().add(periodicTask);
+      Core::Worker::Manager::get().addPeriodicTask(periodicTask, false);
     }
   } else {
     CRITICAL("Cant reinterpret_cast a PeriodicTask");
@@ -254,6 +256,7 @@ void  Core::Worker::Thread::delayedTasksRoutine(void) {
         delayedTaskQueue.wait();
       } else {
         if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
+          if (this->mustEnd()) { break; }
           if (!delayedTaskQueue.empty()) {
             if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
               delayedTaskQueue.pop();
@@ -266,7 +269,7 @@ void  Core::Worker::Thread::delayedTasksRoutine(void) {
     }
 
     if (delayedTask != nullptr) {
-      Core::Worker::Manager::get().add(delayedTask->_task);
+      Core::Worker::Manager::get().addTask(delayedTask->_task);
       Core::Worker::DelayedTask::returnToPool(delayedTask);
     }
   }

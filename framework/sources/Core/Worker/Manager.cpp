@@ -52,7 +52,7 @@ Core::Worker::Manager::DelayedTaskQueue&  Core::Worker::Manager::getDelayedTaskQ
   return this->_delayedTasks;
 }
 
-void  Core::Worker::Manager::add(Core::Worker::ATask* task) {
+void  Core::Worker::Manager::addTask(Core::Worker::ATask* task) {
   if (task != nullptr) {
     SCOPELOCK(&(this->_pendingTasks));
     this->_pendingTasks.push(task);
@@ -60,7 +60,7 @@ void  Core::Worker::Manager::add(Core::Worker::ATask* task) {
   }
 }
 
-void  Core::Worker::Manager::add(Core::Worker::DelayedTask* delayedTask) {
+void  Core::Worker::Manager::addDelayedTask(Core::Worker::DelayedTask* delayedTask) {
   if (delayedTask != nullptr) {
     SCOPELOCK(&(this->_delayedTasks));
     this->_delayedTasks.push(delayedTask);
@@ -68,55 +68,55 @@ void  Core::Worker::Manager::add(Core::Worker::DelayedTask* delayedTask) {
   }
 }
 
-void  Core::Worker::Manager::add(const std::function<void (void)>& cb) {
+void  Core::Worker::Manager::addSimpleTask(const std::function<void (void)>& cb) {
   Core::Worker::SimpleTask *simpleTask = Core::Worker::SimpleTask::getFromPool(cb);
-  this->add(simpleTask);
+  this->addTask(simpleTask);
 }
 
-void  Core::Worker::Manager::add(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+void  Core::Worker::Manager::addSimpleTask(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
   Core::Worker::SimpleTask *simpleTask = Core::Worker::SimpleTask::getFromPool(cb, cl);
-  this->add(simpleTask);
+  this->addTask(simpleTask);
 }
 
-void  Core::Worker::Manager::add(const Core::Event::Event* event, Core::Event::IEventArgs* args) {
+void  Core::Worker::Manager::addEventTask(const Core::Event::Event* event, Core::Event::IEventArgs* args) {
   if (event != nullptr) {
     Core::Worker::EventTask* eventTask = Core::Worker::EventTask::getFromPool(event, args);
-    this->add(eventTask);
+    this->addTask(eventTask);
   }
 }
 
-void  Core::Worker::Manager::add(const std::function<void (const Core::Network::HTTP::Response*)>& cb, const std::function<void (void)>& cl, Core::Network::HTTP::Response* resp) {
+void  Core::Worker::Manager::addHTTPTask(const std::function<void (const Core::Network::HTTP::Response*)>& cb, const std::function<void (void)>& cl, Core::Network::HTTP::Response* resp) {
   if (resp != nullptr) {
     Core::Worker::HTTPTask* httpTask = Core::Worker::HTTPTask::getFromPool(cb, cl, resp);
-    this->add(httpTask);
+    this->addTask(httpTask);
   }
 }
 
-void  Core::Worker::Manager::add(Core::Worker::ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
+void  Core::Worker::Manager::addDelayedTask(Core::Worker::ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
   if (task != nullptr) {
     Core::Worker::DelayedTask* delayedTask = Core::Worker::DelayedTask::getFromPool(task, timepoint);
-    this->add(delayedTask);
+    this->addDelayedTask(delayedTask);
   }
 }
 
-void  Core::Worker::Manager::add(Core::Worker::ATask* task, const std::chrono::steady_clock::duration& duration) {
+void  Core::Worker::Manager::addDelayedTask(Core::Worker::ATask* task, const std::chrono::steady_clock::duration& duration) {
   if (task != nullptr) {
     Core::Worker::DelayedTask* delayedTask = Core::Worker::DelayedTask::getFromPool(task, duration);
-    this->add(delayedTask);
+    this->addDelayedTask(delayedTask);
   }
 }
 
-void  Core::Worker::Manager::add(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval, bool startNow) {
+void  Core::Worker::Manager::addPeriodicTask(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval, bool startNow) {
   Core::Worker::PeriodicTask* periodicTask = Core::Worker::PeriodicTask::getFromPool(callback, clean, interval);
-  this->add(periodicTask, startNow);
+  this->addPeriodicTask(periodicTask, startNow);
 }
 
-void  Core::Worker::Manager::add(Core::Worker::PeriodicTask* periodicTask, bool startNow) {
+void  Core::Worker::Manager::addPeriodicTask(Core::Worker::PeriodicTask* periodicTask, bool startNow) {
   if (periodicTask != nullptr) {
     if (startNow) {
-      this->add(periodicTask);
+      this->addTask(periodicTask);
     } else {
-      this->add(periodicTask, periodicTask->_interval);
+      this->addDelayedTask(periodicTask, periodicTask->_interval);
     }
   }
 }
