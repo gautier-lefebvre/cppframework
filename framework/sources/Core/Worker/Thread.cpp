@@ -147,7 +147,9 @@ void  Core::Worker::Thread::executeSimpleTask(Core::Worker::ATask* task, bool ex
   if (simpleTask) {
     try {
       if (exec) {
-        simpleTask->_callback();
+        if (simpleTask->_callback) {
+          simpleTask->_callback();
+        }
       }
       if (simpleTask->_cleanup) {
         simpleTask->_cleanup();
@@ -212,11 +214,11 @@ void  Core::Worker::Thread::executeHTTPTask(Core::Worker::ATask* task, bool exec
       if (httpTask->_callback) {
         httpTask->_callback(httpTask->_response);
       }
-    } else {
-      if (httpTask->_cleanup) {
-        httpTask->_cleanup();
-      }
     }
+    if (httpTask->_cleanup) {
+      httpTask->_cleanup();
+    }
+    Core::Network::HTTP::Response::returnToPool(httpTask->_response);
     Core::Worker::HTTPTask::returnToPool(httpTask);
   } else {
     CRITICAL("Cant reinterpret_cast an HTTPTask");

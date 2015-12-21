@@ -8,6 +8,7 @@
 #include "Core/System.hh"
 #include "Core/Exception.hh"
 #include "Core/Network/Manager.hh"
+#include "Core/Network/HTTP/Client.hh"
 #include "Core/Event/Manager.hh"
 
 static void tcpServer(Core::System* system, uint16_t port) {
@@ -120,8 +121,27 @@ static void udpClient(Core::System* system, const std::string& hostname, uint16_
   }
 }
 
+static void http(Core::System* system) {
+  Core::Network::HTTP::Request* request = Core::Network::HTTP::Request::getFromPool();
+
+  request->init();
+  request->method = "GET";
+  request->url = "/posts";
+  request->secure = false;
+  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
+  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
+
+  Core::Network::HTTP::Client::get().sendRequest(request, "jsonplaceholder.typicode.com");
+
+  system->run();
+}
+
 int main(int ac, char ** av) {
-  if ((ac != 3 && ac != 4) || (std::string(av[1]) != "tcp" && std::string(av[1]) != "udp")) {
+  if ((ac != 2 && ac != 3 && ac != 4) || (std::string(av[1]) != "http" && std::string(av[1]) != "tcp" && std::string(av[1]) != "udp")) {
     std::cerr << "usage: " << av[0] << " \"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
     return -1;
   }
@@ -157,6 +177,9 @@ int main(int ac, char ** av) {
     } else {
       std::cerr << "invalid nb of arguments" << std::endl;
     }
+  } else if (protocol == "http") {
+    system->initHTTP("test useragent");
+    http(system);
   } else {
     std::cerr << "unknown protocol" << std::endl;
   }

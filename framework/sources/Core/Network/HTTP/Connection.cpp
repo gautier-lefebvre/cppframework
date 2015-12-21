@@ -187,7 +187,7 @@ size_t  Core::Network::HTTP::Connection::write_callback(void *data, size_t size,
 }
 
 Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
-  Core::Network::HTTP::Response *response = Core::Network::HTTP::Response::getFromPool();
+  Core::Network::HTTP::Response *response = nullptr;
   CURLcode    result;
   std::string protocol;
   uint16_t    port;
@@ -197,6 +197,9 @@ Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core:
   FILE*       file;
 
   try {
+    response = Core::Network::HTTP::Response::getFromPool();
+    response->init();
+
     if (!handle) {
       throw Core::Network::Exception("curl_easy_init failed");
     }
