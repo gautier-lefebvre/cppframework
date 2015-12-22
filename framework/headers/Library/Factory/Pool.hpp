@@ -80,7 +80,7 @@ namespace  Factory {
     }
 
     template<typename... Args>
-    C*  get(Args&... args) {
+    C*  get(const Args&... args) {
       C* item = this->get();
       item->init(args...);
       return item;
