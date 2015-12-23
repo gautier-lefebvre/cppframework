@@ -1,18 +1,17 @@
 #ifndef    __LIBRARY_TOOL_LOGGER_HPP__
 #define    __LIBRARY_TOOL_LOGGER_HPP__
 
-#ifdef   __DEBUG__
 
-# include  <map>
-# include  <string>
-# include  <fstream>
-# include  <iostream>
-# include  <sstream>
+#include  <map>
+#include  <string>
+#include  <fstream>
+#include  <iostream>
+#include  <sstream>
 
-# include  "Library/Collection/BidiMap.hpp"
-# include  "Library/DesignPattern/Singleton.hpp"
-# include  "Library/Threading/Lock.hpp"
-# include  "Library/Tool/Date.hh"
+#include  "Library/Collection/BidiMap.hpp"
+#include  "Library/DesignPattern/Singleton.hpp"
+#include  "Library/Threading/Lock.hpp"
+#include  "Library/Tool/Date.hh"
 
 /**
  *  \class Logger Library/Tool/Logger.hpp
@@ -65,7 +64,7 @@ private:
 private:
   Logger::Level  _level; /*!< Lowest level of logging. */
   size_t         _offset; /*!< Current number of \t to write before printing the log. */
-  std::ofstream* _file;
+  std::ofstream* _file; /*!< The file in which to store the logs, if specified. */
 
 private:
   /*! Deleted copy constructor of Logger. */
@@ -152,6 +151,7 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
   {Logger::Level::CRITICAL, std::string("CRITICAL")}
 }; /*!< Used to translate the enum Logging::Level to a string. */
 
+#ifdef   __DEBUG__
 # define LOG(x, y)              Logger::get().log((x), (y))
 # define DEBUG(x)               Logger::get().log((x), Logger::Level::DEBUG)
 # define INFO(x)                Logger::get().log((x), Logger::Level::INFO)

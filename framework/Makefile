@@ -1,4 +1,4 @@
-NAME=       cppframework.so
+NAME=       cppframework
 
 SRCDIR=     sources/
 
@@ -28,6 +28,7 @@ COREDIR=    $(SRCDIR)Core/
 CORESRC=    $(COREDIR)Exception.cpp                          \
             $(COREDIR)Factory.cpp                            \
             $(COREDIR)System.cpp                             \
+            $(COREDIR)Event/Exception.cpp                    \
             $(COREDIR)Event/Event.cpp                        \
             $(COREDIR)Event/EventInfo.cpp                    \
             $(COREDIR)Event/Manager.cpp                      \
@@ -80,7 +81,7 @@ compile:    $(OBJ)
 
 dll:		CXXFLAGS += -c -fPIC
 dll:		$(OBJ)
-			@$(CXX) -shared -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+			@$(CXX) -shared -o $(NAME).so $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
 
 %.o:        %.cpp
 			@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"

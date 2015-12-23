@@ -141,6 +141,14 @@ void Core::System::initLogger(Logger::Level level) {
   }
 }
 
+void Core::System::initLogger(Logger::Level level, const std::string& filepath) {
+  SCOPELOCK(this);
+  if (!this->_modulesInitialized.at(Core::System::Modules::LOGGER)) {
+    LOGGER_INIT_FILE(level, filepath);
+    this->_modulesInitialized[Core::System::Modules::LOGGER] = true;
+  }
+}
+
 void Core::System::run(void) {
   // default config for workers (need at least 1 worker thread)
   this->initWorkerThreads(1, false);

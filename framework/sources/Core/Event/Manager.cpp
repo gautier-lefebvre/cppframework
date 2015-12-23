@@ -23,6 +23,7 @@ void  Core::Event::Manager::subscribeToEvent(const Core::Event::Event* event, co
     this->_events.at(event).addSubscriber(callee, callback);
   } catch (const std::out_of_range&) {
     WARNING("Trying to subscribe to an unregistered event");
+    throw Core::Event::EventNotRegisteredException();
   }
 }
 
@@ -31,6 +32,7 @@ void  Core::Event::Manager::unsubscribeFromEvent(const Core::Event::Event* event
     this->_events.at(event).delSubscriber(callee);
   } catch (const std::out_of_range&) {
     WARNING("Trying to subscribe to an unregistered event");
+    throw Core::Event::EventNotRegisteredException();
   }
 }
 
@@ -51,5 +53,10 @@ void  Core::Event::Manager::fireEventSync(const Core::Event::Event* event, Core:
 }
 
 const Core::Event::EventInfo& Core::Event::Manager::getInfo(const Core::Event::Event* event) const {
-  return this->_events.at(event);
+  try {
+    return this->_events.at(event);
+  } catch (const std::out_of_range&) {
+    WARNING("Trying to retrieve the info of an unregistered event");
+    throw Core::Event::EventNotRegisteredException();
+  }
 }

@@ -4,9 +4,21 @@
 #include  "Library/Exception.hh"
 
 namespace  Core {
+  /**
+   *  \class Exception Core/Exception.hh
+   *  \brief Superclass of every exception thrown in the Core.
+   */
   class  Exception :public ::Exception {
   public:
-    Exception(const std::string&) noexcept;
+    /**
+     *  \brief Constructor of Exception.
+     *  \param message the error message.
+     */
+    Exception(const std::string& message) noexcept;
+
+    /**
+     *  \brief Destructor of Exception.
+     */
     virtual ~Exception(void) noexcept;
   };
 }

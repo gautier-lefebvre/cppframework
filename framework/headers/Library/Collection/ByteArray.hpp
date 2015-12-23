@@ -295,12 +295,26 @@ public:
   void  push_frontStr(const std::string& str, bool resize = false);
 
 public:
+  /**
+   *  \class Guard Library/Collection/ByteArray.hpp
+   *  \brief Returns the ByteArray to its pool in its destructor.
+   *  Similar to a lockguard.
+   */
   struct Guard {
   public:
-    ByteArray*  bytearray;
+    ByteArray*  bytearray; /*!< the ByteArray to return to the pool. */
 
   public:
+    /**
+     *  \brief Constructor of ByteArray::Guard.
+     *  Stores the ByteArray.
+     *  \param b the ByteArray to store.
+     */
     Guard(ByteArray* b);
+
+    /**
+     *  \brief Destructor of ByteArray::Guard. Returns the stored ByteArray to its pool.
+     */
     ~Guard();
   };
 };

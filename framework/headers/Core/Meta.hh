@@ -4,8 +4,12 @@
 #include  <string>
 
 namespace   Core {
+  /**
+   *  \namespace Meta
+   *  \brief Metadata of the Core
+   */
   namespace Meta {
-    static const std::string version = "0.1.0";
+    static const std::string version = "0.1.0"; /*!< last release version. */
   }
 }
 

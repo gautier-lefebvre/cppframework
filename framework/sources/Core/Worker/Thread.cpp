@@ -4,6 +4,7 @@
 #include  "Core/Event/Manager.hh"
 #include  "Core/Worker/Thread.hh"
 #include  "Core/Worker/Manager.hh"
+#include  "Core/Event/Exception.hh"
 #include  "Core/Exception.hh"
 
 const std::map<Core::Worker::ATask::Source, Core::Worker::Thread::WorkerHandler> Core::Worker::Thread::TaskHandlerMap = {
@@ -181,7 +182,7 @@ void  Core::Worker::Thread::executeEventTask(Core::Worker::ATask* task, bool exe
             }
           }
 
-        } catch (const std::out_of_range& e) {
+        } catch (const Core::Event::EventNotRegisteredException& e) {
           WARNING(e.what());
         }
       }

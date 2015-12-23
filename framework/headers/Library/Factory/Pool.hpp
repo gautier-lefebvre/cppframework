@@ -79,6 +79,11 @@ namespace  Factory {
       return element;
     }
 
+    /**
+     *  \brief Does the same as the get method without arguments, and calls the init method of the object with the given arguments.
+     *  \throw Exception the pool is empty and the memory is exhausted.
+     *  \return the object popped from the pool, initialized.
+     */
     template<typename... Args>
     C*  get(const Args&... args) {
       C* item = this->get();

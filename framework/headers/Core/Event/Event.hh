@@ -7,37 +7,32 @@
 
 namespace   Core {
   namespace Event {
-    enum class Source {
-      UNSET,
-      CORE,
-      APP
-    };
-
+    /**
+     *  \class Event Core/Event/Event.hh
+     *  \brief an Event of the program.
+     *  Pooled.
+     */
     class Event :public Factory::AFactored, public Factory::TPooled<Core::Event::Event, 50, 10> {
-    private:
-      Source _source;
-
     public:
-      Event(void);
-      virtual ~Event(void);
-
-    public:
+      /**
+       *  \brief Inherited from AFactored. Does nothing.
+       */
       virtual void reinit(void);
 
     public:
-      void init(Source);
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().fireAsync(event, args);
+       *  See Core::Event::Manager::fireAsync to see the behaviour of the method and the exceptions thrown.
+       *  \param args the arguments passed to the subscribers of the event.
+       */
+      void fireAsync(Core::Event::IEventArgs *args) const;
 
-    public:
-      void fireAsync(Core::Event::IEventArgs*) const;
-      void fireSync(Core::Event::IEventArgs*) const;
-
-    public:
-      Source getSource(void) const;
-    };
-
-    struct HasEvent {
-    public:
-      Core::Event::Event *event;
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().fireAsync(event, args);
+       *  See Core::Event::Manager::fireSync to see the behaviour of the method and the exceptions thrown.
+       *  \param args the arguments passed to the subscribers of the event.
+       */
+      void fireSync(Core::Event::IEventArgs *args) const;
     };
   }
 }
