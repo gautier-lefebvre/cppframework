@@ -5,9 +5,21 @@
 
 namespace    Core {
   namespace  Network {
+    /**
+     *  \class Exception Core/Network/Exception.hh
+     *  \brief Superclass of every exception thrown in the Network.
+     */
     class  Exception :public Core::Exception {
-    public:
-      Exception(const std::string&) noexcept;
+      public:
+      /**
+       *  \brief Constructor of Exception.
+       *  \param message the error message.
+       */
+      Exception(const std::string& message) noexcept;
+
+      /**
+       *  \brief Destructor of Exception.
+       */
       virtual ~Exception(void) noexcept;
     };
   }

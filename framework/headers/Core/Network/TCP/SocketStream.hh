@@ -8,26 +8,66 @@
 namespace     Core {
   namespace   Network {
     namespace TCP {
+      /**
+       *  \class SocketStream Core/Network/TCP/SocketStream.hh
+       *  \brief Socket used to receive and send data.
+       */
       class   SocketStream :public Socket, public Factory::TPooled<Core::Network::TCP::SocketStream, 100, 20> {
       protected:
-        ByteArray*  _input;
-        ByteArray*  _output;
+        ByteArray*  _input; /*!< the input buffer */
+        ByteArray*  _output; /*!< the output buffer */
 
       public:
-        static const size_t BUFFER_SIZE;
+        static const size_t BUFFER_SIZE; /*!< maximum number of bytes in the input or output buffer before considering it full */
 
       public:
+        /**
+         *  \brief Constructor of SocketStream.
+         */
         SocketStream(void);
+
+        /**
+         *  \brief Destructor of SocketStream.
+         */
         virtual ~SocketStream(void);
 
       public:
+        /**
+         *  \brief Reinits the SocketStream. Sends back the input and output ByteArrays to their Pool.
+         */
         virtual void  reinit(void);
 
       public:
+        /**
+         *  \brief Gets I/O ByteArrays from their Pool.
+         */
         void    init(void);
+
+        /**
+         *  \return true if the output buffer is not empty.
+         */
         bool    hasDataToSend(void) const;
-        void    push(const void*, size_t);
+
+        /**
+         *  \brief Adds data to the socket.
+         *  \param ptr pointer to the start of the data to send.
+         *  \param size size in bytes of the data to send.
+         *  \throw Core::Network::Exception the output buffer is full.
+         */
+        void    push(const void* ptr, size_t size);
+
+        /**
+         *  \brief Reads from the socket and adds it to the input buffer.
+         *  \throw Core::Network::Exception the input buffer is full or the socket was closed.
+         *  \return the number of bytes read.
+         */
         ssize_t recv(void);
+
+        /**
+         *  \brief Send data to the socket.
+         *  \throw Core::Network::Exception the socket was closed.
+         *  \return the number of bytes sent.
+         */
         ssize_t send(void);
 
       public:
