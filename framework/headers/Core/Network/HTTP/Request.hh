@@ -10,32 +10,54 @@
 namespace     Core {
   namespace   Network {
     namespace HTTP {
+      /**
+       *  \class Request Core/Network/HTTP/Request.hh
+       *  \brief A request to send to a HTTP server.
+       */
       struct  Request :public AMessage, public Factory::TPooled<Core::Network::HTTP::Request, 10, 2> {
-        std::string method;
-        std::string url;
-        bool secure;
-        std::function<void (const Core::Network::HTTP::Response *)> success;
-        std::function<void (const Core::Network::HTTP::Response *)> error;
-        std::function<void (void)> clean;
+        std::string method; /*!< method (or verb) of the request. */
+        std::string url; /*!< url of the request (ex: "/posts"). */
+        bool secure; /*!< send the request on the secure port (https) of the server. */
+        std::function<void (const Core::Network::HTTP::Response *)> success; /*!< callback called when the response has a status < 400. */
+        std::function<void (const Core::Network::HTTP::Response *)> error; /*!< callback called when the response >= 400. */
+        std::function<void (void)> clean; /*!< callback called when the response is not valid. */
 
         struct {
-          bool isFile;
-          std::string filepath;
-        } file;
+          bool isFile; /*!< wether of not the request must upload a file. */
+          std::string filepath; /*!< path of the file to upload. */
+        } file; /*!< information on a file to send. */
 
         struct {
-          bool isAsynchronous;
-          bool isValid;
-          Threading::Condition lock;
-          Core::Network::HTTP::Response* response;
-        } asynchronous;
+          bool isAsynchronous; /*!< wether or not the request is synchronous. The other attributes of this structure are invalid if this variable is true. */
+          bool isValid; /*!< if false, the thread was only woken because the connection is being closed. */
+          Threading::Condition lock; /*!< condition variable to wait on until the response is read. */
+          Core::Network::HTTP::Response* response; /*!< the response to the request. This is only set in case of a synchronous request. */
+        } asynchronous; /*!< information on a synchronous request. */
 
+        /**
+         *  \brief Constructor of Request.
+         */
         Request(void);
+
+        /**
+         *  \brief Destructor of Request.
+         */
         virtual ~Request(void);
 
+        /**
+         *  \brief Reinits the request. Returns the synchronous response to the pool.
+         */
         virtual void reinit(void);
 
+        /**
+         *  \brief Returns the synchronous response to the pool.
+         */
         void cleanResponse(void);
+
+        /**
+         *  \brief Waits for the synchronous request to end. Never returns if the request was not set synchronous.
+         *  \return true if the request received a response. false if the condition variable was notified because the connection is being closed.
+         */
         bool wait(void);
 
         /**

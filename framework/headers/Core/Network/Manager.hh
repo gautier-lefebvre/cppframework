@@ -10,6 +10,10 @@
 #include  "Core/Network/UDP/Manager.hh"
 
 namespace    Core {
+  /**
+   *  \namespace Network
+   *  \brief All networking classes (HTTP/TCP/UDP) and managers
+   */
   namespace  Network {
     class    Manager :public Singleton<Core::Network::Manager>, public Threading::Lockable, public AEndable, public Initializable {
       friend class Singleton<Core::Network::Manager>;

@@ -6,7 +6,15 @@
 namespace     Core {
   namespace   Network {
     namespace HTTP {
+      /**
+       *  \class Response Core/Network/HTTP/Response.hh
+       *  \brief a Response received from a HTTP server.
+       */
       struct  Response :public AMessage, public Factory::TPooled<Core::Network::HTTP::Response, 10, 2> {
+        /**
+         *  \class Status Core/Network/HTTP/Response.hh
+         *  \brief Meaning of HTTP status.
+         */
         enum class  Status {
           CONTINUE                        = 100,
           SWITCHING_PROTOCOLS             = 101,
@@ -63,12 +71,22 @@ namespace     Core {
           NOT_EXTENDED                    = 510
         };
 
-        uint32_t  status;
-        std::string reason;
+        uint32_t  status; /*!< status of the response (200, 400, ...). */
+        std::string reason; /*!< reason of the response ("Success", "Bad Request", ...). This does not work with cURL. */
 
+        /**
+         *  \brief Constructor of Response.
+         */
         Response(void);
+
+        /**
+         *  \brief Destructor of Response.
+         */
         virtual ~Response(void);
 
+        /**
+         *  \brief Reinits the Response.
+         */
         virtual void reinit(void);
       };
     }
