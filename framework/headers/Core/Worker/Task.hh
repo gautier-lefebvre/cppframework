@@ -63,7 +63,7 @@ namespace    Core {
     class  SimpleTask :public ATask, public Factory::TPooled<Core::Worker::SimpleTask, 15, 10> {
     public:
       std::function<void (void)> _callback; /*!< the callback to be called by the worker thread. */
-      std::function<void (void)> _cleanup; /*!< the callback used to clean resources. Called after the execution callback, or when the tasks queue is being cleared. */
+      std::function<void (void)> _cleanup; /*!< the callback used to clean resources. Called when the tasks queue is being cleared. */
 
     public:
       /**
@@ -92,7 +92,7 @@ namespace    Core {
       /**
        *  \brief Sets the callback and cleanup method.
        *  \param callback the callback to be executed by a worker thread.
-       *  \param cleanup the callback to be used to clean resources. Called after the execution callback, or when the tasks queue is being cleared.
+       *  \param cleanup the callback to be used to clean resources. Called when the tasks queue is being cleared.
        */
       void init(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
     };
