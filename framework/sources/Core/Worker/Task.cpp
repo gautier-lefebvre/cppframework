@@ -126,8 +126,8 @@ void  Core::Worker::PeriodicTask::init(const std::function<void(void)>& callback
   this->_off = false;
 }
 
-void  Core::Worker::PeriodicTask::stop(bool off) {
-  this->_off = off;
+void  Core::Worker::PeriodicTask::stop() {
+  this->_off = true;
 }
 
 /**

@@ -25,6 +25,11 @@ void Core::Network::UDP::ASocket::reinit(void) {
   this->_buffer = nullptr;
 }
 
+void Core::Network::UDP::ASocket::init(void) {
+  SCOPELOCK(this);
+  this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
+}
+
 void Core::Network::UDP::ASocket::socket(void) {
   SCOPELOCK(this);
   if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {

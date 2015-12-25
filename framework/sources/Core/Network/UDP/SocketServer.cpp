@@ -10,11 +10,6 @@ Core::Network::UDP::SocketServer::~SocketServer(void) {
   this->reinit();
 }
 
-void Core::Network::UDP::SocketServer::init(void) {
-  SCOPELOCK(this);
-  this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
-}
-
 void  Core::Network::UDP::SocketServer::bind(uint16_t port) {
   if (port == 80) {
     throw Core::Network::Exception("bind: cannot bind port 80");
@@ -66,9 +61,8 @@ ByteArray*  Core::Network::UDP::SocketServer::recvfrom(struct sockaddr_in& addr)
 
   // copy buffer to datagram resized to the number of bytes read.
   size_t size = static_cast<size_t>(ret);
-  bool resize = true;
 
-  datagram = ByteArray::getFromPool(size, resize);
+  datagram = ByteArray::getFromPool(size, true);
   datagram->push(this->_buffer->atStart(), size, false);
 
   return datagram;

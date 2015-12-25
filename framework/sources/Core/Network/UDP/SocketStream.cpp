@@ -20,6 +20,7 @@ void Core::Network::UDP::SocketStream::reinit(void) {
 
 void Core::Network::UDP::SocketStream::init(const std::string& hostname, uint16_t port) {
   SCOPELOCK(this);
+  this->Core::Network::UDP::ASocket::init();
 
   hostent *hostinfo = gethostbyname(hostname.c_str());
   if (hostinfo == nullptr) {
@@ -29,8 +30,6 @@ void Core::Network::UDP::SocketStream::init(const std::string& hostname, uint16_
   this->_addr.sin_addr   = *(reinterpret_cast<in_addr*>(hostinfo->h_addr));
   this->_addr.sin_port   = htons(port);
   this->_addr.sin_family = AF_INET;
-
-  this->_buffer = ByteArray::getFromPool(Core::Network::UDP::ASocketIO::BUFFER_SIZE);
 }
 
 ssize_t Core::Network::UDP::SocketStream::sendto(void) {
@@ -65,14 +64,16 @@ ssize_t  Core::Network::UDP::SocketStream::recvfrom(void) {
     throw Core::Network::Exception("udp socket closed");
   }
 
-  // copy buffer to datagram resized to the number of bytes read.
-  bool force = true;
-  datagram = ByteArray::getFromPool(ret, force);
-  datagram->push(this->_buffer->atStart(), ret, false);
+  if (this->_input.second + ret <= Core::Network::UDP::ASocketIO::BUFFER_SIZE) {
+    // copy buffer to datagram resized to the number of bytes read.
+    datagram = ByteArray::getFromPool(ret, true);
+    datagram->push(this->_buffer->atStart(), ret, false);
 
-  // add datagram to datagram queue
-  this->_input.first.push(datagram);
-  this->_input.second += datagram->getSize();
-
-  return ret;
+    // add datagram to datagram queue
+    this->_input.first.push(datagram);
+    this->_input.second += datagram->getSize();
+    return ret;
+  } else {
+    throw Core::Network::Exception("recvfrom: input buffer is full");
+  }
 }

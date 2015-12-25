@@ -77,11 +77,13 @@ namespace     Core {
 
         /**
          *  \brief see man getpeername.
+         *  \throw Core::Network::Exception getpeername function call failed.
          */
         uint32_t  getpeername(void) const;
 
         /**
          *  \brief see man getsockname.
+         *  \throw Core::Network::Exception getsockname function call failed.
          */
         uint32_t  getsockname(void) const;
 

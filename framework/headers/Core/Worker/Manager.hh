@@ -15,6 +15,10 @@
 
 namespace    Core {
   namespace  Worker {
+    /**
+     *  \class Manager Core/Worker/Manager.hh
+     *  \brief Worker threads manager.
+     */
     class  Manager :public Singleton<Core::Worker::Manager>, public Threading::Lockable, public AEndable {
       friend class Singleton<Core::Worker::Manager>;
     public:
@@ -22,38 +26,73 @@ namespace    Core {
       typedef Threading::TNotifiable<std::priority_queue<Core::Worker::DelayedTask*, std::vector<Core::Worker::DelayedTask*>, std::function<bool (const Core::Worker::DelayedTask*, const Worker::DelayedTask*)>>>  DelayedTaskQueue;
 
     private:
-      TaskQueue        _pendingTasks;
-      DelayedTaskQueue _delayedTasks;
-      std::vector<Worker::Thread*>  _workers;
+      TaskQueue        _pendingTasks; /*!< tasks to execute. */
+      DelayedTaskQueue _delayedTasks; /*!< tasks to be executed after a delay. */
+      std::vector<Worker::Thread*>  _workers; /*!< list of workers threads. */
 
     private:
+      /**
+       *  \brief Deleted copy constructor of Manager.
+       */
       Manager(const Manager&) = delete;
+
+      /**
+       *  \brief Deleted move constructor of Manager.
+       */
       Manager(const Manager&&) = delete;
+
+      /**
+       *  \brief Deleted assignment constructor of Manager.
+       */
       Manager& operator=(const Manager&) = delete;
 
     private:
+      /**
+       *  \brief Constructor of Manager.
+       */
       Manager(void);
+
+      /**
+       *  \brief Destructor of Manager.
+       */
       virtual ~Manager(void);
 
     public:
+      /**
+       *  \brief Stops every worker threads and clears the tasks queues.
+       */
       virtual void end(void);
 
     public:
+      /**
+       *  \return the tasks queue.
+       */
       TaskQueue&         getTaskQueue(void);
+
+      /**
+       *  \return the delayed tasks queue.
+       */
       DelayedTaskQueue&  getDelayedTaskQueue(void);
 
     public:
+      /**
+       *  \brief Initializes the worker threads.
+       *  \param nbWorkers the number of workers executing the tasks of the task queue.
+       *  \param delayedTasks true if a thread must be used for delayed tasks.
+       */
       void  init(size_t nbWorkers, bool delayedTasks);
 
       /**
        *  \brief Adds a Task to the task queue.
+       *  \param task the task.
        */
-      void  addTask(Core::Worker::ATask*);
+      void  addTask(Core::Worker::ATask* task);
 
       /**
        *  \brief Adds a DelayedTask to the task queue.
+       *  \param dtask the delayed task.
        */
-      void  addDelayedTask(Core::Worker::DelayedTask*);
+      void  addDelayedTask(Core::Worker::DelayedTask* dtask);
 
       /**
        *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
@@ -72,31 +111,46 @@ namespace    Core {
 
       /**
        *  \brief Adds an EventTask to the task queue.
+       *  \param event the event.
+       *  \param args the event arguments.
        */
-      void  addEventTask(const Core::Event::Event*, Core::Event::IEventArgs*);
+      void  addEventTask(const Core::Event::Event* event, Core::Event::IEventArgs* args);
 
       /**
        *  \brief Adds an HTTPTask to the task queue.
+       *  \param callback the function to call with the response.
+       *  \param cleanup the cleanup function.
+       *  \param response the HTTP response.
        */
-      void  addHTTPTask(const std::function<void (const Core::Network::HTTP::Response*)>&, const std::function<void (void)>&, Core::Network::HTTP::Response*);
+      void  addHTTPTask(const std::function<void (const Core::Network::HTTP::Response*)>& callback, const std::function<void (void)>& cleanup, Core::Network::HTTP::Response* response);
 
       /**
-       *  \brief Adds a DelayedTask to the task queue.
+       *  \brief Adds a DelayedTask to the delayed task queue.
+       *  \param task the task to be executed at the specific time point.
+       *  \param tp the timepoint at which the task must be executed.
        */
-      void  addDelayedTask(Core::Worker::ATask*, const std::chrono::steady_clock::time_point&);
+      void  addDelayedTask(Core::Worker::ATask* task, const std::chrono::steady_clock::time_point& tp);
 
       /**
-       *  \brief Adds a DelayedTask to the task queue.
+       *  \brief Adds a DelayedTask to the delayed task queue.
+       *  \param task the task to be executed after a specific duration.
+       *  \param duration the duration to wait before executing the task.
        */
-      void  addDelayedTask(Core::Worker::ATask*, const std::chrono::steady_clock::duration&);
+      void  addDelayedTask(Core::Worker::ATask* task, const std::chrono::steady_clock::duration& duration);
 
       /**
        *  \brief Adds a PeriodicTask to the task queue.
+       *  \param callback the function to call at regular interval.
+       *  \param cleanup the function to call after the periodic task has been canceled.
+       *  \param duration the duration between 2 calls of the callback.
+       *  \param startNow true if the task must be first executed right away, false if the task must be first executed after the specified duration.
        */
-      void  addPeriodicTask(const std::function<void(void)>&, const std::function<void(void)>&, const std::chrono::steady_clock::duration&, bool startNow = true);
+      void  addPeriodicTask(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& duration, bool startNow = true);
 
       /**
        *  \brief Adds a PeriodicTask to the task queue.
+       *  \param task the PeriodicTask.
+       *  \param startNow true if the task must be first executed right away, false if the task must be first executed after the specified duration.
        */
       void  addPeriodicTask(Core::Worker::PeriodicTask*, bool startNow = true);
     };
