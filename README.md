@@ -16,35 +16,13 @@ For now I'm only focusing on Debian-based environments, but Windows will also be
 - pthread
 - ssl
 
+## documentation
+
+See the wiki section of the project.
+
 ## modules
 
 The framework is based on modules, some of which are optional. You can decide to have a TCP/IP server/client manager (see below), a UDP server/client manager, etc.
-
-### networking
-
-#### tcp/ip
-
-The TCP/IP module offers you the possibility to bind sockets and act as a server, or connect to distant servers and act as a client, at the same time. It runs on 2 threads, 1 for input and 1 for output.
-
-When you bind a socket or connect to one, you can attach a callback which will be called whenever data is read from it, or in the case of the bound socket, whenever data is read from a distant socket which connected to yours.
-
-#### udp/ip
-
-The UDP/IP module works in the same way as the TCP/IP one, except that the callback method is called whenever a datagram is read.
-
-#### http
-
-The HTTP module is a HTTP client. It works this way: each remote server runs on a different thread, as you can't send a new request before completely reading the response to the last request you sent. Whenever you want to send a HTTP request, the manager will check if you already have a connection to this url (defined by a path and a port), and create a new thread dynamically. You don't have to initialize anything, but you have the choice.
-
-When sending a HTTP request, you can provide a callback method which will be called when the response to this particular request is read.
-
-This uses cURL.
-
-### workers
-
-Every event or action (data read from a socket, response received from a HTTP request) is put in a shared queue (FIFO collection).
-
-They are then executed by worker threads. There must be at least 1 worker thread.
 
 ### events
 
@@ -58,13 +36,74 @@ You must always unregister your events before destroying them, to prevent a fire
 
 Events can now be fired synchronously, but you'd better be sure of what you are doing, it stops the execution of the calling thread to execute the callback, so keep the operations to a minimum. If the operation is heavy you can always prepare a new task in the event callback, add it to the task queue and execute the operation in the task callback.
 
-#### delayed events
+### networking
 
-If you want an event to be executed after a delay, you can use delayed events, which will need an extra thread (1 for all events). You only need to create an event, specify a delay and add it to the worker manager, which will then pass it to the timout events thread. The event will be added to the action queue after the delay is completed.
+#### tcp/ip
+
+The TCP/IP module offers you the possibility to bind sockets and act as a server, or connect to remote TCP servers and act as a client, at the same time. It runs on 2 threads, 1 for input and 1 for output.
+
+TCP servers offer 4 events:
+- a client connected.
+- a client disconnected.
+- a client sent data.
+- the server closed.
+
+TCP clients offer 2 events:
+- the server sent data.
+- the client closed.
+
+All these events are synchronous.
+
+#### udp/ip
+
+The UDP/IP module works in the same way as the TCP/IP one. The main difference is that the event for socket closing is not accurate, due to the fact that the UDP protocol is not connected.
+
+#### http
+
+The HTTP module is a HTTP client. It works this way: each remote server runs on a different thread, as you can't send a new request before completely reading the response to the last request you sent. Whenever you want to send a HTTP request, the manager will check if you already have a connection to this url (defined by a path and a port), and create a new thread dynamically. You don't have to initialize anything, but you have the choice.
+
+When sending a HTTP request, you can provide a callback method which will be called when the response to this particular request is read.
+
+You can send synchronous HTTP requests. The thread is woken if the response is read or if the system is being shut down.
+
+This uses cURL.
+
+### workers
+
+Every task is put in a shared queue (FIFO collection).
+They are then executed by worker threads. There must be at least 1 worker thread.
+
+When the framework is being cleaned, every task still in the task queue is cleared.
+Most tasks can provide a **cleanup** function which can be used to clean any resource allocated for the normal execution callback.
+
+#### tasks
+
+##### SimpleTask
+
+A simple task is simply an action put at the end of the task queue. You must provide a function with the following prototype: `std::function<void (void)>`.
+You can also provide a cleanup function with the same prototype (see [workers](#workers)).
+
+##### EventTask
+
+This is the task to create when firing an event. There is a shortcut through the event itself, but it creates the EventTask object and adds it to the task queue.
+
+##### HTTPTask
+
+This is the type of task created by the HTTP client module when receiving a response to a HTTP request.
+
+##### PeriodicTask
+
+A periodic task is a task which is executed at regular interval. You set a callback in the form of `std::function<void (void)>`, a cleanup function called when the periodic task is canceled, and a duration as interval.
+
+#### delayed tasks
+
+You can choose to execute a task after a delay. This requires an extra thread, which puts the delayed tasks into the tasks queue after the delay is completed.
 
 ## factory
 
 The framework tries to be the most efficient possible. With that in mind, it tries never to allocate anything dynamically, which means that most of the framework's objects are pooled.
+
+Any pooled object can be retrieved from its pool with a `Foo::Bar::getFromPool(args...)` et returned to their pool with a `Foo::Bar::returnToPool(object)`.
 
 ## threads
 
@@ -72,8 +111,8 @@ Based on the modules you activate and the number of workers you choose, you will
 - TCP module: 2 threads.
 - UDP module: 2 threads (if both TCP and UDP is activated, they will use the same threads).
 - HTTP module: 1 thread for each remote server.
-- Delayed events: 1 thread.
-- Worker: at least 1 thread.
+- Delayed tasks: 1 thread.
+- Worker thread: at least 1 thread.
 
 ## third party
 
