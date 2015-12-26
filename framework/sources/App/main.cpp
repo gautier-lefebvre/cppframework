@@ -183,23 +183,20 @@ int main(int ac, char ** av) {
     http(system);
   } else if (protocol == "delayed") {
     system->initWorkerThreads(1, true);
-    auto callback = [] (void) {
+    Core::Worker::Manager::get().addDelayedTask(Core::Worker::SimpleTask::getFromPool([] (void) {
       INFO("SimpleTask working");
-    };
-    Core::Worker::Manager::get().addDelayedTask(Core::Worker::SimpleTask::getFromPool(callback), std::chrono::seconds(2));
+    }), std::chrono::seconds(2));
     system->run();
   } else if (protocol == "periodic") {
     system->initWorkerThreads(1, true);
-    auto callback = [] (void) {
+    Core::Worker::Manager::get().addPeriodicTask([] (void) {
       INFO("Hello");
-    };
-    Core::Worker::Manager::get().addPeriodicTask(callback, nullptr, std::chrono::seconds(5), true);
+    }, nullptr, std::chrono::seconds(5), true);
     system->run();
   } else if (protocol == "simple") {
-    auto callback = [] (void) {
+    Core::Worker::Manager::get().addSimpleTask([] (void) {
       INFO("SimpleTask :)");
-    };
-    Core::Worker::Manager::get().addSimpleTask(callback);
+    });
     system->run();
   } else {
     std::cerr << "unknown protocol" << std::endl;

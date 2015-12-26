@@ -4,6 +4,7 @@
 
 #include  "Library/Tool/Macro.hh"
 #include  "Core/Network/UDP/ASocket.hh"
+#include  "Core/Network/UDP/ASocketIO.hh"
 #include  "Core/Network/Exception.hh"
 
 Core::Network::UDP::ASocket::ASocket(void):

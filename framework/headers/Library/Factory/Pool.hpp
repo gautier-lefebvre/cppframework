@@ -173,7 +173,7 @@ namespace  Factory {
      *  \return the object.
      */
     template<typename... Args>
-    static C*  getFromPool(Args&... args) {
+    static C*  getFromPool(const Args&... args) {
       return _pool->get(args...);
     }
 
