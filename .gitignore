@@ -30,3 +30,5 @@
 *~
 *.d
 *.autosave
+
+doc/

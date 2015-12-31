@@ -1,6 +1,7 @@
 NAME=       cppframework
 
-SRCDIR=     sources/
+INCLDIR=	include/
+SRCDIR=     src/
 
 LIBRARYDIR= $(SRCDIR)Library/
 LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp            \
@@ -11,8 +12,6 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp            \
             $(LIBRARYDIR)Property/Initializable.cpp          \
             $(LIBRARYDIR)ThirdParty/cppformat/format.cpp     \
             $(LIBRARYDIR)ThirdParty/cppformat/posix.cpp      \
-            $(LIBRARYDIR)ThirdParty/json.cpp                 \
-            $(LIBRARYDIR)ThirdParty/sha512.cpp               \
             $(LIBRARYDIR)Threading/Condition.cpp             \
             $(LIBRARYDIR)Threading/Lock.cpp                  \
             $(LIBRARYDIR)Tool/Arguments.cpp                  \
@@ -63,7 +62,7 @@ DEPS=       $(OBJ:.o=.d)
 LDPTHREAD=  -lpthread
 LDFLAGS=    $(LDPTHREAD) -lssl -lcrypto -lcurl
 
-CXXFLAGS=   -Iheaders/ -std=c++11 -W -Wall -Wextra -Werror
+CXXFLAGS=   -I$(INCLDIR) -std=c++11 -W -Wall -Wextra -Werror
 
 CXX=        g++
 

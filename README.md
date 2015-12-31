@@ -116,9 +116,5 @@ Based on the modules you activate and the number of workers you choose, you will
 
 ## third party
 
-Third party libraries and functions:
-- [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
-- [utfcpp](http://sourceforge.net/projects/utfcpp/)
-- [reader-writer lock with writer priority](http://code.activestate.com/recipes/577803-reader-writer-lock-with-priority-for-writers/) (from python)
-- [SHA-512](http://www.zedwood.com/article/cpp-sha512-function)
+Included third party libraries and functions:
 - [cppformat](http://cppformat.github.io/latest/)
