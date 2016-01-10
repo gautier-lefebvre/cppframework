@@ -8,7 +8,7 @@ It is still in development. Information below is for now only the requisites.
 
 ## operating system
 
-For now I'm only focusing on Debian-based environments, but Windows will also be supported.
+For now only Linux is supported, although Windows only needs basic modifications like `closesocket` instead of `close`.
 
 ## dependencies
 
