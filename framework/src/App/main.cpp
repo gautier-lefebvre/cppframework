@@ -128,7 +128,6 @@ static void http(Core::System* system) {
   request->init();
   request->method = "GET";
   request->url = "/posts";
-  request->secure = false;
   request->success = [] (const Core::Network::HTTP::Response* response) -> void {
     INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
@@ -136,7 +135,7 @@ static void http(Core::System* system) {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Client::get().sendRequest(request, "jsonplaceholder.typicode.com");
+  Core::Network::HTTP::Client::get().sendRequest(request, "jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP);
 
   system->run();
 }

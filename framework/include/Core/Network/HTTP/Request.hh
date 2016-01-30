@@ -17,7 +17,6 @@ namespace     Core {
       struct  Request :public AMessage, public Factory::TPooled<Core::Network::HTTP::Request, 10, 2> {
         std::string method; /*!< method (or verb) of the request. */
         std::string url; /*!< url of the request (ex: "/posts"). */
-        bool secure; /*!< send the request on the secure port (https) of the server. */
         std::function<void (const Core::Network::HTTP::Response *)> success; /*!< callback called when the response has a status < 400. */
         std::function<void (const Core::Network::HTTP::Response *)> error; /*!< callback called when the response >= 400. */
         std::function<void (void)> clean; /*!< callback called when the response is not valid. */

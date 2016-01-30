@@ -8,6 +8,7 @@
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
 #include  "Core/Network/HTTP/Request.hh"
+#include  "Core/Network/HTTP/Protocol.hh"
 
 namespace     Core {
   namespace   Network {
@@ -29,8 +30,8 @@ namespace     Core {
 
       private:
         std::string _host; /*!< hostname of the HTTP server. */
-        uint16_t  _port; /*!< port of the HTTP server. */
-        uint16_t  _secureport; /*!< secure port (https) of the HTTP server. */
+        uint16_t    _port; /*!< port of the HTTP server. */
+        Protocol    _protocol; /*!< protocol of the server (HTTP/HTTPS/FTP...) */
         std::string _userAgent; /*!< user agent used for requests. */
         std::thread *_thread; /*!< thread used by the connection. */
         Threading::TNotifiable<std::queue<Core::Network::HTTP::Request*>>  _pendingRequests; /*!< pending requests. */
@@ -40,10 +41,10 @@ namespace     Core {
          *  \brief Constructor of Connection.
          *  \param hostname hostname of the HTTP server.
          *  \param port port of the HTTP server.
-         *  \param securePort secure port (https) of the HTTP server.
+         *  \param protocol protocol used.
          *  \param userAgent user agent used for sending requests.
          */
-        Connection(const std::string &hostname, uint16_t port, uint16_t securePort, const std::string& userAgent);
+        Connection(const std::string &hostname, uint16_t port, Protocol protocol, const std::string& userAgent);
 
         /**
          *  \brief Destructor of Connection. Calls the end method.
@@ -75,10 +76,10 @@ namespace     Core {
         uint16_t  getPort(void) const;
 
         /**
-         *  \brief Returns the secure port of the HTTP server.
-         *  \return the secure port of the HTTP server.
+         *  \brief Returns the protocol.
+         *  \return the protocol.
          */
-        uint16_t  getSecurePort(void) const;
+        Protocol  getProtocol(void) const;
 
         /**
          *  \brief Adds a request to the queue of pending requests.

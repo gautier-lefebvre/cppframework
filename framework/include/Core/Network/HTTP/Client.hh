@@ -68,23 +68,23 @@ namespace     Core {
         void  init(const std::string& user_agent);
 
         /**
-         *  \brief Gets a connection from its hostname, port and secure port.
+         *  \brief Gets a connection from its hostname, port and protocol.
          *  \param hostname the hostname of the HTTP server.
          *  \param port the port of the HTTP server.
-         *  \param securePort the secure port (https) of the HTTP server.
+         *  \param protocol the protocol used.
          *  \param create if true and the connection is not found, creates it.
          *  \return nullptr if the connection is not found and create is false, else return the connection.
          */
-        Connection* getConnectionByHostPort(const std::string& hostname, uint16_t port = 80, uint16_t securePort = 443, bool create = true);
+        Connection* getConnectionByHostPortProtocol(const std::string& hostname, uint16_t port = 80, Core::Network::HTTP::Protocol protocol = Core::Network::HTTP::Protocol::HTTP, bool create = true);
 
         /**
          *  \brief Send a request to a specific HTTP server. If a connection to this server is not already open, opens it.
          *  \param request the request to send.
          *  \param hostname the hostname of the HTTP server.
          *  \param port the port of the HTTP server.
-         *  \param securePort the secure port (https) of the HTTP server.
+         *  \param protocol the protocol used.
          */
-        void  sendRequest(Core::Network::HTTP::Request *request, const std::string& hostname, uint16_t port = 80, uint16_t securePort = 443);
+        void  sendRequest(Core::Network::HTTP::Request *request, const std::string& hostname, uint16_t port = 80, Core::Network::HTTP::Protocol protocol = Core::Network::HTTP::Protocol::HTTP);
 
         /**
          *  \brief Send a request to a specific open HTTP server.

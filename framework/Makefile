@@ -8,6 +8,8 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp            \
             $(LIBRARYDIR)Encryption/MD5.cpp                  \
             $(LIBRARYDIR)Encryption/XOR.cpp                  \
             $(LIBRARYDIR)Factory/AFactored.cpp               \
+            $(LIBRARYDIR)Network/CURL/EasyHandle.cpp         \
+            $(LIBRARYDIR)Network/CURL/Exception.cpp          \
             $(LIBRARYDIR)Property/AEndable.cpp               \
             $(LIBRARYDIR)Property/Initializable.cpp          \
             $(LIBRARYDIR)ThirdParty/cppformat/format.cpp     \

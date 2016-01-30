@@ -4,6 +4,9 @@
 #include  <unistd.h>
 #include  <cstring>
 
+#include  "Library/Network/CURL/EasyHandle.hh"
+#include  "Library/Network/CURL/Method.hh"
+#include  "Library/Network/CURL/Exception.hh"
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Logger.hpp"
 #include  "Library/Tool/String.hh"
@@ -11,12 +14,12 @@
 #include  "Core/Worker/Manager.hh"
 #include  "Core/Network/Exception.hh"
 
-Core::Network::HTTP::Connection::Connection(const std::string& host, uint16_t port, uint16_t sport, const std::string& user_agent):
+Core::Network::HTTP::Connection::Connection(const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol, const std::string& user_agent):
   Threading::Lockable(),
   AEndable(),
   _host(host),
   _port(port),
-  _secureport(sport),
+  _protocol(protocol),
   _userAgent(user_agent),
   _thread(nullptr),
   _pendingRequests()
@@ -78,8 +81,8 @@ uint16_t      Core::Network::HTTP::Connection::getPort(void) const {
   return this->_port;
 }
 
-uint16_t      Core::Network::HTTP::Connection::getSecurePort(void) const {
-  return this->_port;
+Core::Network::HTTP::Protocol Core::Network::HTTP::Connection::getProtocol(void) const {
+  return this->_protocol;
 }
 
 void  Core::Network::HTTP::Connection::addRequest(::Core::Network::HTTP::Request *request) {
@@ -146,6 +149,164 @@ Core::Network::HTTP::Response*  Core::Network::HTTP::Connection::sendRequest(con
   return response;
 }
 
+Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
+  curlxx::EasyHandle handle;
+  Core::Network::HTTP::Response* response = Core::Network::HTTP::Response::getFromPool();
+
+  try {
+    handle.init();
+
+    // set url
+    handle.setURL(Core::Network::HTTP::ProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
+
+    // set port
+    handle.setPort(this->_port);
+
+    // set method
+    handle.setMethod(request->method);
+
+    // set user agent
+    handle.setUserAgent(this->_userAgent);
+
+    // set headers
+    handle.setHeaders(request->headers);
+
+    // set body or set file
+    if (request->file.isFile) {
+      handle.setFile(request->file.filepath, &read_callback);
+    } else if (request->body->getSize() > 0) {
+      handle.setBody(request->body->atStart(), request->body->getSize());
+    }
+
+    // set response callbacks
+    response->init();
+    handle.setResponseCallbacks(response, &write_callback, &header_callback);
+
+    // send request
+    handle.perform();
+
+    // get response status
+    response->status = handle.getStatus();
+
+    // return response
+    return response;
+  } catch (const std::exception& e) {
+    Core::Network::HTTP::Response::returnToPool(response);
+    throw Core::Network::Exception(e.what());
+  }
+}
+
+// Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
+//   Core::Network::HTTP::Response *response = nullptr;
+//   CURLcode    result;
+//   std::string protocol;
+//   uint16_t    port;
+//   CURL*       handle = curl_easy_init();
+//   curl_slist  *headers = NULL, *tmp;
+//   struct stat file_info;
+//   FILE*       file;
+
+//   try {
+//     response = Core::Network::HTTP::Response::getFromPool();
+//     response->init();
+
+//     if (!handle) {
+//       throw Core::Network::Exception("curl_easy_init failed");
+//     }
+
+//     // choose protocol and port
+//     protocol = request->secure ? "https" : "http";
+//     port = request->secure ? this->_secureport : this->_port;
+
+//     // set user agent
+//     curl_easy_setopt(handle, CURLOPT_USERAGENT, this->_userAgent.c_str());
+
+//     // set path
+//     curl_easy_setopt(handle, CURLOPT_URL, std::string(protocol + "://" + this->_host + request->url).c_str());
+
+//     // set port
+//     curl_easy_setopt(handle, CURLOPT_PORT, static_cast<long>(port));
+
+//     // if body -> set body / else if file -> set filepath
+//     if (request->body->getSize() > 0) {
+//       curl_easy_setopt(handle, CURLOPT_POSTFIELDS, request->body->getBytes());
+//       curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, request->body->getSize());
+//     } else if (request->file.isFile) {
+//       curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
+//       curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_callback);
+
+//       if (stat(request->file.filepath.c_str(), &file_info)) {
+//         throw Core::Network::Exception("Invalid file to upload");
+//       } else if ((file = fopen(request->file.filepath.c_str(), "rb")) == NULL) {
+//         throw Core::Network::Exception("Could not open file to upload");
+//       }
+
+//       curl_easy_setopt(handle, CURLOPT_READDATA, file);
+//       curl_easy_setopt(handle, CURLOPT_INFILESIZE_LARGE, (curl_off_t)file_info.st_size);
+//     }
+
+//     // choose method
+//     if (request->method == "GET") {
+//       curl_easy_setopt(handle, CURLOPT_HTTPGET, 1L);
+//     } else if (request->method == "POST") {
+//       curl_easy_setopt(handle, CURLOPT_POST, 1L);
+//     } else if (request->method == "PUT") {
+//       curl_easy_setopt(handle, CURLOPT_PUT, 1L);
+//     } else if (request->method == "HEAD") {
+//       curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
+//     } else {
+//       curl_easy_setopt(handle, CURLOPT_CUSTOMREQUEST, request->method.c_str());
+//     }
+
+//     // set response handling callbacks
+//     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_callback);
+//     curl_easy_setopt(handle, CURLOPT_WRITEDATA, response);
+//     curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_callback);
+//     curl_easy_setopt(handle, CURLOPT_HEADERDATA, response);
+
+//     // set headers
+//     if (!request->headers.empty()) {
+//       for (auto &header : request->headers) {
+//         if ((tmp = curl_slist_append(headers, std::string(header.first + ": " + header.second).c_str())) == NULL) {
+//           throw Core::Network::Exception("curl_slist_append: fail");
+//         }
+//         headers = tmp;
+//       }
+//       curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
+//     }
+
+//     // send requests
+//     if ((result = curl_easy_perform(handle)) != CURLE_OK) {
+//       throw Core::Network::Exception(std::string("curl_easy_perform: ") + curl_easy_strerror(result));
+//     }
+
+//     // get response status
+//     long status = 0;
+//     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status);
+//     response->status = static_cast<uint32_t>(status);
+
+//     // free headers
+//     if (headers != NULL) {
+//       curl_slist_free_all(headers);
+//     }
+
+//     // cleanup request handle
+//     curl_easy_cleanup(handle);
+//     return response;
+//   } catch (const std::exception& e) {
+//     if (headers != NULL) {
+//       curl_slist_free_all(headers);
+//     }
+
+//     if (handle != NULL) {
+//       curl_easy_cleanup(handle);
+//     }
+
+//     Core::Network::HTTP::Response::returnToPool(response);
+//     throw Core::Network::Exception(e.what());
+//   }
+// }
+
 size_t  Core::Network::HTTP::Connection::read_callback(void *data, size_t size, size_t nmemb, void *userdata) {
   Core::Network::HTTP::Connection::upload_object *u = reinterpret_cast<Core::Network::HTTP::Connection::upload_object*>(userdata);
 
@@ -184,115 +345,4 @@ size_t  Core::Network::HTTP::Connection::write_callback(void *data, size_t size,
   Core::Network::HTTP::Response *response = reinterpret_cast<Core::Network::HTTP::Response*>(userdata);
   response->body->push(reinterpret_cast<const uint8_t*>(data), size * nmemb, true);
   return size * nmemb;
-}
-
-Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
-  Core::Network::HTTP::Response *response = nullptr;
-  CURLcode    result;
-  std::string protocol;
-  uint16_t    port;
-  CURL*       handle = curl_easy_init();
-  curl_slist  *headers = NULL, *tmp;
-  struct stat file_info;
-  FILE*       file;
-
-  try {
-    response = Core::Network::HTTP::Response::getFromPool();
-    response->init();
-
-    if (!handle) {
-      throw Core::Network::Exception("curl_easy_init failed");
-    }
-
-    // choose protocol and port
-    protocol = request->secure ? "https" : "http";
-    port = request->secure ? this->_secureport : this->_port;
-
-    // set user agent
-    curl_easy_setopt(handle, CURLOPT_USERAGENT, this->_userAgent.c_str());
-
-    // set path
-    curl_easy_setopt(handle, CURLOPT_URL, std::string(protocol + "://" + this->_host + request->url).c_str());
-
-    // set port
-    curl_easy_setopt(handle, CURLOPT_PORT, static_cast<long>(port));
-
-    // if body -> set body / else if file -> set filepath
-    if (request->body->getSize() > 0) {
-      curl_easy_setopt(handle, CURLOPT_POSTFIELDS, request->body->getBytes());
-      curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE, request->body->getSize());
-    } else if (request->file.isFile) {
-      curl_easy_setopt(handle, CURLOPT_UPLOAD, 1L);
-      curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_callback);
-
-      if (stat(request->file.filepath.c_str(), &file_info)) {
-        throw Core::Network::Exception("Invalid file to upload");
-      } else if ((file = fopen(request->file.filepath.c_str(), "rb"))) {
-        throw Core::Network::Exception("Could not open file to upload");
-      }
-
-      curl_easy_setopt(handle, CURLOPT_READDATA, file);
-      curl_easy_setopt(handle, CURLOPT_INFILESIZE_LARGE, (curl_off_t)file_info.st_size);
-    }
-
-    // choose method
-    if (request->method == "GET") {
-      curl_easy_setopt(handle, CURLOPT_HTTPGET, 1L);
-    } else if (request->method == "POST") {
-      curl_easy_setopt(handle, CURLOPT_POST, 1L);
-    } else if (request->method == "PUT") {
-      curl_easy_setopt(handle, CURLOPT_PUT, 1L);
-    } else if (request->method == "HEAD") {
-      curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
-    } else {
-      curl_easy_setopt(handle, CURLOPT_CUSTOMREQUEST, request->method.c_str());
-    }
-
-    // set response handling callbacks
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, response);
-    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_callback);
-    curl_easy_setopt(handle, CURLOPT_HEADERDATA, response);
-
-    // set headers
-    if (!request->headers.empty()) {
-      for (auto &header : request->headers) {
-        if ((tmp = curl_slist_append(headers, std::string(header.first + ": " + header.second).c_str())) == NULL) {
-          throw Core::Network::Exception("curl_slist_append: fail");
-        }
-        headers = tmp;
-      }
-      curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
-    }
-
-    // send requests
-    if ((result = curl_easy_perform(handle)) != CURLE_OK) {
-      throw Core::Network::Exception(std::string("curl_easy_perform: ") + curl_easy_strerror(result));
-    }
-
-    // get response status
-    long status = 0;
-    curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status);
-    response->status = static_cast<uint32_t>(status);
-
-    // free headers
-    if (headers != NULL) {
-      curl_slist_free_all(headers);
-    }
-
-    // cleanup request handle
-    curl_easy_cleanup(handle);
-    return response;
-  } catch (const std::exception& e) {
-    if (headers != NULL) {
-      curl_slist_free_all(headers);
-    }
-
-    if (handle != NULL) {
-      curl_easy_cleanup(handle);
-    }
-
-    Core::Network::HTTP::Response::returnToPool(response);
-    throw Core::Network::Exception(e.what());
-  }
 }

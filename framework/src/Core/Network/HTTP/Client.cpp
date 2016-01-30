@@ -40,12 +40,12 @@ void  Core::Network::HTTP::Client::init(const std::string& user_agent) {
   }
 }
 
-Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHostPort(const std::string& host, uint16_t port, uint16_t secureport, bool create) {
+Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHostPortProtocol(const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol, bool create) {
   SCOPELOCK(this);
 
   // if connection found -> return connection
   for (auto &connection : this->_connections) {
-    if (connection->getHost() == host && connection->getPort() == port && connection->getSecurePort() == secureport) {
+    if (connection->getHost() == host && connection->getPort() == port && connection->getProtocol() == protocol) {
       return connection;
     }
   }
@@ -55,7 +55,7 @@ Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHo
   if (create) {
     Core::Network::HTTP::Connection *connection = nullptr;
     try {
-      connection = new Core::Network::HTTP::Connection(host, port, secureport, this->_userAgent);
+      connection = new Core::Network::HTTP::Connection(host, port, protocol, this->_userAgent);
       this->_connections.push_back(connection);
       connection->run();
       return connection;
@@ -64,14 +64,14 @@ Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHo
       throw e;
     }
   } else {
-    return nullptr;
+    throw Core::Network::Exception(fmt::format("Could not find connection to ({0}){1}:{2}", Core::Network::HTTP::ProtocolToString.key.at(protocol), host, port));
   }
 }
 
-void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *request, const std::string& host, uint16_t port, uint16_t secureport) {
+void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *request, const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol) {
   try {
-    this->getConnectionByHostPort(host, port, secureport)->addRequest(request);
-  } catch (const Core::Network::Exception& e) {
+    this->getConnectionByHostPortProtocol(host, port, protocol)->addRequest(request);
+  } catch (const std::exception& e) {
     CRITICAL(e.what());
     Core::Network::HTTP::Request::returnToPool(request);
   }
