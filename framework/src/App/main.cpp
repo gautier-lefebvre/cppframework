@@ -123,8 +123,10 @@ static void udpClient(Core::System* system, const std::string& hostname, uint16_
 }
 
 static void http(Core::System* system) {
-  Core::Network::HTTP::Request* request = Core::Network::HTTP::Request::getFromPool();
+  Core::Network::HTTP::Request* request;
+  Core::Network::HTTP::Connection* connection = Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP, true);
 
+  request = Core::Network::HTTP::Request::getFromPool();
   request->init();
   request->method = "GET";
   request->url = "/posts";
@@ -135,7 +137,31 @@ static void http(Core::System* system) {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Connection* connection = Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP, true);
+  Core::Network::HTTP::Client::get().sendRequest(connection, request);
+
+  request = Core::Network::HTTP::Request::getFromPool();
+  request->init();
+  request->method = "GET";
+  request->url = "/posts";
+  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
+  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
+
+  Core::Network::HTTP::Client::get().sendRequest(connection, request);
+
+  request = Core::Network::HTTP::Request::getFromPool();
+  request->init();
+  request->method = "GET";
+  request->url = "/posts";
+  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
+  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+  };
 
   Core::Network::HTTP::Client::get().sendRequest(connection, request);
 

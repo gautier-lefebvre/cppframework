@@ -99,7 +99,7 @@ namespace     Core {
         /**
          *  \brief Send pending requests and waits for new ones until the end method is called.
          */
-        virtual void routine(void);
+        void routine(void);
 
         /**
          *  \brief Effectively send a request.
@@ -126,6 +126,13 @@ namespace     Core {
          *  \param response the pointer to the response used by curl.
          */
         void prepareHandle(curlxx::EasyHandle* handle, const Core::Network::HTTP::Request *request, Core::Network::HTTP::Response *response) const;
+
+        /**
+         *  \brief Sets the response to the specified request. Will add the response to the task queue (asynchronous request) or wake the waiting worker (synchronous request).
+         *  \param request the request whose response is being set.
+         *  \param response the response read. nullptr if the connection is being shut down.
+         */
+        void setResponse(Core::Network::HTTP::Request* request, Core::Network::HTTP::Response* response) const;
 
       protected:
         /**

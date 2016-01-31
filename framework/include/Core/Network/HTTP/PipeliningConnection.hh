@@ -24,10 +24,12 @@ namespace     Core {
          */
         virtual void run(void);
 
-        virtual void routine(void);
+      private:
+        void routine(void);
 
       private:
-        void  sendPipeline(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle);
+        void  sendPipeline(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle) const;
+        void  getAnswers(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle) const;
       };
     }
   }

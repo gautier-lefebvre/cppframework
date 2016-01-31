@@ -1,13 +1,14 @@
 #include  <unistd.h>
 
 #include  "Library/Network/CURL/Exception.hh"
+#include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Library/Tool/Logger.hpp"
 #include  "Core/Network/HTTP/PipeliningConnection.hh"
 #include  "Core/Network/Exception.hh"
 #include  "Core/Worker/Manager.hh"
 
 Core::Network::HTTP::PipeliningConnection::PipeliningConnection(const std::string &hostname, uint16_t port, Protocol protocol, const std::string& userAgent):
-  Core::Network::HTTP::Connection(hostname, port, protocol, userAgent)
+Core::Network::HTTP::Connection(hostname, port, protocol, userAgent)
 {}
 
 Core::Network::HTTP::PipeliningConnection::~PipeliningConnection(void) {}
@@ -56,34 +57,11 @@ void Core::Network::HTTP::PipeliningConnection::routine(void) {
       CRITICAL(e.what());
     }
 
-    // add responses to the worker manager or wake waiting threads
-    for (auto& it : pipelined) {
-      try {
-        request = std::get<0>(it.second);
-        response = std::get<1>(it.second);
-
-        if (request->asynchronous.isAsynchronous) {
-          // asynchronous request
-          // add http task and return request to pool
-          if (response->status >= 400) {
-            Core::Worker::Manager::get().addHTTPTask(request->error, request->clean, response);
-          } else {
-            Core::Worker::Manager::get().addHTTPTask(request->success, request->clean, response);
-          }
-          Core::Network::HTTP::Request::returnToPool(request);
-        } else {
-          request->wake(response);
-        }
-      } catch (const std::exception& e) {
-        CRITICAL(e.what());
-      }
-    }
-
     multiHandle.cleanup();
   }
 }
 
-void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle) {
+void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle) const {
   multiHandle.init();
 
   // prepare all requests
@@ -96,9 +74,13 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
     } catch (const std::exception& e) {
       CRITICAL(e.what());
 
+      // set general error response
       std::get<2>(it.second) = true;
       std::get<1>(it.second)->status = 400;
       std::get<1>(it.second)->reason = e.what();
+
+      // add http task or wake waiting thread
+      this->setResponse(std::get<0>(it.second), std::get<1>(it.second));
     }
   }
 
@@ -109,6 +91,9 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
       fd_set  rset, wset, eset;
       int     maxfd;
       while (multiHandle.perform()) {
+        // get all status
+        this->getAnswers(pipelined, multiHandle);
+
         multiHandle.timeout(interval);
         multiHandle.fdset(&rset, &wset, &eset, maxfd);
 
@@ -119,17 +104,8 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
         }
       }
 
-      // get all status
-      CURLMsg* msg;
-      while ((msg = multiHandle.infoRead()) != NULL) {
-        if (msg->msg == CURLMSG_DONE) {
-          curlxx::EasyHandle* easyHandle = multiHandle.findHandle(msg->easy_handle);
-          if (easyHandle != nullptr) {
-            std::get<1>(pipelined[easyHandle])->status = easyHandle->getStatus();
-            std::get<2>(pipelined[easyHandle]) = true;
-          }
-        }
-      }
+      this->getAnswers(pipelined, multiHandle);
+
     }
   } catch (const std::exception& e) {
     CRITICAL(e.what());
@@ -142,8 +118,30 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
     if (std::get<2>(it.second) == false) {
       std::get<1>(it.second)->status = 400;
       std::get<1>(it.second)->reason = "HTTP pipelining failed";
+
+      // add http job or wake waiting thread
+      this->setResponse(std::get<0>(it.second), std::get<1>(it.second));
     }
 
     curlxx::EasyHandle::returnToPool(it.first);
+  }
+}
+
+void Core::Network::HTTP::PipeliningConnection::getAnswers(HandlesMap& pipelined, curlxx::MultiHandle& multiHandle) const {
+  // get the answers and send the response to the worker manager
+  CURLMsg* msg;
+  while ((msg = multiHandle.infoRead()) != NULL) {
+    if (msg->msg == CURLMSG_DONE) {
+      curlxx::EasyHandle* easyHandle = multiHandle.findHandle(msg->easy_handle);
+      if (easyHandle != nullptr) {
+        // set status
+        auto& handleData = pipelined.at(easyHandle);
+        std::get<1>(handleData)->status = easyHandle->getStatus();
+        std::get<2>(handleData) = true;
+
+        // add http job or wake waiting thread
+        this->setResponse(std::get<0>(handleData), std::get<1>(handleData));
+      }
+    }
   }
 }

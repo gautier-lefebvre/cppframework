@@ -183,7 +183,6 @@ void Core::Network::UDP::Manager::push(Core::Network::UDP::ASocketIO* socket, co
   	ByteArray* datagram = ByteArray::getFromPool(data, size);
 
     try {
-      DEBUG(fmt::format("Pushed a datagram of {0} bytes to the socket", size));
       socket->push(datagram);
 
       {
