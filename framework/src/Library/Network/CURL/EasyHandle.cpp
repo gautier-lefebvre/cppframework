@@ -11,6 +11,7 @@
 #include  "Library/ThirdParty/cppformat/format.hh"
 
 curlxx::EasyHandle::EasyHandle(void):
+  Factory::AFactored(),
   _handle(NULL),
   _headers(NULL)
  {
@@ -24,6 +25,10 @@ void curlxx::EasyHandle::init(void) {
   if ((this->_handle = curl_easy_init()) == NULL) {
     throw curlxx::Exception("curl_easy_init failed");
   }
+}
+
+void curlxx::EasyHandle::reinit(void) {
+  this->cleanup();
 }
 
 void curlxx::EasyHandle::setOpt(CURLoption option, long parameter) const {
@@ -165,4 +170,8 @@ void curlxx::EasyHandle::setResponseCallbacks(void* responsePtr, size_t (*body)(
   this->setOpt(CURLOPT_WRITEDATA, responsePtr);
   this->setOpt(CURLOPT_HEADERFUNCTION, headers);
   this->setOpt(CURLOPT_HEADERDATA, responsePtr);
+}
+
+CURL* curlxx::EasyHandle::getHandle(void) const {
+  return this->_handle;
 }

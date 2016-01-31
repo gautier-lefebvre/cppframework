@@ -54,9 +54,7 @@ void  Core::Network::HTTP::Connection::end(void) {
         if (request->asynchronous.isAsynchronous) {
           Core::Network::HTTP::Request::returnToPool(request);
         } else {
-          ScopeLock slsync(request->asynchronous.lock);
-          request->asynchronous.isValid = false;
-          request->asynchronous.lock.notify();
+          request->wake(nullptr);
         }
         this->_pendingRequests.pop();
       }
@@ -125,11 +123,7 @@ void  Core::Network::HTTP::Connection::routine(void) {
         }
         Core::Network::HTTP::Request::returnToPool(request);
       } else {
-        // synchronous request -> wake request
-        SCOPELOCK(&(request->asynchronous.lock));
-        request->asynchronous.response = response;
-        request->asynchronous.isValid = true;
-        request->asynchronous.lock.notify();
+        request->wake(response);
       }
     }
   }
@@ -149,46 +143,70 @@ Core::Network::HTTP::Response*  Core::Network::HTTP::Connection::sendRequest(con
   return response;
 }
 
-Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
-  curlxx::EasyHandle handle;
-  Core::Network::HTTP::Response* response = Core::Network::HTTP::Response::getFromPool();
-
+void Core::Network::HTTP::Connection::prepareHandle(curlxx::EasyHandle* handle, const Core::Network::HTTP::Request *request, Core::Network::HTTP::Response* response) const {
   try {
-    handle.init();
+    handle->init();
 
-    // set url
-    handle.setURL(Core::Network::HTTP::ProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
-
-    // set port
-    handle.setPort(this->_port);
-
-    // set method
-    handle.setMethod(request->method);
-
-    // set user agent
-    handle.setUserAgent(this->_userAgent);
-
-    // set headers
-    handle.setHeaders(request->headers);
+    handle->setUserAgent(this->_userAgent);
+    handle->setURL(Core::Network::HTTP::ProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
+    handle->setPort(this->_port);
+    handle->setMethod(request->method);
+    handle->setHeaders(request->headers);
 
     // set body or set file
     if (request->file.isFile) {
-      handle.setFile(request->file.filepath, &read_callback);
+      handle->setFile(request->file.filepath, &read_callback);
     } else if (request->body->getSize() > 0) {
-      handle.setBody(request->body->atStart(), request->body->getSize());
+      handle->setBody(request->body->atStart(), request->body->getSize());
     }
 
     // set response callbacks
     response->init();
-    handle.setResponseCallbacks(response, &write_callback, &header_callback);
+    handle->setResponseCallbacks(response, &write_callback, &header_callback);
+  } catch (const std::exception& e) {
+    throw Core::Network::Exception(e.what());
+  }
+}
 
-    // send request
-    handle.perform();
+curlxx::EasyHandle* Core::Network::HTTP::Connection::prepareHandle(const Core::Network::HTTP::Request *request, Core::Network::HTTP::Response* response) const {
+  curlxx::EasyHandle* handle = curlxx::EasyHandle::getFromPool();
 
-    // get response status
-    response->status = handle.getStatus();
+  try {
+    handle->init();
 
-    // return response
+    handle->setUserAgent(this->_userAgent);
+    handle->setURL(Core::Network::HTTP::ProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
+    handle->setPort(this->_port);
+    handle->setMethod(request->method);
+    handle->setHeaders(request->headers);
+
+    // set body or set file
+    if (request->file.isFile) {
+      handle->setFile(request->file.filepath, &read_callback);
+    } else if (request->body->getSize() > 0) {
+      handle->setBody(request->body->atStart(), request->body->getSize());
+    }
+
+    // set response callbacks
+    response->init();
+    handle->setResponseCallbacks(response, &write_callback, &header_callback);
+  } catch (const std::exception& e) {
+    curlxx::EasyHandle::returnToPool(handle);
+    throw Core::Network::Exception(e.what());
+  }
+
+  return handle;
+}
+
+Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
+  Core::Network::HTTP::Response* response = Core::Network::HTTP::Response::getFromPool();
+
+  try {
+    curlxx::EasyHandle* handle = this->prepareHandle(request, response);
+
+    // send request and get status
+    handle->perform();
+    response->status = handle->getStatus();
     return response;
   } catch (const std::exception& e) {
     Core::Network::HTTP::Response::returnToPool(response);

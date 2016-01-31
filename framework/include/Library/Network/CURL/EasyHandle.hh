@@ -6,9 +6,11 @@
 #include  <map>
 
 #include  "Library/Collection/BidiMap.hpp"
+#include  "Library/Factory/AFactored.hh"
+#include  "Library/Factory/Pool.hpp"
 
 namespace curlxx {
-  class   EasyHandle {
+  class   EasyHandle :public Factory::AFactored, public Factory::TPooled<curlxx::EasyHandle, 10, 2> {
   private:
     CURL*       _handle;
     curl_slist* _headers;
@@ -19,6 +21,9 @@ namespace curlxx {
 
   public:
     void init(void);
+    virtual void reinit(void);
+
+  public:
     void setOpt(CURLoption, long) const;
     void setOpt(CURLoption, const std::string&) const;
     void setOpt(CURLoption, void*) const;
@@ -37,6 +42,9 @@ namespace curlxx {
     void setURL(const std::string& fullURL) const;
     void setUserAgent(const std::string&) const;
     void setResponseCallbacks(void*, size_t (*body)(void*, size_t, size_t, void*), size_t (*headers)(void*, size_t, size_t, void*)) const;
+
+  public:
+    CURL* getHandle(void) const;
 
   private:
     void appendHeader(const std::string&, const std::string&);

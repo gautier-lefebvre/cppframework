@@ -3,6 +3,7 @@
 
 #include  "Library/Tool/Logger.hpp"
 #include  "Core/Network/HTTP/Client.hh"
+#include  "Core/Network/HTTP/PipeliningConnection.hh"
 #include  "Core/Network/Exception.hh"
 
 const std::string Core::Network::HTTP::Client::defaultUserAgent = std::string("cppframework user agent");
@@ -40,44 +41,35 @@ void  Core::Network::HTTP::Client::init(const std::string& user_agent) {
   }
 }
 
-Core::Network::HTTP::Connection * Core::Network::HTTP::Client::getConnectionByHostPortProtocol(const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol, bool create) {
+Core::Network::HTTP::Connection * Core::Network::HTTP::Client::initConnection(const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol, bool enablePipelining) {
   SCOPELOCK(this);
 
-  // if connection found -> return connection
+  // if connection found -> return connection (this does not change the pipelining parameter !)
   for (auto &connection : this->_connections) {
     if (connection->getHost() == host && connection->getPort() == port && connection->getProtocol() == protocol) {
       return connection;
     }
   }
 
-  // if connection not found and can create -> create new connection
-  // else -> return nullptr
-  if (create) {
-    Core::Network::HTTP::Connection *connection = nullptr;
-    try {
-      connection = new Core::Network::HTTP::Connection(host, port, protocol, this->_userAgent);
-      this->_connections.push_back(connection);
-      connection->run();
-      return connection;
-    } catch (const Core::Network::Exception& e) {
-      delete connection;
-      throw e;
-    }
-  } else {
-    throw Core::Network::Exception(fmt::format("Could not find connection to ({0}){1}:{2}", Core::Network::HTTP::ProtocolToString.key.at(protocol), host, port));
-  }
-}
-
-void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *request, const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol) {
+  // if connection not found -> create new connection
+  Core::Network::HTTP::Connection *connection = nullptr;
   try {
-    this->getConnectionByHostPortProtocol(host, port, protocol)->addRequest(request);
-  } catch (const std::exception& e) {
-    CRITICAL(e.what());
-    Core::Network::HTTP::Request::returnToPool(request);
+    if (!enablePipelining) {
+      connection = new Core::Network::HTTP::Connection(host, port, protocol, this->_userAgent);
+    } else {
+      connection = new Core::Network::HTTP::PipeliningConnection(host, port, protocol, this->_userAgent);
+    }
+
+    this->_connections.push_back(connection);
+    connection->run();
+    return connection;
+  } catch (const Core::Network::Exception& e) {
+    delete connection;
+    throw e;
   }
 }
 
-void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Request *request, Core::Network::HTTP::Connection *connection) {
+void  Core::Network::HTTP::Client::sendRequest(Core::Network::HTTP::Connection *connection, Core::Network::HTTP::Request *request) {
   if (connection != nullptr) {
     connection->addRequest(request);
   } else {

@@ -68,30 +68,26 @@ namespace     Core {
         void  init(const std::string& user_agent);
 
         /**
-         *  \brief Gets a connection from its hostname, port and protocol.
-         *  \param hostname the hostname of the HTTP server.
-         *  \param port the port of the HTTP server.
-         *  \param protocol the protocol used.
-         *  \param create if true and the connection is not found, creates it.
-         *  \return nullptr if the connection is not found and create is false, else return the connection.
+         *  \brief Creates a new connection.
+         *
+         *  If a connection to this host/port/protocol already exists,
+         *  this returns the existing connection, but does not change the pipelining parameter.
+         *
+         *  \throw Core::Network::Exception if the connection to the server could not be initialized (i.e. the thread did not launch).
+         *  \param hostname hostname of the HTTP server.
+         *  \param port port of the HTTP server.
+         *  \param protocol protocol used (HTTP/HTTPS/FTP).
+         *  \param enablePipelining true to enable HTTP pipelining.
+         *  \return the connection created.
          */
-        Connection* getConnectionByHostPortProtocol(const std::string& hostname, uint16_t port = 80, Core::Network::HTTP::Protocol protocol = Core::Network::HTTP::Protocol::HTTP, bool create = true);
-
-        /**
-         *  \brief Send a request to a specific HTTP server. If a connection to this server is not already open, opens it.
-         *  \param request the request to send.
-         *  \param hostname the hostname of the HTTP server.
-         *  \param port the port of the HTTP server.
-         *  \param protocol the protocol used.
-         */
-        void  sendRequest(Core::Network::HTTP::Request *request, const std::string& hostname, uint16_t port = 80, Core::Network::HTTP::Protocol protocol = Core::Network::HTTP::Protocol::HTTP);
+        Connection* initConnection(const std::string& hostname, uint16_t port = 80, Core::Network::HTTP::Protocol protocol = Core::Network::HTTP::Protocol::HTTP, bool enablePipelining = true);
 
         /**
          *  \brief Send a request to a specific open HTTP server.
          *  \param request the request to send.
          *  \param connection the open connection to the HTTP server.
          */
-        void  sendRequest(Core::Network::HTTP::Request *request, Core::Network::HTTP::Connection *connection);
+        void  sendRequest(Core::Network::HTTP::Connection *connection, Core::Network::HTTP::Request *request);
       };
     }
   }

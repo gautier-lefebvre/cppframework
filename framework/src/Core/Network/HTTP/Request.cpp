@@ -44,3 +44,10 @@ bool  Core::Network::HTTP::Request::wait(void) {
 
   return this->asynchronous.isValid || this->asynchronous.response;
 }
+
+void Core::Network::HTTP::Request::wake(Core::Network::HTTP::Response *response) {
+  SCOPELOCK(&(this->asynchronous.lock));
+  this->asynchronous.response = response;
+  this->asynchronous.isValid = (response != nullptr);
+  this->asynchronous.lock.notify();
+}

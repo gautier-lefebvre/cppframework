@@ -60,6 +60,12 @@ namespace     Core {
         bool wait(void);
 
         /**
+         *  \brief Wakes the synchronous request.
+         *  \param response the http response read. If nullptr, means that the response was not read and the thread was only woken because the client is being shut down.
+         */
+        void wake(Core::Network::HTTP::Response* response);
+
+        /**
           synchronous request usage:
 
           Core::Network::HTTP::Request* request = Core::Network::HTTP::Request::getFromPool();
