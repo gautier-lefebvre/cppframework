@@ -1,4 +1,5 @@
 #include  "Library/Threading/Lock.hpp"
+#include  "Library/Tool/Logger.hpp"
 
 Threading::Lockable::Lockable(void):
   _lock()

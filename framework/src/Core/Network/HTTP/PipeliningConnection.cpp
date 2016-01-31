@@ -39,7 +39,6 @@ void Core::Network::HTTP::PipeliningConnection::routine(void) {
       } else {
         for (size_t i = 0 ; i < curlxx::MultiHandle::PIPELINED_REQUESTS_MAX_NB && !(this->_pendingRequests.empty()) ; ++i) {
           easyHandle = curlxx::EasyHandle::getFromPool();
-          easyHandle->init();
 
           request = this->_pendingRequests.front();
           response = Core::Network::HTTP::Response::getFromPool();
@@ -96,7 +95,6 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
       multiHandle.addHandle(it.first);
     } catch (const std::exception& e) {
       CRITICAL(e.what());
-      curlxx::EasyHandle::returnToPool(it.first);
 
       std::get<2>(it.second) = true;
       std::get<1>(it.second)->status = 400;
@@ -127,7 +125,7 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
         if (msg->msg == CURLMSG_DONE) {
           curlxx::EasyHandle* easyHandle = multiHandle.findHandle(msg->easy_handle);
           if (easyHandle != nullptr) {
-            std::get<1>(pipelined[easyHandle])->status = msg->data.result;
+            std::get<1>(pipelined[easyHandle])->status = easyHandle->getStatus();
             std::get<2>(pipelined[easyHandle]) = true;
           }
         }
@@ -137,6 +135,7 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
     CRITICAL(e.what());
   }
 
+  // cleanup every easy handle
   // if any requests still pending (= fail)
   // set general error status
   for (auto& it : pipelined) {
@@ -144,5 +143,7 @@ void  Core::Network::HTTP::PipeliningConnection::sendPipeline(HandlesMap& pipeli
       std::get<1>(it.second)->status = 400;
       std::get<1>(it.second)->reason = "HTTP pipelining failed";
     }
+
+    curlxx::EasyHandle::returnToPool(it.first);
   }
 }

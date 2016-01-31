@@ -135,7 +135,7 @@ static void http(Core::System* system) {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Connection* connection = Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP, false);
+  Core::Network::HTTP::Connection* connection = Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP, true);
 
   Core::Network::HTTP::Client::get().sendRequest(connection, request);
 

@@ -1,6 +1,6 @@
 NAME=       cppframework
 
-INCLDIR=	include/
+INCLDIR=    include/
 SRCDIR=     src/
 
 LIBRARYDIR= $(SRCDIR)Library/

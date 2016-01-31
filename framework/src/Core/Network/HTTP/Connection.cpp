@@ -200,18 +200,24 @@ curlxx::EasyHandle* Core::Network::HTTP::Connection::prepareHandle(const Core::N
 
 Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {
   Core::Network::HTTP::Response* response = Core::Network::HTTP::Response::getFromPool();
+  curlxx::EasyHandle* handle = nullptr;
 
   try {
-    curlxx::EasyHandle* handle = this->prepareHandle(request, response);
+    handle = this->prepareHandle(request, response);
 
     // send request and get status
     handle->perform();
     response->status = handle->getStatus();
+
+    curlxx::EasyHandle::returnToPool(handle);
+
     return response;
   } catch (const std::exception& e) {
     Core::Network::HTTP::Response::returnToPool(response);
+    curlxx::EasyHandle::returnToPool(handle);
     throw Core::Network::Exception(e.what());
   }
+
 }
 
 // Core::Network::HTTP::Response* Core::Network::HTTP::Connection::exec(const Core::Network::HTTP::Request *request) const {

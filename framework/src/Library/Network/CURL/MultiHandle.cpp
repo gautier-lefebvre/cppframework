@@ -1,5 +1,6 @@
 #include  "Library/Network/CURL/MultiHandle.hh"
 #include  "Library/Network/CURL/Exception.hh"
+#include  "Library/Tool/Logger.hpp"
 
 const size_t curlxx::MultiHandle::PIPELINED_REQUESTS_MAX_NB = 10;
 
@@ -38,7 +39,7 @@ void curlxx::MultiHandle::addHandle(EasyHandle* handle) {
     if (this->_easyHandles[i] == nullptr) {
       this->_easyHandles[i] = handle;
       curl_multi_add_handle(this->_multiHandle, handle->getHandle());
-      break;
+      return;
     }
   }
 

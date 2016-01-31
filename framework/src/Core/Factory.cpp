@@ -1,4 +1,5 @@
 #include  "Library/Collection/ByteArray.hpp"
+#include  "Library/Network/CURL/EasyHandle.hh"
 #include  "Core/Network/HTTP/Request.hh"
 #include  "Core/Network/HTTP/Response.hh"
 #include  "Core/Network/TCP/Manager.hh"
@@ -22,6 +23,7 @@ void Core::Factory::init(void) {
 
     // Library
     ByteArray::initPool("ByteArray");
+    curlxx::EasyHandle::initPool("curlxx::EasyHandle");
 
     // Core
     // -- Events
@@ -62,6 +64,7 @@ void Core::Factory::end(void) {
 
     // Library
     ByteArray::destroyPool();
+    curlxx::EasyHandle::destroyPool();
 
     // Core
     // -- Events
