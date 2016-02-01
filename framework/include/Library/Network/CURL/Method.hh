@@ -9,7 +9,7 @@ namespace curlxx {
     {std::string("POST"), CURLOPT_POST},
     {std::string("PUT"), CURLOPT_PUT},
     {std::string("HEAD"), CURLOPT_NOBODY},
-  };
+  }; /*!< Methods known by CURL. */
 }
 
 #endif    /* __LIBRARY_NETWORK_CURL_METHOD_HH__ */

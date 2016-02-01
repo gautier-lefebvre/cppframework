@@ -156,27 +156,10 @@ curlxx::EasyHandle* Core::Network::HTTP::Connection::prepareHandle(const Core::N
   curlxx::EasyHandle* handle = curlxx::EasyHandle::getFromPool();
 
   try {
-    handle->init();
-
-    handle->setUserAgent(this->_userAgent);
-    handle->setURL(Core::Network::HTTP::ProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
-    handle->setPort(this->_port);
-    handle->setMethod(request->method);
-    handle->setHeaders(request->headers);
-
-    // set body or set file
-    if (request->file.isFile) {
-      handle->setFile(request->file.filepath, &read_callback);
-    } else if (request->body->getSize() > 0) {
-      handle->setBody(request->body->atStart(), request->body->getSize());
-    }
-
-    // set response callbacks
-    response->init();
-    handle->setResponseCallbacks(response, &write_callback, &header_callback);
+    this->prepareHandle(handle, request, response);
   } catch (const std::exception& e) {
     curlxx::EasyHandle::returnToPool(handle);
-    throw Core::Network::Exception(e.what());
+    throw;
   }
 
   return handle;

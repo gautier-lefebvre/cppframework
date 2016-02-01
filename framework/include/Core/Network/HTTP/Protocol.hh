@@ -8,6 +8,10 @@
 namespace Core {
   namespace Network {
     namespace HTTP {
+      /**
+       *  \class Protocol Core/Network/HTTP/Protocol.hh
+       *  \brief protocols used in the http client.
+       */
       enum class Protocol {
         HTTP,
         HTTPS,
