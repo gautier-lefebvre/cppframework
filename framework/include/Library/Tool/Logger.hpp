@@ -3,6 +3,7 @@
 
 
 #include  <map>
+#include  <unordered_map>
 #include  <string>
 #include  <fstream>
 #include  <iostream>
@@ -15,10 +16,9 @@
 
 /**
  *  \class Logger Library/Tool/Logger.hpp
- *  \brief A singleton object used for logging.
+ *  \brief A logger class, which can write logs to a file or to the terminal output.
  */
-class Logger :public Singleton<Logger>, public Threading::Lockable {
-  friend class Singleton<Logger>;
+class Logger :public Threading::Lockable {
 public:
   /*! Logging levels. */
   enum class Level {
@@ -62,41 +62,38 @@ private:
   }; /*!< associates a level to a color. */
 
 private:
-  Logger::Level  _level; /*!< Lowest level of logging. */
-  size_t         _offset; /*!< Current number of `\t` to write before printing the log. */
-  std::ofstream* _file; /*!< The file in which to store the logs, if specified. */
-
-private:
-  /*! Deleted copy constructor of Logger. */
-  Logger(const Logger&) = delete;
-
-  /*! Deleted move constructor of Logger. */
-  Logger(const Logger&&) = delete;
-
-  /*! Deleted assignement constructor of Logger. */
-  Logger& operator=(const Logger&) = delete;
-
-private:
-  /*! Default constructor of Logger. */
-  Logger(void);
-
-  /*! Destructor of Logger. */
-  virtual ~Logger(void);
+  std::string     _name; /*!< name of the logger. */
+  Logger::Level   _level; /*!< lowest level of logging. */
+  size_t          _offset; /*!< current number of tabulations between the timestamp and the message. */
+  std::ofstream*  _file; /*!< file where the logs are written. */
 
 public:
   /**
-   *  \brief Sets the lowest level of logging.
-   *  \param level the lowest level of logging.
+   *  \brief Constructor of Logger.
+   *  Default lowest level of logging is INFO.
+   *  \param name name of the logger.
    */
-  void  init(Logger::Level level);
+  Logger(const std::string& name);
 
   /**
-   *  \brief Sets the lowest level of logging and logging file path.
-   *  \param level the lowest level of logging.
-   *  \param filepath the filepath of the logging file.
+   *  \brief Copy constructor of Logger.
+   *  \param oth logger to copy.
    */
-  void  init(Logger::Level level, const std::string& filepath);
+  Logger(const Logger& oth);
 
+  /**
+   *  \brief Assignation constructor of Logger.
+   *  \param oth logger to copy.
+   */
+  Logger& operator=(const Logger& oth);
+
+  /**
+   *  \brief Destructor of Logger.
+   *  Closes the file if it is open.
+   */
+  ~Logger(void);
+
+public:
   /**
    *  \brief Logs the message only if its level is greater or equal to the lowest debugging level. Prints the message inside the file if specified in \a init.
    *  Prints in a "hh:mm:ss:µµµµµµ -- msg" format.
@@ -105,10 +102,12 @@ public:
    */
   template<typename T>
   void  log(const T &msg, Logger::Level level) {
+    SCOPELOCK(this);
     if (level >= this->_level) {
       std::ostream& os = (this->_file != nullptr ? *(this->_file) : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
 
       os << Date::getTime() << " -- ";
+      os << this->_name << " -- ";
 
       for (size_t i = 0 ; i < this->_offset ; ++i) {
         os << "\t";
@@ -141,6 +140,97 @@ public:
    *  \param off the decrementation.
    */
   void  delOffset(size_t off);
+
+  /**
+   *  \brief Sets the lowest level of logging.
+   *  \param level lowest level of logging.
+   */
+  void  setLevel(Logger::Level level);
+
+  /**
+   *  \brief Sets the logging file.
+   *  \throw Exception if the file could not be opened.
+   *  \param filepath path to the logging file.
+   */
+  void  setFile(const std::string& filepath);
+
+  /**
+   *  \brief Closes the file. Any log will be written to the std output.
+   *  If no file is attached to the logger, nothing happens.
+   */
+  void closeFile(void);
+};
+
+/**
+ *  \class LoggerManager Library/Tool/Logger.hpp
+ *  \brief Loggers module.
+ */
+class LoggerManager :public Singleton<LoggerManager>, public Threading::Lockable {
+  friend class Singleton<LoggerManager>;
+public:
+  typedef std::unordered_map<std::string, Logger> NameLoggerMap;
+
+private:
+  NameLoggerMap _loggers; /*!< Current list of loggers. */
+
+private:
+  /*! Deleted copy constructor of LoggerManager. */
+  LoggerManager(const LoggerManager&) = delete;
+
+  /*! Deleted move constructor of LoggerManager. */
+  LoggerManager(const LoggerManager&&) = delete;
+
+  /*! Deleted assignement constructor of LoggerManager. */
+  LoggerManager& operator=(const LoggerManager&) = delete;
+
+private:
+  /*! Default constructor of LoggerManager. */
+  LoggerManager(void);
+
+  /*! Destructor of LoggerManager. */
+  virtual ~LoggerManager(void);
+
+public:
+  /**
+   *  \brief Inits a new logger or changes the info of a current logger.
+   *  \param loggerName name of the logger.
+   *  \param level the lowest level of logging for this logger.
+   */
+  Logger&  init(const std::string& loggerName, Logger::Level level);
+
+  /**
+   *  \brief Inits a new logger or changes the info of a current logger.
+   *  \throw Exception if the file could not be opened.
+   *  \param loggerName name of the logger.
+   *  \param level the lowest level of logging.
+   *  \param filepath the filepath of the logging file.
+   */
+  Logger&  init(const std::string& loggerName, Logger::Level level, const std::string& filepath);
+
+  /**
+   *  \brief Gets the Logger matching the specified name, or creates it and returns it.
+   *  \param name the logger name.
+   *  \return the logger.
+   */
+  Logger& getLogger(const std::string& name);
+
+  /**
+   *  \brief Deletes a Logger.
+   *  \param name name of the logger to remove.
+   */
+  void endLogger(const std::string& name);
+
+  /**
+   *  \brief Logs the message to the specified logger. If the logger does not exist, creates it.
+   *  \param msg the message to log.
+   *  \param level the level of logging.
+   *  \param loggerName the name of the logger.
+   */
+  template<typename T>
+  void  log(const std::string& loggerName, const T &msg, Logger::Level level) {
+    SCOPELOCK(this);
+    this->getLogger(loggerName).log(msg, level);
+  }
 };
 
 static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
@@ -151,36 +241,18 @@ static const BidiMap<Logger::Level, const std::string> LoggerLevelToString = {
   {Logger::Level::CRITICAL, std::string("CRITICAL")}
 }; /*!< Used to translate the enum Logging::Level to a string. */
 
-#ifdef   __DEBUG__
-# define LOG(x, y)              Logger::get().log((x), (y))
-# define DEBUG(x)               Logger::get().log((x), Logger::Level::DEBUG)
-# define INFO(x)                Logger::get().log((x), Logger::Level::INFO)
-# define WARNING(x)             Logger::get().log((x), Logger::Level::WARNING)
-# define ERROR(x)               Logger::get().log((x), Logger::Level::ERROR)
-# define CRITICAL(x)            Logger::get().log((x), Logger::Level::CRITICAL)
-# define LOGGER_SET_OFFSET(x)   Logger::get().setOffset((x))
-# define LOGGER_ADD_OFFSET(x)   Logger::get().addOffset((x))
-# define LOGGER_DEL_OFFSET(x)   Logger::get().delOffset((x))
-# define LOGGER_INIT(x)         Logger::get().init((x))
-# define LOGGER_INIT_FILE(x, y) Logger::get().init((x), y)
-# define LOGGER_DESTROY         Logger::destroy()
-
-#else     /* ifndef __DEBUG__ */
-
-# define LOG(x, y)              (void)(x);(void)(y)
-# define DEBUG(x)               (void)(x)
-# define INFO(x)                (void)(x)
-# define WARNING(x)             (void)(x)
-# define ERROR(x)               (void)(x)
-# define CRITICAL(x)            (void)(x)
-# define LOGGER_SET_OFFSET(x)   (void)(x)
-# define LOGGER_ADD_OFFSET(x)   (void)(x)
-# define LOGGER_DEL_OFFSET(x)   (void)(x)
-# define LOGGER_INIT(x)         (void)(x)
-# define LOGGER_INIT_FILE(x, y) (void)(x);(void)(y)
-# define LOGGER_DESTROY         ;
-
-#endif    /* __DEBUG__ */
-
+#define LOG(x, y)              LoggerManager::get().log("cppframework", (x), (y))
+#define DEBUG(x)               LoggerManager::get().log("cppframework", (x), Logger::Level::DEBUG)
+#define INFO(x)                LoggerManager::get().log("cppframework", (x), Logger::Level::INFO)
+#define WARNING(x)             LoggerManager::get().log("cppframework", (x), Logger::Level::WARNING)
+#define ERROR(x)               LoggerManager::get().log("cppframework", (x), Logger::Level::ERROR)
+#define CRITICAL(x)            LoggerManager::get().log("cppframework", (x), Logger::Level::CRITICAL)
+#define LOGGER_SET_OFFSET(x)   LoggerManager::get().getLogger("cppframework").setOffset((x))
+#define LOGGER_ADD_OFFSET(x)   LoggerManager::get().getLogger("cppframework").addOffset((x))
+#define LOGGER_DEL_OFFSET(x)   LoggerManager::get().getLogger("cppframework").delOffset((x))
+#define LOGGER_INIT(x)         LoggerManager::get().init("cppframework", (x))
+#define LOGGER_INIT_FILE(x, y) LoggerManager::get().init("cppframework", (x), (y))
+#define LOGGER_END(x)          LoggerManager::get().endLogger((x))
+#define LOGGER_DESTROY         LoggerManager::destroy()
 
 #endif    /* __LIBRARY_TOOL_LOGGER_HPP__ */
