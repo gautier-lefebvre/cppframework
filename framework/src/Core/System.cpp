@@ -17,7 +17,6 @@ Core::System::System(void):
   this->_modulesInitialized[Core::System::Modules::UDP] = false;
   this->_modulesInitialized[Core::System::Modules::TCP] = false;
   this->_modulesInitialized[Core::System::Modules::WORKERS] = false;
-  this->_modulesInitialized[Core::System::Modules::LOGGER] = false;
 
   Core::Factory::get().init();
 }
@@ -130,22 +129,6 @@ void Core::System::endWorkerThreads() {
   if (this->_modulesInitialized.at(Core::System::Modules::WORKERS)) {
     Core::Worker::Manager::get().end();
     this->_modulesInitialized[Core::System::Modules::WORKERS] = false;
-  }
-}
-
-void Core::System::initLogger(Logger::Level level) {
-  SCOPELOCK(this);
-  if (!this->_modulesInitialized.at(Core::System::Modules::LOGGER)) {
-    LOGGER_INIT(level);
-    this->_modulesInitialized[Core::System::Modules::LOGGER] = true;
-  }
-}
-
-void Core::System::initLogger(Logger::Level level, const std::string& filepath) {
-  SCOPELOCK(this);
-  if (!this->_modulesInitialized.at(Core::System::Modules::LOGGER)) {
-    LOGGER_INIT_FILE(level, filepath);
-    this->_modulesInitialized[Core::System::Modules::LOGGER] = true;
   }
 }
 

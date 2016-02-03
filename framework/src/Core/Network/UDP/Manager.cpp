@@ -411,35 +411,35 @@ void Core::Network::UDP::Manager::recv(fd_set& set) {
   }
 }
 
-void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Core::Network::UDP::SocketClient* socket, const std::string&) {
+void Core::Network::UDP::Manager::__onIOException(Core::Event::Handle* event, Core::Network::UDP::SocketClient* socket, const std::string&) {
   // fire closed event
   this->__fireEvent(event, socket);
   // close socket
   Core::Network::UDP::SocketClient::returnToPool(socket);
 }
 
-void Core::Network::UDP::Manager::__onIOException(Core::Event::Event* event, Core::Network::UDP::SocketStream* socket, const std::string&) {
+void Core::Network::UDP::Manager::__onIOException(Core::Event::Handle* event, Core::Network::UDP::SocketStream* socket, const std::string&) {
   // fire closed event
   this->__fireEvent(event, socket);
   // close socket
   Core::Network::UDP::SocketStream::returnToPool(socket);
 }
 
-void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketStream* socket) const {
+void Core::Network::UDP::Manager::__fireEvent(Core::Event::Handle* event, Core::Network::UDP::SocketStream* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketStreamArgs* ssargs = Core::Network::UDP::EventArgs::SocketStreamArgs::getFromPool(socket);
     event->fireSync(ssargs);
 	}
 }
 
-void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketServer* socket) const {
+void Core::Network::UDP::Manager::__fireEvent(Core::Event::Handle* event, Core::Network::UDP::SocketServer* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketServerArgs* ssargs = Core::Network::UDP::EventArgs::SocketServerArgs::getFromPool(socket);
     event->fireSync(ssargs);
 	}
 }
 
-void Core::Network::UDP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::UDP::SocketClient* socket) const {
+void Core::Network::UDP::Manager::__fireEvent(Core::Event::Handle* event, Core::Network::UDP::SocketClient* socket) const {
 	if (event && socket) {
 	  Core::Network::UDP::EventArgs::SocketClientArgs* scargs = Core::Network::UDP::EventArgs::SocketClientArgs::getFromPool(socket);
     event->fireSync(scargs);
@@ -458,10 +458,10 @@ Core::Network::UDP::Manager::Server::Server(uint16_t port, Core::Network::UDP::S
   accept(accept),
   blacklist(blacklist),
   events({
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool()
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool()
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
@@ -478,10 +478,10 @@ Core::Network::UDP::Manager::Server::~Server(void) {
   eventManager.unregisterEvent(this->events.onClientClosed);
   eventManager.unregisterEvent(this->events.onClosed);
 
-  Core::Event::Event::returnToPool(this->events.onNewClient);
-  Core::Event::Event::returnToPool(this->events.onReceivedData);
-  Core::Event::Event::returnToPool(this->events.onClientClosed);
-  Core::Event::Event::returnToPool(this->events.onClosed);
+  Core::Event::Handle::returnToPool(this->events.onNewClient);
+  Core::Event::Handle::returnToPool(this->events.onReceivedData);
+  Core::Event::Handle::returnToPool(this->events.onClientClosed);
+  Core::Event::Handle::returnToPool(this->events.onClosed);
 }
 
 /**
@@ -493,8 +493,8 @@ Core::Network::UDP::Manager::Client::Client(const std::string& hostname, uint16_
   port(port),
   socket(socket),
   events({
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool()
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool()
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
@@ -507,8 +507,8 @@ Core::Network::UDP::Manager::Client::~Client(void) {
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClosed);
 
-  Core::Event::Event::returnToPool(this->events.onReceivedData);
-  Core::Event::Event::returnToPool(this->events.onClosed);
+  Core::Event::Handle::returnToPool(this->events.onReceivedData);
+  Core::Event::Handle::returnToPool(this->events.onClosed);
 }
 
 /**

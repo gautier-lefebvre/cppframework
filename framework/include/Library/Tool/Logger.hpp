@@ -1,7 +1,6 @@
 #ifndef    __LIBRARY_TOOL_LOGGER_HPP__
 #define    __LIBRARY_TOOL_LOGGER_HPP__
 
-
 #include  <map>
 #include  <unordered_map>
 #include  <string>
@@ -208,11 +207,12 @@ public:
   Logger&  init(const std::string& loggerName, Logger::Level level, const std::string& filepath);
 
   /**
-   *  \brief Gets the Logger matching the specified name, or creates it and returns it.
+   *  \brief Gets the Logger matching the specified name, or creates it and returns it if asked.
+   *  \throw std::out_of_range if create is false and the logger was not initialized.
    *  \param name the logger name.
    *  \return the logger.
    */
-  Logger& getLogger(const std::string& name);
+  Logger& getLogger(const std::string& name, bool create = false);
 
   /**
    *  \brief Deletes a Logger.
@@ -229,7 +229,10 @@ public:
   template<typename T>
   void  log(const std::string& loggerName, const T &msg, Logger::Level level) {
     SCOPELOCK(this);
-    this->getLogger(loggerName).log(msg, level);
+    try {
+      // only log if the logger was initialized
+      this->getLogger(loggerName).log(msg, level);
+    } catch (const std::out_of_range&) {}
   }
 };
 

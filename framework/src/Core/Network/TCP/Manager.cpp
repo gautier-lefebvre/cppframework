@@ -391,7 +391,7 @@ void Core::Network::TCP::Manager::recv(fd_set& set) {
   }
 }
 
-void Core::Network::TCP::Manager::__onIOException(Core::Event::Event* event, Core::Network::TCP::SocketStream* socket, const std::string&) {
+void Core::Network::TCP::Manager::__onIOException(Core::Event::Handle* event, Core::Network::TCP::SocketStream* socket, const std::string&) {
   // fire closed event
   this->__fireEvent(event, socket);
 
@@ -399,12 +399,12 @@ void Core::Network::TCP::Manager::__onIOException(Core::Event::Event* event, Cor
   Core::Network::TCP::SocketStream::returnToPool(socket);
 }
 
-void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::TCP::SocketStream* socket) const {
+void Core::Network::TCP::Manager::__fireEvent(Core::Event::Handle* event, Core::Network::TCP::SocketStream* socket) const {
   Core::Network::TCP::EventArgs::SocketStreamArgs* ssargs = Core::Network::TCP::EventArgs::SocketStreamArgs::getFromPool(socket);
   event->fireSync(ssargs);
 }
 
-void Core::Network::TCP::Manager::__fireEvent(Core::Event::Event* event, Core::Network::TCP::Socket* socket) const {
+void Core::Network::TCP::Manager::__fireEvent(Core::Event::Handle* event, Core::Network::TCP::Socket* socket) const {
   Core::Network::TCP::EventArgs::SocketArgs* sargs = Core::Network::TCP::EventArgs::SocketArgs::getFromPool(socket);
   event->fireSync(sargs);
 }
@@ -421,10 +421,10 @@ Core::Network::TCP::Manager::Server::Server(uint16_t port, Core::Network::TCP::S
   accept(accept),
   blacklist(blacklist),
   events({
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool()
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool()
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
@@ -441,10 +441,10 @@ Core::Network::TCP::Manager::Server::~Server(void) {
   eventManager.unregisterEvent(this->events.onClientClosed);
   eventManager.unregisterEvent(this->events.onClosed);
 
-  Core::Event::Event::returnToPool(this->events.onAccept);
-  Core::Event::Event::returnToPool(this->events.onReceivedData);
-  Core::Event::Event::returnToPool(this->events.onClientClosed);
-  Core::Event::Event::returnToPool(this->events.onClosed);
+  Core::Event::Handle::returnToPool(this->events.onAccept);
+  Core::Event::Handle::returnToPool(this->events.onReceivedData);
+  Core::Event::Handle::returnToPool(this->events.onClientClosed);
+  Core::Event::Handle::returnToPool(this->events.onClosed);
 }
 
 /**
@@ -457,8 +457,8 @@ Core::Network::TCP::Manager::Client::Client(const std::string& hostname, uint16_
   port(port),
   socket(socket),
   events({
-    Core::Event::Event::getFromPool(),
-    Core::Event::Event::getFromPool()
+    Core::Event::Handle::getFromPool(),
+    Core::Event::Handle::getFromPool()
   })
 {
   Core::Event::Manager& eventManager = Core::Event::Manager::get();
@@ -471,8 +471,8 @@ Core::Network::TCP::Manager::Client::~Client(void) {
   eventManager.unregisterEvent(this->events.onReceivedData);
   eventManager.unregisterEvent(this->events.onClosed);
 
-  Core::Event::Event::returnToPool(this->events.onReceivedData);
-  Core::Event::Event::returnToPool(this->events.onClosed);
+  Core::Event::Handle::returnToPool(this->events.onReceivedData);
+  Core::Event::Handle::returnToPool(this->events.onClosed);
 }
 
 /**

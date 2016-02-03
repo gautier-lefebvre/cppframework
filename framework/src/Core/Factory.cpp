@@ -27,7 +27,7 @@ void Core::Factory::init(void) {
 
     // Core
     // -- Events
-    Core::Event::Event::initPool("Core::Event::Event");
+    Core::Event::Handle::initPool("Core::Event::Handle");
 
     // -- HTTP
     Core::Network::HTTP::Request::initPool("Core::Network::HTTP::Request");
@@ -68,7 +68,7 @@ void Core::Factory::end(void) {
 
     // Core
     // -- Events
-    Core::Event::Event::destroyPool();
+    Core::Event::Handle::destroyPool();
 
     // -- HTTP
     Core::Network::HTTP::Request::destroyPool();

@@ -1,6 +1,6 @@
 #include  "Core/Event/EventInfo.hh"
 
-Core::Event::EventInfo::EventInfo(const Core::Event::Event* ebase):
+Core::Event::EventInfo::EventInfo(const Core::Event::Handle* ebase):
   base(ebase),
   subscribers()
 {}

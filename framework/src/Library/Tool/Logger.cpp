@@ -85,7 +85,7 @@ LoggerManager::~LoggerManager(void) {}
 
 Logger&  LoggerManager::init(const std::string& loggerName, Logger::Level level) {
   SCOPELOCK(this);
-  Logger& logger = this->getLogger(loggerName);
+  Logger& logger = this->getLogger(loggerName, true);
   logger.setLevel(level);
   return logger;
 }
@@ -93,20 +93,28 @@ Logger&  LoggerManager::init(const std::string& loggerName, Logger::Level level)
 Logger&  LoggerManager::init(const std::string& loggerName, Logger::Level level, const std::string& filepath) {
   SCOPELOCK(this);
 
-  Logger& logger = this->getLogger(loggerName);
+  Logger& logger = this->getLogger(loggerName, true);
   logger.setLevel(level);
   logger.setFile(filepath);
   return logger;
 }
 
-Logger& LoggerManager::getLogger(const std::string& loggerName) {
+Logger& LoggerManager::getLogger(const std::string& loggerName, bool create) {
   SCOPELOCK(this);
 
   try {
+    // returns logger if already in the list
     return this->_loggers.at(loggerName);
   } catch (const std::out_of_range&) {
-    this->_loggers.emplace(std::make_pair(loggerName, Logger(loggerName)));
-    return this->_loggers.at(loggerName);
+    // if the logger is not in the list
+    if (create) {
+      // if create is true, creates it and returns it
+      this->_loggers.emplace(std::make_pair(loggerName, Logger(loggerName)));
+      return this->_loggers.at(loggerName);
+    } else {
+      // else rethrow the exception
+      throw;
+    }
   }
 }
 

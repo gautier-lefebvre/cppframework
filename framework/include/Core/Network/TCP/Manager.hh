@@ -9,7 +9,7 @@
 #include  "Library/Factory/Pool.hpp"
 #include  "Core/Network/TCP/Socket.hh"
 #include  "Core/Network/TCP/SocketStream.hh"
-#include  "Core/Event/Event.hh"
+#include  "Core/Event/Handle.hh"
 #include  "Core/Event/IEventArgs.hh"
 
 namespace Threading {
@@ -112,10 +112,10 @@ namespace       Core {
           std::set<uint32_t> blacklist; /*!< rejected IPs */
 
           struct Events {
-            Core::Event::Event* onAccept; /*!< Event fired whenever a new client connects to this server. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
-            Core::Event::Event* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
-            Core::Event::Event* onClientClosed; /*!< Event fired whenever a client of this server closes. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
-            Core::Event::Event* onClosed; /*!< Event fired when the bound socket is closed. Event argument type: Core::Network::TCP::EventArgs::SocketArgs. */
+            Core::Event::Handle* onAccept; /*!< Event fired whenever a new client connects to this server. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
+            Core::Event::Handle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
+            Core::Event::Handle* onClientClosed; /*!< Event fired whenever a client of this server closes. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
+            Core::Event::Handle* onClosed; /*!< Event fired when the bound socket is closed. Event argument type: Core::Network::TCP::EventArgs::SocketArgs. */
           } events; /*!< events for this server */
 
         public:
@@ -146,8 +146,8 @@ namespace       Core {
           Core::Network::TCP::SocketStream *socket; /*!< connected socket */
 
           struct Events {
-            Core::Event::Event* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
-            Core::Event::Event* onClosed; /*!< Event fired when this socket is closed. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
+            Core::Event::Handle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
+            Core::Event::Handle* onClosed; /*!< Event fired when this socket is closed. Event argument type: Core::Network::TCP::EventArgs::SocketStreamArgs. */
           } events; /*!< events for this client */
 
         public:
@@ -299,21 +299,21 @@ namespace       Core {
          *  \param ss the socket to send as argument of the event.
          *  \param message the message of the exception.
          */
-        void __onIOException(Core::Event::Event* event, Core::Network::TCP::SocketStream* ss, const std::string& message);
+        void __onIOException(Core::Event::Handle* event, Core::Network::TCP::SocketStream* ss, const std::string& message);
 
         /**
          *  \brief Fires an event with the socket as argument.
          *  \param event the event to fire.
          *  \param socket the socket to send as argument of the event.
          */
-        void __fireEvent(Core::Event::Event *event, Core::Network::TCP::SocketStream* socket) const;
+        void __fireEvent(Core::Event::Handle *event, Core::Network::TCP::SocketStream* socket) const;
 
         /**
          *  \brief Fires an event with the socket as argument.
          *  \param event the event to fire.
          *  \param socket the socket to send as argument of the event.
          */
-        void __fireEvent(Core::Event::Event *event, Core::Network::TCP::Socket* socket) const;
+        void __fireEvent(Core::Event::Handle *event, Core::Network::TCP::Socket* socket) const;
       };
     }
   }

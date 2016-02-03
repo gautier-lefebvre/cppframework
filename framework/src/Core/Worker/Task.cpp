@@ -64,7 +64,7 @@ void  Core::EventTask::reinit(void) {
   this->_args = nullptr;
 }
 
-void  Core::EventTask::init(const Core::Event::Event* ebase, Core::Event::IEventArgs* args) {
+void  Core::EventTask::init(const Core::Event::Handle* ebase, Core::Event::IEventArgs* args) {
   this->_eventCreation = ebase->lastOutOfPoolTimePoint();
   this->_event = ebase;
   this->_args = args;

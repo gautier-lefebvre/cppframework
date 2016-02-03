@@ -30,7 +30,6 @@ namespace Core {
       UDP,
       TCP,
       WORKERS,
-      LOGGER
     };
 
   public:
@@ -102,21 +101,6 @@ namespace Core {
      *  \brief Stops the worker threads. Clears every pending tasks.
      */
     virtual void endWorkerThreads(void);
-
-    /**
-     *  \brief Initializes the Logger module.
-     *  \param level minimum level of logging.
-     *  Note that this can only be called once.
-     */
-    virtual void initLogger(Logger::Level level);
-
-    /**
-     *  \brief Initializes the Logger module.
-     *  \param level minimum level of logging.
-     *  \param filepath path of the file in which to store the logs.
-     *  Note that this can only be called once.
-     */
-    virtual void initLogger(Logger::Level level, const std::string& filepath);
 
     /**
      *  \brief Waits until the end method is called.

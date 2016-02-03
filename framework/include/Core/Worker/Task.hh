@@ -5,7 +5,7 @@
 #include  <functional>
 
 #include  "Library/Factory/Pool.hpp"
-#include  "Core/Event/Event.hh"
+#include  "Core/Event/Handle.hh"
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Network/HTTP/Response.hh"
 
@@ -103,7 +103,7 @@ namespace    Core {
   class  EventTask :public ATask, public Factory::TPooled<Core::EventTask, 100, 20> {
   public:
     std::chrono::steady_clock::time_point _eventCreation; /*!< time of event firing. */
-    const Core::Event::Event* _event; /*!< the event fired. */
+    const Core::Event::Handle* _event; /*!< the event fired. */
     Core::Event::IEventArgs*  _args; /*!< the event arguments. */
 
   public:
@@ -129,7 +129,7 @@ namespace    Core {
      *  \param event the fired event.
      *  \param args the event arguments.
      */
-    void init(const Core::Event::Event* event, Core::Event::IEventArgs* args);
+    void init(const Core::Event::Handle* event, Core::Event::IEventArgs* args);
   };
 
   /**

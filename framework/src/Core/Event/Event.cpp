@@ -1,28 +1,28 @@
-#include  "Core/Event/Event.hh"
+#include  "Core/Event/Handle.hh"
 #include  "Core/Event/Manager.hh"
 
-void Core::Event::Event::reinit(void) {}
+void Core::Event::Handle::reinit(void) {}
 
-void Core::Event::Event::fireAsync(Core::Event::IEventArgs* args) const {
+void Core::Event::Handle::fireAsync(Core::Event::IEventArgs* args) const {
   Core::Event::Manager::get().fireEventAsync(this, args);
 }
 
-void Core::Event::Event::fireSync(Core::Event::IEventArgs* args) const {
+void Core::Event::Handle::fireSync(Core::Event::IEventArgs* args) const {
   Core::Event::Manager::get().fireEventSync(this, args);
 }
 
-void Core::Event::Event::subscribe(const std::function<void (const Core::Event::IEventArgs *)>& callback, const void *key) const {
+void Core::Event::Handle::subscribe(const std::function<void (const Core::Event::IEventArgs *)>& callback, const void *key) const {
   Core::Event::Manager::get().subscribeToEvent(this, callback, key);
 }
 
-void Core::Event::Event::unsubscribe(const void *key) const {
+void Core::Event::Handle::unsubscribe(const void *key) const {
   Core::Event::Manager::get().unsubscribeFromEvent(this, key);
 }
 
-void Core::Event::Event::registerToManager(void) const {
+void Core::Event::Handle::registerToManager(void) const {
   Core::Event::Manager::get().registerEvent(this);
 }
 
-void Core::Event::Event::unregisterFromManager(void) const {
+void Core::Event::Handle::unregisterFromManager(void) const {
   Core::Event::Manager::get().unregisterEvent(this);
 }

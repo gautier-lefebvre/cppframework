@@ -78,7 +78,7 @@ void  Core::Worker::Manager::addSimpleTask(const std::function<void (void)>& cb,
   this->addTask(simpleTask);
 }
 
-void  Core::Worker::Manager::addEventTask(const Core::Event::Event* event, Core::Event::IEventArgs* args) {
+void  Core::Worker::Manager::addEventTask(const Core::Event::Handle* event, Core::Event::IEventArgs* args) {
   if (event != nullptr) {
     Core::EventTask* eventTask = Core::EventTask::getFromPool(event, args);
     this->addTask(eventTask);

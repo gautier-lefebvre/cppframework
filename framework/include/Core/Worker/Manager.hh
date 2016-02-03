@@ -8,7 +8,7 @@
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Threading/Condition.hpp"
-#include  "Core/Event/Event.hh"
+#include  "Core/Event/Handle.hh"
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Worker/Task.hh"
 #include  "Core/Worker/Thread.hh"
@@ -118,7 +118,7 @@ namespace    Core {
        *  \param event the event.
        *  \param args the event arguments.
        */
-      void  addEventTask(const Core::Event::Event* event, Core::Event::IEventArgs* args);
+      void  addEventTask(const Core::Event::Handle* event, Core::Event::IEventArgs* args);
 
       /**
        *  \brief Adds an HTTPTask to the task queue.

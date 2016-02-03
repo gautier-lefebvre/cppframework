@@ -5,7 +5,7 @@
 #include  <map>
 
 #include  "Core/Event/IEventArgs.hh"
-#include  "Core/Event/Event.hh"
+#include  "Core/Event/Handle.hh"
 
 namespace   Core {
   namespace Event {
@@ -15,7 +15,7 @@ namespace   Core {
      */
     struct  EventInfo {
     public:
-      const Core::Event::Event * base; /*!< the registered event. */
+      const Core::Event::Handle * base; /*!< the registered event. */
       std::map<const void *, std::function<void (const Core::Event::IEventArgs*)>> subscribers; /*!< the subscribers of the event. */
 
     public:
@@ -23,7 +23,7 @@ namespace   Core {
        *  \brief Constructor of EventInfo.
        *  \param event the event.
        */
-      EventInfo(const Core::Event::Event *event);
+      EventInfo(const Core::Event::Handle *event);
 
       /**
        *  \brief Copy constructor of EventInfo.
