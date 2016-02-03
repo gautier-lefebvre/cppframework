@@ -33,6 +33,29 @@ namespace   Core {
        *  \param args the arguments passed to the subscribers of the event.
        */
       void fireSync(Core::Event::IEventArgs *args) const;
+
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().subscribeToEvent(event, callback, key).
+       *  \param callback the function called when the event is fired.
+       *  \param key the key of the subscriber (must be unique for this event).
+       */
+      void subscribe(const std::function<void (const Core::Event::IEventArgs *)>& callback, const void *key) const;
+
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().unsubscribeFromEvent(event, key).
+       *  \param key the key of the subscriber (must be unique for this event).
+       */
+      void unsubscribe(const void *key) const;
+
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().registerEvent(event).
+       */
+      void registerToManager(void) const;
+
+      /**
+       *  \brief Shortcut to Core::Event::Manager::get().unregisterEvent(event).
+       */
+      void unregisterFromManager(void) const;
     };
   }
 }
