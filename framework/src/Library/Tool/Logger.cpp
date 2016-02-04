@@ -2,6 +2,8 @@
 #include  "Library/Tool/Macro.hh"
 #include  "Library/Exception.hh"
 
+using namespace fwk;
+
 Logger::Logger(const std::string& name):
   Threading::Lockable(),
   _name(name),

@@ -6,6 +6,8 @@
 #include  "Core/Network/HTTP/PipeliningConnection.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 const std::string Core::Network::HTTP::Client::defaultUserAgent = std::string("cppframework user agent");
 
 Core::Network::HTTP::Client::Client(void):

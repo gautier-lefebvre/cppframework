@@ -1,5 +1,7 @@
 #include  "Core/Network/HTTP/Response.hh"
 
+using namespace fwk;
+
 Core::Network::HTTP::Response::Response(void):
   Core::Network::HTTP::AMessage(),
   status(0),

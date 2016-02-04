@@ -7,6 +7,8 @@
 #include  "Core/Worker/Manager.hh"
 #include  "Core/Factory.hh"
 
+using namespace fwk;
+
 Core::System::System(void):
   Threading::Lockable(),
   AEndable(),

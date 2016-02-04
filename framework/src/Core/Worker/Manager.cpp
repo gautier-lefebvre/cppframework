@@ -1,6 +1,8 @@
 #include  "Core/Worker/Manager.hh"
 #include  "Core/Exception.hh"
 
+using namespace fwk;
+
 Core::Worker::Manager::Manager(void):
   Threading::Lockable(),
   AEndable(),

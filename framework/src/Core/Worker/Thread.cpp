@@ -7,6 +7,8 @@
 #include  "Core/Event/Exception.hh"
 #include  "Core/Exception.hh"
 
+using namespace fwk;
+
 const std::map<Core::ATask::Source, Core::Worker::Thread::WorkerHandler> Core::Worker::Thread::TaskHandlerMap = {
   {Core::ATask::Source::SIMPLE, &Core::Worker::Thread::executeSimpleTask},
   {Core::ATask::Source::EVENT, &Core::Worker::Thread::executeEventTask},

@@ -7,6 +7,8 @@
 #include  "Core/Network/UDP/ASocketIO.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::UDP::ASocket::ASocket(void):
   Threading::Lockable(),
   Factory::AFactored(),

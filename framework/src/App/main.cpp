@@ -12,158 +12,158 @@
 #include "Core/Network/HTTP/Client.hh"
 #include "Core/Event/Manager.hh"
 
-static void tcpServer(Core::System* system, uint16_t port) {
+static void tcpServer(fwk::Core::System* system, uint16_t port) {
   int i = 0;
 
   try {
-    const Core::Network::TCP::Manager::Server& server = Core::Network::Manager::get().getTCP().bind(port);
+    const fwk::Core::Network::TCP::Manager::Server& server = fwk::Core::Network::Manager::get().getTCP().bind(port);
 
     // on accept new socket callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onAccept, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onAccept, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("New client connected");
     }, &i);
 
     // on received data callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
     // on client closed callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Client closed");
     }, &i);
 
     // on server closed callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Server closed");
     }, &i);
 
     system->run();
-  } catch (const Core::Exception& e) {
+  } catch (const fwk::Core::Exception& e) {
     CRITICAL(e.what());
   }
 }
 
-static void tcpClient(Core::System* system, const std::string& hostname, uint16_t port) {
+static void tcpClient(fwk::Core::System* system, const std::string& hostname, uint16_t port) {
   try {
     int i = 0;
 
-    const Core::Network::TCP::Manager::Client& client = Core::Network::Manager::get().getTCP().connect(hostname, port);
+    const fwk::Core::Network::TCP::Manager::Client& client = fwk::Core::Network::Manager::get().getTCP().connect(hostname, port);
 
-    Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
-    Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Connection closed");
     }, &i);
     
-    Core::Network::Manager::get().getTCP().push(client.socket, (void*)"Hello", 5);
+    fwk::Core::Network::Manager::get().getTCP().push(client.socket, (void*)"Hello", 5);
 
     system->run();
 
-  } catch (const Core::Exception& e) {
+  } catch (const fwk::Core::Exception& e) {
     CRITICAL(e.what());
   }
 }
 
-static void udpServer(Core::System* system, uint16_t port) {
+static void udpServer(fwk::Core::System* system, uint16_t port) {
   int i = 0;
 
   try {
-    const Core::Network::UDP::Manager::Server& server = Core::Network::Manager::get().getUDP().bind(port);
+    const fwk::Core::Network::UDP::Manager::Server& server = fwk::Core::Network::Manager::get().getUDP().bind(port);
 
     // on accept new socket callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onNewClient, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onNewClient, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("New client connected");
     }, &i);
 
     // on received data callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onReceivedData, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
     // on client closed callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onClientClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Client closed");
     }, &i);
 
     // on server closed callback
-    Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(server.events.onClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Server closed");
     }, &i);
 
     system->run();
-  } catch (const Core::Exception& e) {
+  } catch (const fwk::Core::Exception& e) {
     CRITICAL(e.what());
   }
 }
 
-static void udpClient(Core::System* system, const std::string& hostname, uint16_t port) {
+static void udpClient(fwk::Core::System* system, const std::string& hostname, uint16_t port) {
   try {
     int i = 0;
 
-    const Core::Network::UDP::Manager::Client& client = Core::Network::Manager::get().getUDP().connect(hostname, port);
+    const fwk::Core::Network::UDP::Manager::Client& client = fwk::Core::Network::Manager::get().getUDP().connect(hostname, port);
 
-    Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(client.events.onReceivedData, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
-    Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const Core::Event::IEventArgs *) {
+    fwk::Core::Event::Manager::get().subscribeToEvent(client.events.onClosed, [] (const fwk::Core::Event::IEventArgs *) {
       INFO("Connection closed");
     }, &i);
     
-    Core::Network::Manager::get().getUDP().push(client.socket, (void*)"Hello", 5);
+    fwk::Core::Network::Manager::get().getUDP().push(client.socket, (void*)"Hello", 5);
 
     system->run();
 
-  } catch (const Core::Exception& e) {
+  } catch (const fwk::Core::Exception& e) {
     CRITICAL(e.what());
   }
 }
 
-static void http(Core::System* system) {
-  Core::Network::HTTP::Request* request;
-  Core::Network::HTTP::Connection* connection = Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, Core::Network::HTTP::Protocol::HTTP, true);
+static void http(fwk::Core::System* system) {
+  fwk::Core::Network::HTTP::Request* request;
+  fwk::Core::Network::HTTP::Connection* connection = fwk::Core::Network::HTTP::Client::get().initConnection("jsonplaceholder.typicode.com", 80, fwk::Core::Network::HTTP::Protocol::HTTP, true);
 
-  request = Core::Network::HTTP::Request::getFromPool();
+  request = fwk::Core::Network::HTTP::Request::getFromPool();
   request->init();
   request->method = "GET";
   request->url = "/posts";
-  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->success = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
-  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->error = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Client::get().sendRequest(connection, request);
+  fwk::Core::Network::HTTP::Client::get().sendRequest(connection, request);
 
-  request = Core::Network::HTTP::Request::getFromPool();
+  request = fwk::Core::Network::HTTP::Request::getFromPool();
   request->init();
   request->method = "GET";
   request->url = "/posts";
-  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->success = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
-  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->error = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Client::get().sendRequest(connection, request);
+  fwk::Core::Network::HTTP::Client::get().sendRequest(connection, request);
 
-  request = Core::Network::HTTP::Request::getFromPool();
+  request = fwk::Core::Network::HTTP::Request::getFromPool();
   request->init();
   request->method = "GET";
   request->url = "/posts";
-  request->success = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->success = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
-  request->error = [] (const Core::Network::HTTP::Response* response) -> void {
+  request->error = [] (const fwk::Core::Network::HTTP::Response* response) -> void {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
   };
 
-  Core::Network::HTTP::Client::get().sendRequest(connection, request);
+  fwk::Core::Network::HTTP::Client::get().sendRequest(connection, request);
 
   system->run();
 }
@@ -174,8 +174,8 @@ int main(int ac, char ** av) {
     return -1;
   }
 
-  Core::System* system = new Core::System();
-  Signal::get().setCallback(Signal::Type::INT, [&] (void) -> bool {
+  fwk::Core::System* system = new fwk::Core::System();
+  fwk::Signal::get().setCallback(fwk::Signal::Type::INT, [&] (void) -> bool {
     INFO("Caught SIGINT, exiting.");
     system->end();
     return false;
@@ -210,18 +210,18 @@ int main(int ac, char ** av) {
     http(system);
   } else if (protocol == "delayed") {
     system->initWorkerThreads(1, true);
-    Core::Worker::Manager::get().addDelayedTask(Core::SimpleTask::getFromPool([] (void) {
+    fwk::Core::Worker::Manager::get().addDelayedTask(fwk::Core::SimpleTask::getFromPool([] (void) {
       INFO("SimpleTask working");
     }), std::chrono::seconds(2));
     system->run();
   } else if (protocol == "periodic") {
     system->initWorkerThreads(1, true);
-    Core::Worker::Manager::get().addPeriodicTask([] (void) {
+    fwk::Core::Worker::Manager::get().addPeriodicTask([] (void) {
       INFO("Hello");
     }, nullptr, std::chrono::seconds(5), true);
     system->run();
   } else if (protocol == "simple") {
-    Core::Worker::Manager::get().addSimpleTask([] (void) {
+    fwk::Core::Worker::Manager::get().addSimpleTask([] (void) {
       INFO("SimpleTask :)");
     });
     system->run();

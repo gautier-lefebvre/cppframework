@@ -8,6 +8,8 @@
 #include  "Core/Network/TCP/SocketStream.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 const size_t Core::Network::TCP::SocketStream::BUFFER_SIZE = 32768;
 
 Core::Network::TCP::SocketStream::SocketStream(void):

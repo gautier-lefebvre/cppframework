@@ -1,5 +1,7 @@
 #include  "Library/Property/AEndable.hh"
 
+using namespace fwk;
+
 AEndable::AEndable(void):
   _end(false)
 {}

@@ -7,6 +7,8 @@
 #include  "Core/Worker/Task.hh"
 #include  "Core/Factory.hh"
 
+using namespace fwk;
+
 Core::Factory::Factory(void):
   Initializable(),
   Threading::Lockable()

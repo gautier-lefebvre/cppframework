@@ -9,6 +9,8 @@
 
 #include  "Library/Tool/Date.hh"
 
+using namespace fwk;
+
 int  Date::gettimeofday(struct timeval *tp) {
 #ifdef  _WIN32
   struct _timeb timebuffer;

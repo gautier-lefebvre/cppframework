@@ -1,6 +1,8 @@
 #include  "Library/Threading/Lock.hpp"
 #include  "Library/Tool/Logger.hpp"
 
+using namespace fwk;
+
 Threading::Lockable::Lockable(void):
   _lock()
 {}

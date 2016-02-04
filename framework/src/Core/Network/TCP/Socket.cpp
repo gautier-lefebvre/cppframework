@@ -10,6 +10,8 @@
 #include  "Core/Network/Exception.hh"
 #include  "Library/Tool/Macro.hh"
 
+using namespace fwk;
+
 Core::Network::TCP::Socket::Socket(void):
   Factory::AFactored(),
   Threading::Lockable(),

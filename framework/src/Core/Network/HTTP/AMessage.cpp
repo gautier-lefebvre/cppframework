@@ -2,6 +2,8 @@
 
 #include  "Core/Network/HTTP/AMessage.hh"
 
+using namespace fwk;
+
 Core::Network::HTTP::AMessage::AMessage(void):
   Factory::AFactored(),
   version("HTTP/1.1"),

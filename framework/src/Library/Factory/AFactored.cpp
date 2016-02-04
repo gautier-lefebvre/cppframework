@@ -1,5 +1,7 @@
 #include  "Library/Factory/AFactored.hh"
 
+using namespace fwk;
+
 Factory::AFactored::AFactored(void):
   _valid(false),
   _lastOutOfPoolTimePoint()

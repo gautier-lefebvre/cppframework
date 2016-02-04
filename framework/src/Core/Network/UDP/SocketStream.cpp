@@ -3,6 +3,8 @@
 #include  "Core/Network/UDP/SocketStream.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::UDP::SocketStream::SocketStream(void):
   Core::Network::UDP::ASocketIO(),
   Core::Network::UDP::ASocket()

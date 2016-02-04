@@ -3,6 +3,8 @@
 
 #include  "Library/Tool/Random.hh"
 
+using namespace fwk;
+
 void  Random::setSeed(unsigned int seed) {
   srand(seed);
 }

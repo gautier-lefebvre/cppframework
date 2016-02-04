@@ -7,6 +7,8 @@
 #include  "Library/Tool/Macro.hh"
 #include  "Library/Exception.hh"
 
+using namespace fwk;
+
 Arguments::Arg::Arg(const std::string &flag):
   flag(flag)
 {}
@@ -181,7 +183,7 @@ const Arguments::Arg&  Arguments::operator[](const std::string& flag) const {
   return (*this->arg(flag));
 }
 
-std::string Arguments::usage(void) const {
+const std::string Arguments::usage(void) const {
   std::string usage = std::string("Usage: ") + this->_av[0];
   for (auto& it: this->_expected) {
     if (!this->isIncompatible(it->flag)) {

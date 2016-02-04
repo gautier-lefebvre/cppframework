@@ -4,43 +4,45 @@
 #include  <string>
 #include  <exception>
 
-/**
- *  \class Exception Library/Exception.hh
- *  \brief Base class of all the custom exceptions of the project.
- */
-class    Exception :public std::exception {
-private:
-  std::string  _what; /*!< a string describing the error. */
-
-public:
+namespace fwk {
   /**
-   *  \brief Constructor of Exception.
-   *  \param what a string describing the error.
+   *  \class Exception Library/Exception.hh
+   *  \brief Base class of all the custom exceptions of the project.
    */
-  Exception(const std::string& what) noexcept;
+  class Exception :public std::exception {
+  private:
+    std::string  _what; /*!< a string describing the error. */
 
-  /**
-   *  \brief Constructor of Exception.
-   *  \param oth an exception to copy.
-   */
-  Exception(const std::exception& oth) noexcept;
+  public:
+    /**
+     *  \brief Constructor of Exception.
+     *  \param what a string describing the error.
+     */
+    Exception(const std::string& what) noexcept;
 
-  /**
-   *  \brief Constructor of Exception.
-   *  \param oth an exception to copy.
-   */
-  Exception& operator=(const std::exception& oth) noexcept;
+    /**
+     *  \brief Constructor of Exception.
+     *  \param oth an exception to copy.
+     */
+    Exception(const std::exception& oth) noexcept;
 
-  /**
-   *  \brief Destructor of Exception.
-   */
-  virtual ~Exception(void);
+    /**
+     *  \brief Constructor of Exception.
+     *  \param oth an exception to copy.
+     */
+    Exception& operator=(const std::exception& oth) noexcept;
 
-  /**
-   *  \brief Gets the error thrown.
-   *  \return a string describing the error.
-   */
-  virtual const char* what(void) const noexcept;
-};
+    /**
+     *  \brief Destructor of Exception.
+     */
+    virtual ~Exception(void);
+
+    /**
+     *  \brief Gets the error thrown.
+     *  \return a string describing the error.
+     */
+    virtual const char*  what(void) const noexcept;
+  };
+}
 
 #endif    /* __LIBRARY_EXCEPTION_HH__ */

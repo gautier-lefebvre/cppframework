@@ -3,25 +3,27 @@
 
 #include  "Core/Exception.hh"
 
-namespace    Core {
-  namespace  Network {
-    /**
-     *  \class Exception Core/Network/Exception.hh
-     *  \brief Superclass of every exception thrown in the Network.
-     */
-    class  Exception :public Core::Exception {
-      public:
+namespace fwk {  
+  namespace Core {
+    namespace Network {
       /**
-       *  \brief Constructor of Exception.
-       *  \param message the error message.
+       *  \class Exception Core/Network/Exception.hh
+       *  \brief Superclass of every exception thrown in the Network.
        */
-      Exception(const std::string& message) noexcept;
+      class Exception :public Core::Exception {
+        public:
+        /**
+         *  \brief Constructor of Exception.
+         *  \param message the error message.
+         */
+        Exception(const std::string& message) noexcept;
 
-      /**
-       *  \brief Destructor of Exception.
-       */
-      virtual ~Exception(void) noexcept;
-    };
+        /**
+         *  \brief Destructor of Exception.
+         */
+        virtual ~Exception(void) noexcept;
+      };
+    }
   }
 }
 

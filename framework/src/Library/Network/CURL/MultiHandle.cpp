@@ -2,6 +2,8 @@
 #include  "Library/Network/CURL/Exception.hh"
 #include  "Library/Tool/Logger.hpp"
 
+using namespace fwk;
+
 const size_t curlxx::MultiHandle::PIPELINED_REQUESTS_MAX_NB = 10;
 
 curlxx::MultiHandle::MultiHandle(void):

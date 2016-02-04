@@ -2,6 +2,8 @@
 #include "Library/Tool/Logger.hpp"
 #include "Library/Tool/Signal.hh"
 
+using namespace fwk;
+
 const BidiMap<Signal::Type, int> Signal::SignalTypeToInt = {
   {Signal::Type::INT, SIGINT}
 };

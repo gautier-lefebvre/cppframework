@@ -14,6 +14,8 @@
 #include  "Core/Worker/Manager.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::HTTP::Connection::Connection(const std::string& host, uint16_t port, Core::Network::HTTP::Protocol protocol, const std::string& user_agent):
   Threading::Lockable(),
   AEndable(),

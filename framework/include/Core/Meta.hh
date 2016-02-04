@@ -3,13 +3,15 @@
 
 #include  <string>
 
-namespace   Core {
-  /**
-   *  \namespace Core::Meta
-   *  \brief Metadata of the Core
-   */
-  namespace Meta {
-    static const std::string version = "0.1.0"; /*!< last release version. */
+namespace fwk {
+  namespace Core {
+    /**
+     *  \namespace Core::Meta
+     *  \brief Metadata of the framework
+     */
+    namespace Meta {
+      static const std::string version = "0.1.0"; /*!< last release version. */
+    }
   }
 }
 

@@ -1,6 +1,8 @@
 #include  "Core/Network/UDP/ASocketIO.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 const size_t Core::Network::UDP::ASocketIO::BUFFER_SIZE = 32768;
 
 Core::Network::UDP::ASocketIO::ASocketIO(void):

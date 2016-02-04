@@ -1,5 +1,7 @@
 #include  "Library/Tool/TypeChecker.hh"
 
+using namespace fwk;
+
 bool  TypeChecker::charactersIn(const std::string& str, const std::string& characters) {
   size_t  str_size  = str.size();
   size_t  char_size = characters.size();

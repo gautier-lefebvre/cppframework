@@ -1,5 +1,7 @@
 #include  "Library/Exception.hh"
 
+using namespace fwk;
+
 Exception::Exception(const std::string& what) noexcept:
   std::exception(),
   _what(what)

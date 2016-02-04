@@ -4,6 +4,8 @@
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Macro.hh"
 
+using namespace fwk;
+
 ByteArray::ByteArray(size_t s):
   Factory::AFactored(),
   Threading::Lockable(),

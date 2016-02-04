@@ -1,5 +1,7 @@
 #include  "Core/Network/HTTP/Request.hh"
 
+using namespace fwk;
+
 Core::Network::HTTP::Request::Request(void):
   Core::Network::HTTP::AMessage(),
   method(""),

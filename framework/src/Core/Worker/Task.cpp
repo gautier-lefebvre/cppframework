@@ -1,5 +1,7 @@
 #include  "Core/Worker/Task.hh"
 
+using namespace fwk;
+
 /**
  *  ATask
  */

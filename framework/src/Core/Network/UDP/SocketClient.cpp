@@ -3,6 +3,8 @@
 #include  "Core/Network/UDP/SocketClient.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::UDP::SocketClient::SocketClient(void):
   Core::Network::UDP::ASocketIO(),
   _info(std::make_pair(0, 0))

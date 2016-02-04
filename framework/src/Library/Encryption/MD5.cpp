@@ -5,6 +5,8 @@
 
 #include  "Library/Encryption/MD5.hh"
 
+using namespace fwk;
+
 const std::string Encryption::MD5::hash(const void* ptr, size_t length) {
   const uint8_t* target = reinterpret_cast<const uint8_t*>(ptr);
   uint8_t result[MD5_DIGEST_LENGTH];

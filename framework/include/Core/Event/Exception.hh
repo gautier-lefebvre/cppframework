@@ -3,25 +3,27 @@
 
 #include  "Core/Exception.hh"
 
-namespace Core {
-  namespace Event {
-    /**
-     *  \class EventNotRegisteredException Core/Event/Manager.hh
-     *  \brief Superclass of every exception thrown in the Core.
-     */
-    class  EventNotRegisteredException :public Core::Exception {
-    public:
+namespace fwk {
+  namespace Core {
+    namespace Event {
       /**
-       *  \brief Constructor of EventNotRegisteredException.
-       *  \param message the error message.
+       *  \class EventNotRegisteredException Core/Event/Manager.hh
+       *  \brief Event thrown when trying to subscribe to an unregistered event.
        */
-      EventNotRegisteredException(const std::string& message = "This event was not registered") noexcept;
+      class EventNotRegisteredException :public Core::Exception {
+      public:
+        /**
+         *  \brief Constructor of EventNotRegisteredException.
+         *  \param message the error message.
+         */
+        EventNotRegisteredException(const std::string& message = "This event was not registered") noexcept;
 
-      /**
-       *  \brief Destructor of EventNotRegisteredException.
-       */
-      virtual ~EventNotRegisteredException(void) noexcept;
-    };
+        /**
+         *  \brief Destructor of EventNotRegisteredException.
+         */
+        virtual ~EventNotRegisteredException(void) noexcept;
+      };
+    }
   }
 }
 

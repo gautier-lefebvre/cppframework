@@ -2,6 +2,8 @@
 #include  "Core/Network/UDP/SocketClient.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::UDP::SocketServer::SocketServer(void):
   Core::Network::UDP::ASocket()
 {}

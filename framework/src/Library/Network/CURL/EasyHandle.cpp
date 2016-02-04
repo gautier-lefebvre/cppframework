@@ -10,6 +10,8 @@
 #include  "Library/Network/CURL/Method.hh"
 #include  "Library/ThirdParty/cppformat/format.hh"
 
+using namespace fwk;
+
 curlxx::EasyHandle::EasyHandle(void):
   Factory::AFactored(),
   _handle(NULL),

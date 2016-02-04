@@ -7,6 +7,8 @@
 #include  "Core/Network/Exception.hh"
 #include  "Core/Worker/Manager.hh"
 
+using namespace fwk;
+
 Core::Network::HTTP::PipeliningConnection::PipeliningConnection(const std::string &hostname, uint16_t port, Protocol protocol, const std::string& userAgent):
 Core::Network::HTTP::Connection(hostname, port, protocol, userAgent)
 {}

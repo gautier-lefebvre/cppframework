@@ -1,5 +1,7 @@
 #include  "Library/Threading/Condition.hpp"
 
+using namespace fwk;
+
 Threading::Condition::Condition(void):
   Threading::Lockable(),
   _condvar()

@@ -1,5 +1,7 @@
 #include  "Core/Event/EventInfo.hh"
 
+using namespace fwk;
+
 Core::Event::EventInfo::EventInfo(const Core::Event::Handle* ebase):
   base(ebase),
   subscribers()

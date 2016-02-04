@@ -1,6 +1,8 @@
 #include  "Core/Event/Handle.hh"
 #include  "Core/Event/Manager.hh"
 
+using namespace fwk;
+
 void Core::Event::Handle::reinit(void) {}
 
 void Core::Event::Handle::fireAsync(Core::Event::IEventArgs* args) const {

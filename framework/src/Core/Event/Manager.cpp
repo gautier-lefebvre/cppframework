@@ -3,6 +3,8 @@
 #include  "Core/Worker/Manager.hh"
 #include  "Core/Worker/Thread.hh"
 
+using namespace fwk;
+
 Core::Event::Manager::Manager(void):
   Threading::Lockable(),
   _events()

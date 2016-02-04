@@ -1,5 +1,7 @@
 #include "Library/Property/Initializable.hpp"
 
+using namespace fwk;
+
 Initializable::Initializable(void):
   _initialized(false)
 {}

@@ -4,6 +4,8 @@
 #include  "Core/Network/Manager.hh"
 #include  "Core/Network/Exception.hh"
 
+using namespace fwk;
+
 Core::Network::Manager::Manager(void):
   Threading::Lockable(),
   AEndable(),

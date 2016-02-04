@@ -3,24 +3,26 @@
 
 #include  "Library/Exception.hh"
 
-namespace  Core {
-  /**
-   *  \class Exception Core/Exception.hh
-   *  \brief Superclass of every exception thrown in the Core.
-   */
-  class  Exception :public ::Exception {
-  public:
+namespace fwk {
+  namespace Core {
     /**
-     *  \brief Constructor of Exception.
-     *  \param message the error message.
+     *  \class Exception Core/Exception.hh
+     *  \brief Superclass of every exception thrown in the Core.
      */
-    Exception(const std::string& message) noexcept;
+    class Exception :public fwk::Exception {
+    public:
+      /**
+       *  \brief Constructor of Exception.
+       *  \param message the error message.
+       */
+      Exception(const std::string& message) noexcept;
 
-    /**
-     *  \brief Destructor of Exception.
-     */
-    virtual ~Exception(void) noexcept;
-  };
+      /**
+       *  \brief Destructor of Exception.
+       */
+      virtual ~Exception(void) noexcept;
+    };
+  }
 }
 
 #endif    /* __CORE_EXCEPTION_HH__ */

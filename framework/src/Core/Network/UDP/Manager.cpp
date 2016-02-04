@@ -8,6 +8,8 @@
 #include  "Core/Network/Exception.hh"
 #include  "Core/Event/Manager.hh"
 
+using namespace fwk;
+
 Core::Network::UDP::Manager::Manager(Threading::NotifiableThread& input, Threading::NotifiableThread& output):
   _servers(),
   _clients(),
