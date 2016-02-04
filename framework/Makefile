@@ -52,6 +52,7 @@ CORESRC=    $(COREDIR)Exception.cpp                         			\
             $(COREDIR)Network/UDP/SocketClient.cpp          			\
             $(COREDIR)Network/UDP/SocketStream.cpp          			\
             $(COREDIR)Network/UDP/Manager.cpp               			\
+            $(COREDIR)Worker/DelayedTasksThread.cpp 							\
             $(COREDIR)Worker/Manager.cpp                    			\
             $(COREDIR)Worker/Task.cpp                       			\
             $(COREDIR)Worker/Thread.cpp

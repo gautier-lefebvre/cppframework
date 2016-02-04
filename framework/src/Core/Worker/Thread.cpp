@@ -16,24 +16,13 @@ const std::map<Core::ATask::Source, Core::Worker::Thread::WorkerHandler> Core::W
   {Core::ATask::Source::PERIODIC_TASK, &Core::Worker::Thread::executePeriodicTask}
 };
 
-Core::Worker::Thread::Thread(size_t id, Core::Worker::Thread::Assignment assignment):
+Core::Worker::Thread::Thread(size_t id):
   Threading::Lockable(),
   AEndable(),
   _id(id),
   _thread(nullptr)
 {
-  void  (Core::Worker::Thread::*routine)() = nullptr;
-  if (assignment == Core::Worker::Thread::Assignment::TASKS) {
-    routine = &Core::Worker::Thread::tasksRoutine;
-  } else {
-    routine = &Core::Worker::Thread::delayedTasksRoutine;
-  }
-
-  if (routine != nullptr) {
-    this->_thread = new std::thread(routine, this);
-  } else {
-    throw Core::Exception(fmt::format("Invalid assignment for worker {0}", this->_id));
-  }
+  this->_thread = new std::thread(&Core::Worker::Thread::routine, this);
 }
 
 Core::Worker::Thread::~Thread(void) {
@@ -82,18 +71,12 @@ void  Core::Worker::Thread::end(void) {
   SCOPELOCK(this);
   if (!this->mustEnd()) {
     Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
-    Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
 
     this->mustEnd(true);
 
     {
       ScopeLock sltasks(taskQueue);
       taskQueue.notify_all();
-    }
-
-    {
-      ScopeLock sldtasks(delayedTaskQueue);
-      delayedTaskQueue.notify_all();
     }
 
     if (this->_thread) {
@@ -112,7 +95,7 @@ size_t  Core::Worker::Thread::getID(void) const {
   return this->_id;
 }
 
-void  Core::Worker::Thread::tasksRoutine(void) {
+void  Core::Worker::Thread::routine(void) {
   Core::Worker::Manager::TaskQueue& taskQueue = Core::Worker::Manager::get().getTaskQueue();
   Core::ATask* task;
   WorkerHandler handler;
@@ -244,37 +227,5 @@ void  Core::Worker::Thread::executePeriodicTask(Core::ATask* task, bool exec) {
     }
   } else {
     CRITICAL("Cant reinterpret_cast a PeriodicTask");
-  }
-}
-
-void  Core::Worker::Thread::delayedTasksRoutine(void) {
-  Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
-  Core::DelayedTask* delayedTask;
-
-  while (!this->mustEnd()) {
-    delayedTask = nullptr;
-
-    {
-      SCOPELOCK(&delayedTaskQueue);
-      if (delayedTaskQueue.empty()) {
-        delayedTaskQueue.wait();
-      } else {
-        if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
-          if (this->mustEnd()) { break; }
-          if (!delayedTaskQueue.empty()) {
-            if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
-              delayedTaskQueue.pop();
-            } else {
-              delayedTask = nullptr;
-            }
-          }
-        }
-      }
-    }
-
-    if (delayedTask != nullptr) {
-      Core::Worker::Manager::get().addTask(delayedTask->_task);
-      Core::DelayedTask::returnToPool(delayedTask);
-    }
   }
 }

@@ -1,4 +1,5 @@
 #include  "Core/Worker/Manager.hh"
+#include  "Core/Worker/DelayedTasksThread.hh"
 #include  "Core/Exception.hh"
 
 using namespace fwk;
@@ -25,6 +26,8 @@ void  Core::Worker::Manager::end(void) {
       delete worker;
     }
 
+    Core::Worker::DelayedTasksThread::destroy();
+
     this->_workers.clear();
     Core::Worker::Thread::cleanup();
   }
@@ -35,18 +38,18 @@ void  Core::Worker::Manager::init(size_t nbTasksWorkers, bool delayedTasks) {
   try {
     size_t i;
     for (i = 0 ; i < nbTasksWorkers ; ++i) {
-      this->_workers.push_back(new Core::Worker::Thread(i, Core::Worker::Thread::Assignment::TASKS));
+      this->_workers.push_back(new Core::Worker::Thread(i));
     }
 
     if (delayedTasks) {
-      this->_workers.push_back(new Core::Worker::Thread(i, Core::Worker::Thread::Assignment::DELAYED_TASKS));
+      Core::Worker::DelayedTasksThread::get().run();
     }
   } catch (const std::system_error& e) {
     throw Core::Exception(e.what());
   }
 }
 
-Core::Worker::Manager::TaskQueue&      Core::Worker::Manager::getTaskQueue(void) {
+Core::Worker::Manager::TaskQueue&  Core::Worker::Manager::getTaskQueue(void) {
   return this->_pendingTasks;
 }
 

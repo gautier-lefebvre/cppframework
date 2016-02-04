@@ -27,16 +27,6 @@ namespace fwk {
          */
         static void cleanup();
 
-      public:
-        /**
-         *  \class Assignment Core/Worker/Thread.hh
-         *  \brief Enumerations of possible assignments for a worker thread.
-         */
-        enum class Assignment {
-          TASKS, /*!< The worker thread will execute tasks from the tasks queue */
-          DELAYED_TASKS /*!< This thread will put delayed tasks in the tasks queue after their delay is over */
-        };
-
       private:
         size_t _id; /*!< ID of the thread. */
         std::thread *_thread; /*!< thread object. */
@@ -47,7 +37,7 @@ namespace fwk {
          *  \param id thread id.
          *  \param assignment assignment of the Thread.
          */
-        Thread(size_t id, Assignment assignment = Assignment::TASKS);
+        Thread(size_t id);
 
         /**
          *  \brief Destructor of Thread.
@@ -70,12 +60,7 @@ namespace fwk {
         /**
          *  \brief the routine for workers with TASKS assignment.
          */
-        void  tasksRoutine(void);
-
-        /**
-         *  \brief the routine for workers with DELAYED_TASKS assignment.
-         */
-        void  delayedTasksRoutine(void);
+        void  routine(void);
 
       public:
         /**
