@@ -8,33 +8,29 @@
 #include  "Library/Threading/Lock.hpp"
 
 namespace fwk {
-  namespace Core {
-    namespace Worker {
-      class DelayedTasksThread :public Singleton<fwk::Core::Worker::DelayedTasksThread>, public Threading::Lockable, public AEndable {
-        friend class Singleton<fwk::Core::Worker::DelayedTasksThread>;
-      private:
-        std::thread *_thread;
+  class DelayedTasksThread :public Singleton<fwk::DelayedTasksThread>, public Threading::Lockable, public AEndable {
+    friend class Singleton<fwk::DelayedTasksThread>;
+  private:
+    std::thread *_thread;
 
-      private:
-        DelayedTasksThread(const DelayedTasksThread&) = delete;
-        DelayedTasksThread(const DelayedTasksThread&&) = delete;
-        DelayedTasksThread& operator=(const DelayedTasksThread&) = delete;
+  private:
+    DelayedTasksThread(const DelayedTasksThread&) = delete;
+    DelayedTasksThread(const DelayedTasksThread&&) = delete;
+    DelayedTasksThread& operator=(const DelayedTasksThread&) = delete;
 
-      private:
-        DelayedTasksThread(void);
-        virtual ~DelayedTasksThread(void);
+  private:
+    DelayedTasksThread(void);
+    virtual ~DelayedTasksThread(void);
 
-      public:
-        virtual void  end(void);
+  public:
+    virtual void  end(void);
 
-      public:
-        void  run(void);
+  public:
+    void  run(void);
 
-      private:
-        void  routine(void) const;
-      };
-    }
-  }
+  private:
+    void  routine(void) const;
+  };
 }
 
 #endif    /* __CORE_WORKER_DELAYEDTASKSTHREAD_HH__ */

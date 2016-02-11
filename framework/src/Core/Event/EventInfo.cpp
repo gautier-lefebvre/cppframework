@@ -2,17 +2,17 @@
 
 using namespace fwk;
 
-Core::Event::EventInfo::EventInfo(const Core::Event::Handle* ebase):
+EventInfo::EventInfo(const EventHandle* ebase):
   base(ebase),
   subscribers()
 {}
 
-Core::Event::EventInfo::EventInfo(const Core::Event::EventInfo& oth):
+EventInfo::EventInfo(const EventInfo& oth):
   base(oth.base),
   subscribers(oth.subscribers)
 {}
 
-Core::Event::EventInfo& Core::Event::EventInfo::operator=(const Core::Event::EventInfo& oth) {
+EventInfo& EventInfo::operator=(const EventInfo& oth) {
   if (this != &oth) {
     this->base = oth.base;
     this->subscribers = oth.subscribers;
@@ -20,10 +20,10 @@ Core::Event::EventInfo& Core::Event::EventInfo::operator=(const Core::Event::Eve
   return *this;
 }
 
-void  Core::Event::EventInfo::addSubscriber(const void *subscriber, const std::function<void  (const Core::Event::IEventArgs*)>& callback) {
+void  EventInfo::addSubscriber(const void *subscriber, const std::function<void  (const IEventArgs*)>& callback) {
   this->subscribers[subscriber] = callback;
 }
 
-void  Core::Event::EventInfo::delSubscriber(const void *subscriber) {
+void  EventInfo::delSubscriber(const void *subscriber) {
   this->subscribers.erase(subscriber);
 }

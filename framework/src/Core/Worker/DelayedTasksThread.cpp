@@ -1,26 +1,26 @@
 #include  "Core/Worker/DelayedTasksThread.hh"
-#include  "Core/Worker/Manager.hh"
+#include  "Core/Worker/WorkerManager.hh"
 
 using namespace fwk;
 
-Core::Worker::DelayedTasksThread::DelayedTasksThread(void):
+DelayedTasksThread::DelayedTasksThread(void):
   Threading::Lockable(),
   AEndable(),
   _thread(nullptr)
 {}
 
-Core::Worker::DelayedTasksThread::~DelayedTasksThread(void) {
+DelayedTasksThread::~DelayedTasksThread(void) {
   this->end();
 }
 
-void  Core::Worker::DelayedTasksThread::run(void) {
-  this->_thread = new std::thread(&Core::Worker::DelayedTasksThread::routine, this);
+void  DelayedTasksThread::run(void) {
+  this->_thread = new std::thread(&DelayedTasksThread::routine, this);
 }
 
-void  Core::Worker::DelayedTasksThread::end(void) {
+void  DelayedTasksThread::end(void) {
   SCOPELOCK(this);
   if (!this->mustEnd()) {
-    Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
+    WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
 
     this->mustEnd(true);
 
@@ -41,9 +41,9 @@ void  Core::Worker::DelayedTasksThread::end(void) {
   }
 }
 
-void  Core::Worker::DelayedTasksThread::routine(void) const {
-  Core::Worker::Manager::DelayedTaskQueue& delayedTaskQueue = Core::Worker::Manager::get().getDelayedTaskQueue();
-  Core::DelayedTask* delayedTask;
+void  DelayedTasksThread::routine(void) const {
+  WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
+  DelayedTask* delayedTask;
 
   while (!this->mustEnd()) {
     delayedTask = nullptr;
@@ -67,8 +67,8 @@ void  Core::Worker::DelayedTasksThread::routine(void) const {
     }
 
     if (delayedTask != nullptr) {
-      Core::Worker::Manager::get().addTask(delayedTask->_task);
-      Core::DelayedTask::returnToPool(delayedTask);
+      WorkerManager::get().addTask(delayedTask->_task);
+      DelayedTask::returnToPool(delayedTask);
     }
   }
 }

@@ -2,8 +2,8 @@
 
 using namespace fwk;
 
-Core::Event::EventNotRegisteredException::EventNotRegisteredException(const std::string& msg) noexcept:
-  Core::Exception(msg)
+EventNotRegisteredException::EventNotRegisteredException(const std::string& msg) noexcept:
+  CoreException(msg)
 {}
 
-Core::Event::EventNotRegisteredException::~EventNotRegisteredException() {}
+EventNotRegisteredException::~EventNotRegisteredException() {}

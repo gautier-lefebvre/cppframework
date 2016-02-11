@@ -4,25 +4,23 @@
 #include  "Library/Exception.hh"
 
 namespace fwk {
-  namespace Core {
+  /**
+   *  \class CoreException Core/Exception.hh
+   *  \brief Superclass of every exception thrown in the Core.
+   */
+  class CoreException :public fwk::Exception {
+  public:
     /**
-     *  \class Exception Core/Exception.hh
-     *  \brief Superclass of every exception thrown in the Core.
+     *  \brief Constructor of CoreException.
+     *  \param message the error message.
      */
-    class Exception :public fwk::Exception {
-    public:
-      /**
-       *  \brief Constructor of Exception.
-       *  \param message the error message.
-       */
-      Exception(const std::string& message) noexcept;
+    CoreException(const std::string& message) noexcept;
 
-      /**
-       *  \brief Destructor of Exception.
-       */
-      virtual ~Exception(void) noexcept;
-    };
-  }
+    /**
+     *  \brief Destructor of CoreException.
+     */
+    virtual ~CoreException(void) noexcept;
+  };
 }
 
 #endif    /* __CORE_EXCEPTION_HH__ */

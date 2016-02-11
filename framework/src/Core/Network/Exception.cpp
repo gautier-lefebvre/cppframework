@@ -2,8 +2,8 @@
 
 using namespace fwk;
 
-Core::Network::Exception::Exception(const std::string& msg) noexcept:
-  Core::Exception(msg)
+NetworkException::NetworkException(const std::string& msg) noexcept:
+  CoreException(msg)
 {}
 
-Core::Network::Exception::~Exception(void) {}
+NetworkException::~NetworkException(void) {}

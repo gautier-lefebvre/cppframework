@@ -6,14 +6,14 @@ using namespace fwk;
  *  ATask
  */
 
-Core::ATask::ATask(Core::ATask::Source source):
+ATask::ATask(ATask::Source source):
   Factory::AFactored(),
   _source(source)
 {}
 
-Core::ATask::~ATask(void) {}
+ATask::~ATask(void) {}
 
-Core::ATask::Source Core::ATask::getSource(void) const {
+ATask::Source ATask::getSource(void) const {
   return this->_source;
 }
 
@@ -21,27 +21,27 @@ Core::ATask::Source Core::ATask::getSource(void) const {
  *  SimpleTask
  */
 
-Core::SimpleTask::SimpleTask(void):
-  Core::ATask(Core::ATask::Source::SIMPLE),
+SimpleTask::SimpleTask(void):
+  ATask(ATask::Source::SIMPLE),
   _callback(nullptr),
   _cleanup(nullptr)
 {}
 
-Core::SimpleTask::~SimpleTask(void) {
+SimpleTask::~SimpleTask(void) {
   this->reinit();
 }
 
-void  Core::SimpleTask::reinit(void) {
+void  SimpleTask::reinit(void) {
   this->_callback = nullptr;
   this->_cleanup = nullptr;
 }
 
-void  Core::SimpleTask::init(const std::function<void (void)>& cb) {
+void  SimpleTask::init(const std::function<void (void)>& cb) {
   this->_callback = cb;
   this->_cleanup = nullptr;
 }
 
-void  Core::SimpleTask::init(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+void  SimpleTask::init(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
   this->_callback = cb;
   this->_cleanup = cl;
 }
@@ -50,50 +50,50 @@ void  Core::SimpleTask::init(const std::function<void (void)>& cb, const std::fu
  *  EventTask
  */
 
-Core::EventTask::EventTask(void):
-  Core::ATask(Core::ATask::Source::EVENT),
+EventTask::EventTask(void):
+  ATask(ATask::Source::EVENT),
   _eventCreation(),
   _event(nullptr),
   _args(nullptr)
 {}
 
-Core::EventTask::~EventTask(void) {
+EventTask::~EventTask(void) {
   this->reinit();
 }
 
-void  Core::EventTask::reinit(void) {
+void  EventTask::reinit(void) {
   this->_event = nullptr;
   this->_args = nullptr;
 }
 
-void  Core::EventTask::init(const Core::Event::Handle* ebase, Core::Event::IEventArgs* args) {
+void  EventTask::init(const EventHandle* ebase, IEventArgs* args) {
   this->_eventCreation = ebase->lastOutOfPoolTimePoint();
   this->_event = ebase;
   this->_args = args;
 }
 
 /**
- *  HTTPTask
+ *  HttpTask
  */
 
-Core::HTTPTask::HTTPTask(void):
-  Core::ATask(Core::ATask::Source::HTTP_CALLBACK),
+HttpTask::HttpTask(void):
+  ATask(ATask::Source::HTTP_CALLBACK),
   _callback(nullptr),
   _cleanup(nullptr),
   _response(nullptr)
 {}
 
-Core::HTTPTask::~HTTPTask(void) {
+HttpTask::~HttpTask(void) {
   this->reinit();
 }
 
-void  Core::HTTPTask::reinit(void) {
+void  HttpTask::reinit(void) {
   this->_callback = nullptr;
   this->_cleanup = nullptr;
   this->_response = nullptr;
 }
 
-void  Core::HTTPTask::init(const std::function<void (const Core::Network::HTTP::Response*)>& cb, const std::function<void (void)>& cl, Core::Network::HTTP::Response* resp) {
+void  HttpTask::init(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {
   this->_callback = cb;
   this->_cleanup = cl;
   this->_response = resp;
@@ -103,32 +103,32 @@ void  Core::HTTPTask::init(const std::function<void (const Core::Network::HTTP::
  *  PeriodicTask
  */
 
-Core::PeriodicTask::PeriodicTask(void):
-  Core::ATask(Core::ATask::Source::PERIODIC_TASK),
+PeriodicTask::PeriodicTask(void):
+  ATask(ATask::Source::PERIODIC_TASK),
   _callback(nullptr),
   _clean(nullptr),
   _interval(),
   _off(true)
 {}
 
-Core::PeriodicTask::~PeriodicTask(void) {
+PeriodicTask::~PeriodicTask(void) {
   this->reinit();
 }
 
-void  Core::PeriodicTask::reinit(void) {
+void  PeriodicTask::reinit(void) {
   this->_callback = nullptr;
   this->_clean = nullptr;
   this->_off = true;
 }
 
-void  Core::PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval) {
+void  PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval) {
   this->_callback = callback;
   this->_clean = clean;
   this->_interval = interval;
   this->_off = false;
 }
 
-void  Core::PeriodicTask::stop() {
+void  PeriodicTask::stop() {
   this->_off = true;
 }
 
@@ -136,38 +136,38 @@ void  Core::PeriodicTask::stop() {
  *  DelayedTask
  */
 
-Core::DelayedTask::DelayedTask(void):
+DelayedTask::DelayedTask(void):
   Factory::AFactored(),
   _task(nullptr),
   _timePoint()
 {}
 
-Core::DelayedTask::~DelayedTask(void) {
+DelayedTask::~DelayedTask(void) {
   this->reinit();
 }
 
-void  Core::DelayedTask::reinit(void) {
+void  DelayedTask::reinit(void) {
   this->_task = nullptr;
 }
 
-void  Core::DelayedTask::init(Core::ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
+void  DelayedTask::init(ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
   this->_task = task;
   this->_timePoint = timepoint;
 }
 
-void  Core::DelayedTask::init(Core::ATask* task, const std::chrono::steady_clock::duration& interval) {
+void  DelayedTask::init(ATask* task, const std::chrono::steady_clock::duration& interval) {
   this->_task = task;
   this->_timePoint = std::chrono::steady_clock::now() + interval;
 }
 
-bool  Core::DelayedTask::operator<(const Core::DelayedTask& oth) const {
+bool  DelayedTask::operator<(const DelayedTask& oth) const {
   return this->_timePoint < oth._timePoint;
 }
 
-bool  Core::DelayedTask::operator>(const Core::DelayedTask& oth) const {
+bool  DelayedTask::operator>(const DelayedTask& oth) const {
   return this->_timePoint > oth._timePoint;
 }
 
-bool  Core::DelayedTask::operator==(const Core::ATask *oth) const {
+bool  DelayedTask::operator==(const ATask *oth) const {
   return this->_task == oth;
 }
