@@ -14,6 +14,7 @@ const size_t TcpSocketStream::BUFFER_SIZE = 32768;
 
 TcpSocketStream::TcpSocketStream(void):
   TcpSocket(),
+  APooled<TcpSocketStream>(),
   _input(nullptr),
   _output(nullptr)
 {}

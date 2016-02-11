@@ -5,11 +5,16 @@
 using namespace fwk;
 
 UdpSocketServer::UdpSocketServer(void):
-  AUdpSocket()
+  AUdpSocket(),
+  APooled<UdpSocketServer>()
 {}
 
 UdpSocketServer::~UdpSocketServer(void) {
   this->reinit();
+}
+
+void UdpSocketServer::reinit(void) {
+  this->AUdpSocket::reinit();
 }
 
 void  UdpSocketServer::bind(uint16_t port) {

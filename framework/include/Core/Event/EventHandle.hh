@@ -1,7 +1,7 @@
 #ifndef   __CORE_EVENT_EVENTHANDLE_HH__
 #define   __CORE_EVENT_EVENTHANDLE_HH__
 
-#include  "Library/Factory/AFactored.hh"
+#include  "Library/Factory/APooled.hpp"
 #include  "Library/Factory/Pool.hpp"
 #include  "Core/Event/IEventArgs.hh"
 
@@ -11,10 +11,16 @@ namespace fwk {
    *  \brief an Event of the program.
    *  Pooled.
    */
-  class EventHandle :public Factory::AFactored, public Factory::TPooled<EventHandle, 50, 10> {
+  class EventHandle :public APooled<EventHandle> {
   public:
     /**
-     *  \brief Inherited from AFactored. Does nothing.
+     *  \brief Constructor of EventHandle.
+     */
+    EventHandle(void);
+
+  public:
+    /**
+     *  \brief Inherited from APooled. Does nothing.
      */
     virtual void reinit(void);
 

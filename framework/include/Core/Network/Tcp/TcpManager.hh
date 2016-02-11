@@ -4,9 +4,9 @@
 #include  <list>
 #include  <set>
 
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Tcp/TcpSocket.hh"
 #include  "Core/Network/Tcp/TcpSocketStream.hh"
 #include  "Core/Event/EventHandle.hh"
@@ -17,7 +17,7 @@ namespace fwk {
    *  \class TcpSocketStreamEventArgs Core/Network/Tcp/Manager.hh
    *  \brief Used when firing an event sending a TcpSocketStream as argument.
    */
-  struct TcpSocketStreamEventArgs :public IEventArgs, public Factory::TPooled<TcpSocketStreamEventArgs, 20, 10> {
+  struct TcpSocketStreamEventArgs :public IEventArgs, public APooled<TcpSocketStreamEventArgs> {
   public:
     TcpSocketStream* socket; /*!< the SocketStream object. */
 
@@ -49,7 +49,7 @@ namespace fwk {
    *  \class TcpSocketEventArgs Core/Network/Tcp/Manager.hh
    *  \brief Used when firing an event sending a TcpSocket as argument.
    */
-  struct TcpSocketEventArgs :public IEventArgs, public Factory::TPooled<TcpSocketEventArgs, 2, 1> {
+  struct TcpSocketEventArgs :public IEventArgs, public APooled<TcpSocketEventArgs> {
   public:
     TcpSocket* socket; /*!< the Socket object. */
 
@@ -87,11 +87,11 @@ namespace fwk {
      *  \class Server Core/Network/Tcp/TcpManager.hh
      *  \brief TCP server and connected clients.
      */
-    struct Server :public Threading::Lockable {
+    struct Server :public Lockable {
     public:
       uint16_t port; /*!< bound port. */
       TcpSocket* server; /*!< socket listening on the bound port. */
-      Threading::TLockable<std::list<TcpSocketStream*>> clients; /*!< list of connected clients to this server. */
+      TLockable<std::list<TcpSocketStream*>> clients; /*!< list of connected clients to this server. */
       std::set<uint32_t> accept; /*!< accepted IPs. */
       std::set<uint32_t> blacklist; /*!< rejected IPs. */
       bool active; /*!< the server is running. */
@@ -124,7 +124,7 @@ namespace fwk {
      *  \class Client Core/Network/Tcp/Manager.hh
      *  \brief TCP client.
      */
-    struct Client :public Threading::Lockable {
+    struct Client :public Lockable {
     public:
       std::string hostname; /*!< hostname of the TCP socket this client is connected to. */
       uint16_t port; /*!< port of the TCP socket this client is connected to. */
@@ -152,15 +152,15 @@ namespace fwk {
     };
 
   public:
-    typedef Threading::TLockable<std::list<Server>> ServerList;
-    typedef Threading::TLockable<std::list<Client>> ClientList;
+    typedef TLockable<std::list<Server>> ServerList;
+    typedef TLockable<std::list<Client>> ClientList;
 
   private:
     ServerList _servers; /*!< bound servers. */
     ClientList _clients; /*!< connected clients. */
 
-    Threading::NotifiableThread& _input; /*!< input thread */
-    Threading::NotifiableThread& _output; /*!< output thread */
+    NotifiableThread& _input; /*!< input thread */
+    NotifiableThread& _output; /*!< output thread */
 
   public:
     /**
@@ -168,7 +168,7 @@ namespace fwk {
      *  \param input the input thread.
      *  \param output the output thread.
      */
-    TcpManager(Threading::NotifiableThread& input, Threading::NotifiableThread& output);
+    TcpManager(NotifiableThread& input, NotifiableThread& output);
 
     /**
      *  \brief Destructor of TcpManager.

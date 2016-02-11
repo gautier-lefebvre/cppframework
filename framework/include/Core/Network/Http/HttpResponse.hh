@@ -1,6 +1,7 @@
 #ifndef   __CORE_NETWORK_HTTP_HTTPRESPONSE_HH__
 #define   __CORE_NETWORK_HTTP_HTTPRESPONSE_HH__
 
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Http/AHttpMessage.hh"
 
 namespace fwk {
@@ -8,7 +9,7 @@ namespace fwk {
    *  \class HttpResponse Core/Network/Http/HttpResponse.hh
    *  \brief a HttpResponse received from a HTTP server.
    */
-  struct HttpResponse :public AHttpMessage, public Factory::TPooled<HttpResponse, 10, 2> {
+  struct HttpResponse :public AHttpMessage, public APooled<HttpResponse> {
     /**
      *  \class Status Core/Network/Http/HttpResponse.hh
      *  \brief Meaning of HTTP status.

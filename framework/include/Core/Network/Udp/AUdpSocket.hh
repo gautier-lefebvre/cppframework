@@ -2,15 +2,14 @@
 #define   __CORE_NETWORK_UDP_AUDPSOCKET_HH__
 
 #include  "Library/Collection/ByteArray.hpp"
-#include  "Library/Factory/AFactored.hh"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
   /**
    *  \class AUdpSocket Core/Network/Udp/AUdpSocket.hh
    *  \brief Superclass of UDP sockets which can be created.
    */
-  class AUdpSocket :public virtual Threading::Lockable, public virtual Factory::AFactored {
+  class AUdpSocket :public virtual Lockable {
   protected:
     int _fd; /*!< file descriptor of the socket */
     ByteArray* _buffer; /*!< buffer used to read */

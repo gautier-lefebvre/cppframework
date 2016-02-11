@@ -6,7 +6,7 @@
 using namespace fwk;
 
 EventManager::EventManager(void):
-  Threading::Lockable(),
+  Lockable(),
   _events()
 {}
 

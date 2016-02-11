@@ -10,7 +10,7 @@
 using namespace fwk;
 
 System::System(void):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _endCondition(),
   _modulesInitialized()

@@ -5,10 +5,10 @@
 
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
-  class DelayedTasksThread :public Singleton<fwk::DelayedTasksThread>, public Threading::Lockable, public AEndable {
+  class DelayedTasksThread :public Singleton<fwk::DelayedTasksThread>, public Lockable, public AEndable {
     friend class Singleton<fwk::DelayedTasksThread>;
   private:
     std::thread *_thread;

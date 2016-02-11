@@ -11,7 +11,7 @@ namespace fwk {
    *  \class HttpClient Core/Network/Http/HttpClient.hh
    *  \brief Singleton class handling HTTP connections.
    */
-  class HttpClient: public Singleton<fwk::HttpClient>, public Threading::Lockable, public AEndable {
+  class HttpClient: public Singleton<fwk::HttpClient>, public Lockable, public AEndable {
     friend class Singleton<fwk::HttpClient>;
   private:
     std::string _userAgent; /*!< user agent string sent for each request. */

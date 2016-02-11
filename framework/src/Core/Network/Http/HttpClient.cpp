@@ -11,7 +11,7 @@ using namespace fwk;
 const std::string HttpClient::defaultUserAgent = std::string("cppframework user agent");
 
 HttpClient::HttpClient(void):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _userAgent(""),
   _connections()

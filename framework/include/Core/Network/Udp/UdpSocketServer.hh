@@ -3,6 +3,7 @@
 
 #include  <sys/select.h>
 
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Udp/AUdpSocket.hh"
 #include  "Core/Network/Udp/UdpSocketClient.hh"
 
@@ -11,7 +12,7 @@ namespace fwk {
    *  \class UdpSocketServer Core/Network/Udp/UdpSocketServer.hh
    *  \brief A UDP server socket.
    */
-  class UdpSocketServer :public AUdpSocket, public Factory::TPooled<UdpSocketServer, 2, 1>  {
+  class UdpSocketServer :public AUdpSocket, public APooled<UdpSocketServer>  {
   public:
     /**
      *  \brief Constructor of UdpSocketServer.
@@ -22,6 +23,9 @@ namespace fwk {
      *  \brief Destructor of UdpSocketServer.
      */
     virtual ~UdpSocketServer(void);
+
+  public:
+    virtual void reinit(void);
 
   public:
     /**

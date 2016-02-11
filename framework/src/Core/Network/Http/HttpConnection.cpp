@@ -17,7 +17,7 @@
 using namespace fwk;
 
 HttpConnection::HttpConnection(const std::string& host, uint16_t port, HttpProtocol protocol, const std::string& user_agent):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _host(host),
   _port(port),

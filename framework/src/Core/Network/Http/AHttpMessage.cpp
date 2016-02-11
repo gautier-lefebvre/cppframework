@@ -5,7 +5,6 @@
 using namespace fwk;
 
 AHttpMessage::AHttpMessage(void):
-  Factory::AFactored(),
   version("HTTP/1.1"),
   headers(),
   body(nullptr)

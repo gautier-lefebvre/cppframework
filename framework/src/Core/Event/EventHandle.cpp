@@ -3,6 +3,10 @@
 
 using namespace fwk;
 
+EventHandle::EventHandle(void):
+  APooled<EventHandle>()
+{}
+
 void EventHandle::reinit(void) {}
 
 void EventHandle::fireAsync(IEventArgs* args) const {

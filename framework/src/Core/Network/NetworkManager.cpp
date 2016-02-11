@@ -7,7 +7,7 @@
 using namespace fwk;
 
 NetworkManager::NetworkManager(void):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   Initializable(),
   _input(),

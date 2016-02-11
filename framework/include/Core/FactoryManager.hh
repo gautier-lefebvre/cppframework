@@ -3,14 +3,14 @@
 
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/Initializable.hpp"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
   /**
    *  \class FactoryManager Core/FactoryManager.hh
    *  \brief Singleton class to initialize the Pools.
    */
-  class FactoryManager :public Singleton<fwk::FactoryManager>, public Initializable, public Threading::Lockable {
+  class FactoryManager :public Singleton<fwk::FactoryManager>, public Initializable, public Lockable {
     friend class Singleton<fwk::FactoryManager>;
   private:
     /**

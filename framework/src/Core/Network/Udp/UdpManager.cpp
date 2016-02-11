@@ -1,7 +1,6 @@
 #include  <algorithm>
 
 #include  "Library/ThirdParty/cppformat/format.hh"
-#include  "Library/Threading/Condition.hpp"
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Macro.hh"
 #include  "Core/Network/Udp/UdpManager.hh"
@@ -10,7 +9,7 @@
 
 using namespace fwk;
 
-UdpManager::UdpManager(Threading::NotifiableThread& input, Threading::NotifiableThread& output):
+UdpManager::UdpManager(NotifiableThread& input, NotifiableThread& output):
   _servers(),
   _clients(),
   _input(input),
@@ -453,7 +452,7 @@ void UdpManager::__fireEvent(EventHandle* event, UdpSocketClient* socket) const 
  */
 
 UdpManager::Server::Server(uint16_t port, UdpSocketServer* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
-  Threading::Lockable(),
+  Lockable(),
   port(port),
   server(server),
   clients(),
@@ -518,6 +517,7 @@ UdpManager::Client::~Client(void) {
  */
 
 UdpSocketStreamEventArgs::UdpSocketStreamEventArgs(void):
+  APooled<UdpSocketStreamEventArgs>(),
   socket(nullptr)
 {}
 
@@ -538,6 +538,7 @@ void UdpSocketStreamEventArgs::cleanup(void) {
  */
 
 UdpSocketServerEventArgs::UdpSocketServerEventArgs(void):
+  APooled<UdpSocketServerEventArgs>(),
   socket(nullptr)
 {}
 
@@ -558,6 +559,7 @@ void UdpSocketServerEventArgs::cleanup(void) {
  */
 
 UdpSocketClientEventArgs::UdpSocketClientEventArgs(void):
+  APooled<UdpSocketClientEventArgs>(),
   socket(nullptr)
 {}
 

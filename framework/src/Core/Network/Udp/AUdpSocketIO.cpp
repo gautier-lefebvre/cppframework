@@ -6,8 +6,7 @@ using namespace fwk;
 const size_t AUdpSocketIO::BUFFER_SIZE = 32768;
 
 AUdpSocketIO::AUdpSocketIO(void):
-  Threading::Lockable(),
-  Factory::AFactored(),
+  Lockable(),
   _addr(),
   _input(std::make_pair(std::queue<ByteArray*>(), 0)),
   _output(std::make_pair(std::queue<ByteArray*>(), 0))

@@ -2,7 +2,7 @@
 #define   __CORE_NETWORK_TCP_TCPSOCKETSTREAM_HH__
 
 #include  "Library/Collection/ByteArray.hpp"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Tcp/TcpSocket.hh"
 
 namespace fwk {
@@ -10,7 +10,7 @@ namespace fwk {
    *  \class TcpSocketStream Core/Network/Tcp/TcpSocketStream.hh
    *  \brief Socket used to receive and send data.
    */
-  class TcpSocketStream :public TcpSocket, public Factory::TPooled<TcpSocketStream, 100, 20> {
+  class TcpSocketStream :public TcpSocket, public APooled<TcpSocketStream> {
   protected:
     ByteArray*  _input; /*!< the input buffer */
     ByteArray*  _output; /*!< the output buffer */

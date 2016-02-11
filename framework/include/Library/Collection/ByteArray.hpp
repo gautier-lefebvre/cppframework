@@ -5,16 +5,15 @@
 #include  <cstring>
 
 #include  "Library/DesignPattern/Singleton.hpp"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Factory/AFactored.hh"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Factory/APooled.hpp"
 
 namespace fwk {
   /**
    *  \class ByteArray Library/Collection/ByteArray.hpp
    *  \brief Raw data container.
    */
-  class ByteArray :public Factory::AFactored, public Threading::Lockable, public Factory::TPooled<ByteArray, 100, 10> {
+  class ByteArray :public Lockable, public APooled<ByteArray> {
   protected:
     uint8_t *_bytearray; /*!< Pointer to the start of the data. */
     size_t  _size; /*!< Size of the data in bytes. */

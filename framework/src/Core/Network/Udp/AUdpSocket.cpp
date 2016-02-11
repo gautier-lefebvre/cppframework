@@ -10,8 +10,7 @@
 using namespace fwk;
 
 AUdpSocket::AUdpSocket(void):
-  Threading::Lockable(),
-  Factory::AFactored(),
+  Lockable(),
   _fd(-1),
   _buffer(nullptr)
 {}

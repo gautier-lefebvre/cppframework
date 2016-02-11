@@ -4,7 +4,7 @@
 using namespace fwk;
 
 DelayedTasksThread::DelayedTasksThread(void):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _thread(nullptr)
 {}

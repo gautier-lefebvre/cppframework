@@ -3,15 +3,14 @@
 
 #include  <sys/select.h>
 
-#include  "Library/Factory/AFactored.hh"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
   /**
    *  \class TcpSocket Core/Network/Tcp/TcpSocket.hh
    *  \brief A TCP socket.
    */
-  class TcpSocket :public Factory::AFactored, public Threading::Lockable {
+  class TcpSocket :public Lockable {
   protected:
     int _fd; /*!< fd of the socket */
 

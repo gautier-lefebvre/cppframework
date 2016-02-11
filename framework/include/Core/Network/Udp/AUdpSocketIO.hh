@@ -6,15 +6,14 @@
 #include  <netinet/in.h>
 
 #include  "Library/Collection/ByteArray.hpp"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Factory/AFactored.hh"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
   /**
    *  \class AUdpSocketIO Core/Network/Udp/AUdpSocketIO.hh
    *  \brief Superclass of UDP socket who can store input and output datagrams.
    */
-  class AUdpSocketIO :public virtual Threading::Lockable, public virtual Factory::AFactored {
+  class AUdpSocketIO :public virtual Lockable {
   protected:
     sockaddr_in _addr; /*!< address to read from / write to */
     std::pair<std::queue<ByteArray*>, size_t> _input; /*!< queue of datagrams read / total size of queued datagrams in bytes. */

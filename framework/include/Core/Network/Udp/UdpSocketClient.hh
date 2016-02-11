@@ -3,7 +3,7 @@
 
 #include  <sys/select.h>
 
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Udp/AUdpSocketIO.hh"
 
 namespace fwk {
@@ -11,7 +11,7 @@ namespace fwk {
    *  \class UdpSocketClient Core/Network/Udp/UdpSocketClient.hh
    *  \brief Client of a server socket. The address of a client who sent a message to a bound UDP server.
    */
-  class UdpSocketClient :public AUdpSocketIO, public Factory::TPooled<UdpSocketClient, 100, 20> {
+  class UdpSocketClient :public AUdpSocketIO, public APooled<UdpSocketClient> {
   private:
     std::pair<uint32_t, uint16_t> _info; /*!< IP and port of the remote client. */
 

@@ -4,9 +4,9 @@
 #include  <list>
 #include  <set>
 
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Event/EventHandle.hh"
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Network/Udp/UdpSocketServer.hh"
@@ -18,7 +18,7 @@ namespace fwk {
    *  \class UdpSocketStreamEventArgs Core/Network/Udp/UdpManager.hh
    *  \brief Used when firing an event sending a UdpSocketStream as argument.
    */
-  struct UdpSocketStreamEventArgs :public IEventArgs, public Factory::TPooled<UdpSocketStreamEventArgs, 20, 10> {
+  struct UdpSocketStreamEventArgs :public IEventArgs, public APooled<UdpSocketStreamEventArgs> {
   public:
     UdpSocketStream* socket; /*!< the SocketStream object. */
 
@@ -50,7 +50,7 @@ namespace fwk {
    *  \class UdpSocketClientEventArgs Core/Network/Udp/UdpManager.hh
    *  \brief Used when firing an event sending a UdpSocketClient as argument.
    */
-  struct UdpSocketClientEventArgs :public IEventArgs, public Factory::TPooled<UdpSocketClientEventArgs, 2, 1> {
+  struct UdpSocketClientEventArgs :public IEventArgs, public APooled<UdpSocketClientEventArgs> {
   public:
     UdpSocketClient* socket; /*!< the SocketClient object. */
 
@@ -82,7 +82,7 @@ namespace fwk {
    *  \class UdpSocketServerEventArgs Core/Network/Udp/UdpManager.hh
    *  \brief Used when firing an event sending a UdpSocketServer as argument.
    */
-  struct UdpSocketServerEventArgs :public IEventArgs, public Factory::TPooled<UdpSocketServerEventArgs, 2, 1> {
+  struct UdpSocketServerEventArgs :public IEventArgs, public APooled<UdpSocketServerEventArgs> {
   public:
     UdpSocketServer* socket; /*!< the SocketServer object. */
 
@@ -120,11 +120,11 @@ namespace fwk {
      *  \class Server Core/Network/Udp/UdpManager.hh
      *  \brief UDP server and known clients.
      */
-    struct Server :public Threading::Lockable {
+    struct Server :public Lockable {
     public:
       uint16_t port; /*!< bound port */
       UdpSocketServer* server; /*!< socket listening on the bound port */
-      Threading::TLockable<std::list<UdpSocketClient*>> clients; /*!< list of known clients to this server */
+      TLockable<std::list<UdpSocketClient*>> clients; /*!< list of known clients to this server */
       std::set<uint32_t> accept; /*!< accepted IPs */
       std::set<uint32_t> blacklist; /*!< rejected IPs */
 
@@ -156,7 +156,7 @@ namespace fwk {
      *  \class Client Core/Network/Udp/UdpManager.hh
      *  \brief UDP client.
      */
-    struct Client :public Threading::Lockable {
+    struct Client :public Lockable {
     public:
       std::string hostname; /*!< hostname of the UDP socket this client sends messages to */
       uint16_t port; /*!< port of the UDP socket this client sends messages to */
@@ -183,15 +183,15 @@ namespace fwk {
     };
 
   public:
-    typedef Threading::TLockable<std::list<Server>> ServerList;
-    typedef Threading::TLockable<std::list<Client>> ClientList;
+    typedef TLockable<std::list<Server>> ServerList;
+    typedef TLockable<std::list<Client>> ClientList;
 
   private:
     ServerList _servers; /*!< bound servers. */
     ClientList _clients; /*!< client sockets. */
 
-    Threading::NotifiableThread& _input; /*!< input thread */
-    Threading::NotifiableThread& _output; /*!< output thread */
+    NotifiableThread& _input; /*!< input thread */
+    NotifiableThread& _output; /*!< output thread */
 
   public:
     /**
@@ -199,7 +199,7 @@ namespace fwk {
      *  \param input the input thread.
      *  \param output the output thread.
      */
-    UdpManager(Threading::NotifiableThread& input, Threading::NotifiableThread& output);
+    UdpManager(NotifiableThread& input, NotifiableThread& output);
 
     /**
      *  \brief Destructor of UdpManager.

@@ -4,17 +4,17 @@
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Property/Initializable.hpp"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
 #include  "Core/Network/Tcp/TcpManager.hh"
 #include  "Core/Network/Udp/UdpManager.hh"
 
 namespace fwk {
-  class NetworkManager :public Singleton<fwk::NetworkManager>, public Threading::Lockable, public AEndable, public Initializable {
+  class NetworkManager :public Singleton<fwk::NetworkManager>, public Lockable, public AEndable, public Initializable {
     friend class Singleton<fwk::NetworkManager>;
   public:
-    Threading::NotifiableThread _input; /*!< the input thread. */
-    Threading::NotifiableThread _output; /*!< the output thread. */
+    NotifiableThread _input; /*!< the input thread. */
+    NotifiableThread _output; /*!< the output thread. */
 
     TcpManager _tcp; /*!< the TCP network manager. */
     UdpManager _udp; /*!<  the UDP network manager.*/

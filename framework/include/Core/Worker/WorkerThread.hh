@@ -5,8 +5,8 @@
 #include  <map>
 
 #include  "Library/Property/AEndable.hh"
-#include  "Library/Threading/Condition.hpp"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Notifiable.hpp"
+#include  "Library/Threading/Lockable.hpp"
 #include  "Core/Worker/Task.hh"
 
 namespace fwk {
@@ -14,7 +14,7 @@ namespace fwk {
    *  \class WorkerThread Core/Worker/WorkerThread.hh
    *  \brief A thread handling tasks.
    */
-  class WorkerThread :public Threading::Lockable, public AEndable {
+  class WorkerThread :public Lockable, public AEndable {
   private:
     typedef void (*WorkerHandler)(ATask*, bool);
     static const std::map<ATask::Source, WorkerHandler> TaskHandlerMap; /*!< a map redirecting tasks to their handling methods. */

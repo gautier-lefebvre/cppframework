@@ -5,7 +5,7 @@
 using namespace fwk;
 
 Logger::Logger(const std::string& name):
-  Threading::Lockable(),
+  Lockable(),
   _name(name),
   _level(Logger::Level::INFO),
   _offset(0),
@@ -13,7 +13,7 @@ Logger::Logger(const std::string& name):
 {}
 
 Logger::Logger(const Logger& oth):
-  Threading::Lockable(),
+  Lockable(),
   _name(oth._name),
   _level(oth._level),
   _offset(oth._offset),
@@ -79,7 +79,7 @@ void Logger::closeFile(void) {
 } 
 
 LoggerManager::LoggerManager(void):
-  Threading::Lockable(),
+  Lockable(),
   _loggers()
 {}
 

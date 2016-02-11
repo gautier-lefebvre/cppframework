@@ -7,7 +7,6 @@ using namespace fwk;
  */
 
 ATask::ATask(ATask::Source source):
-  Factory::AFactored(),
   _source(source)
 {}
 
@@ -23,6 +22,7 @@ ATask::Source ATask::getSource(void) const {
 
 SimpleTask::SimpleTask(void):
   ATask(ATask::Source::SIMPLE),
+  APooled<SimpleTask>(),
   _callback(nullptr),
   _cleanup(nullptr)
 {}
@@ -52,6 +52,7 @@ void  SimpleTask::init(const std::function<void (void)>& cb, const std::function
 
 EventTask::EventTask(void):
   ATask(ATask::Source::EVENT),
+  APooled<EventTask>(),
   _eventCreation(),
   _event(nullptr),
   _args(nullptr)
@@ -78,6 +79,7 @@ void  EventTask::init(const EventHandle* ebase, IEventArgs* args) {
 
 HttpTask::HttpTask(void):
   ATask(ATask::Source::HTTP_CALLBACK),
+  APooled<HttpTask>(),
   _callback(nullptr),
   _cleanup(nullptr),
   _response(nullptr)
@@ -105,6 +107,7 @@ void  HttpTask::init(const std::function<void (const HttpResponse*)>& cb, const 
 
 PeriodicTask::PeriodicTask(void):
   ATask(ATask::Source::PERIODIC_TASK),
+  APooled<PeriodicTask>(),
   _callback(nullptr),
   _clean(nullptr),
   _interval(),
@@ -137,7 +140,7 @@ void  PeriodicTask::stop() {
  */
 
 DelayedTask::DelayedTask(void):
-  Factory::AFactored(),
+  APooled<DelayedTask>(),
   _task(nullptr),
   _timePoint()
 {}

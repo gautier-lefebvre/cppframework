@@ -7,7 +7,6 @@ LIBRARYDIR= $(SRCDIR)Library/
 LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp                 \
             $(LIBRARYDIR)Encryption/MD5.cpp                       \
             $(LIBRARYDIR)Encryption/XOR.cpp                       \
-            $(LIBRARYDIR)Factory/AFactored.cpp                    \
             $(LIBRARYDIR)Factory/Exception.cpp                    \
             $(LIBRARYDIR)Network/CURL/EasyHandle.cpp              \
             $(LIBRARYDIR)Network/CURL/MultiHandle.cpp             \
@@ -16,8 +15,8 @@ LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp                 \
             $(LIBRARYDIR)Property/Initializable.cpp               \
             $(LIBRARYDIR)ThirdParty/cppformat/format.cpp          \
             $(LIBRARYDIR)ThirdParty/cppformat/posix.cpp           \
-            $(LIBRARYDIR)Threading/Condition.cpp                  \
-            $(LIBRARYDIR)Threading/Lock.cpp                       \
+            $(LIBRARYDIR)Threading/Lockable.cpp                   \
+            $(LIBRARYDIR)Threading/Notifiable.cpp                 \
             $(LIBRARYDIR)Tool/Arguments.cpp                       \
             $(LIBRARYDIR)Tool/Date.cpp                            \
             $(LIBRARYDIR)Tool/Logger.cpp                          \
@@ -57,13 +56,16 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)Worker/Task.cpp                             \
             $(COREDIR)Worker/WorkerThread.cpp
 
-SRC=        $(LIBRARYSRC)                                         \
-            $(CORESRC)                                            \
+SRCDLL=     $(LIBRARYSRC)                                         \
+            $(CORESRC)
+
+SRCPROG=    $(SRCDLL)                                             \
             $(SRCDIR)App/main.cpp
 
-OBJ=        $(SRC:.cpp=.o)
+OBJDLL=     $(SRCDLL:.cpp=.o)
+OBJPROG=    $(SRCPROG:.cpp=.o)
 
-DEPS=       $(OBJ:.o=.d)
+DEPS=       $(OBJPROG:.o=.d)
 
 LDPTHREAD=  -lpthread
 LDFLAGS=    $(LDPTHREAD) -lssl -lcrypto -lcurl
@@ -81,24 +83,24 @@ debug:      compile
 
 nodebug:    compile
 
-compile:    $(OBJ)
-			@$(CXX) -o $(NAME) $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+compile:    $(OBJPROG)
+			@$(CXX) -o $(NAME) $(OBJPROG) $(LDFLAGS) && echo "Built    $(NAME)"
 
 dll:		CXXFLAGS += -c -fPIC
-dll:		$(OBJ)
-			@$(CXX) -shared -o $(NAME).so $(OBJ) $(LDFLAGS) && echo "Built    $(NAME)"
+dll:		$(OBJDLL)
+			@$(CXX) -shared -o $(NAME).so $(OBJDLL) $(LDFLAGS) && echo "Built    $(NAME).so"
 
 %.o:        %.cpp
 			@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
 
 clean:
-			@rm -f $(OBJ) && echo "Objects removed"
+			@rm -f $(OBJPROG) && echo "Objects removed"
 
 clean_dep:
 			@rm -f $(DEPS) && echo "Dependencies removed"
 
 fclean:     clean clean_dep
-			@rm -f $(NAME) && echo "Executable removed"
+			@rm -f $(NAME) $(NAME).so && echo "Executable removed"
 
 re:         fclean all
 

@@ -13,7 +13,7 @@
 using namespace fwk;
 
 curlxx::EasyHandle::EasyHandle(void):
-  Factory::AFactored(),
+  APooled<curlxx::EasyHandle>(),
   _handle(NULL),
   _headers(NULL)
  {

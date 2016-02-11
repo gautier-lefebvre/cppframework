@@ -17,7 +17,7 @@ static void my_signal_handler(int signum) {
 }
 
 Signal::Signal(void):
-  Threading::Lockable(),
+  Lockable(),
   callbacks(),
   oldcallbacks()
 {}

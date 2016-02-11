@@ -7,6 +7,7 @@ using namespace fwk;
 
 UdpSocketClient::UdpSocketClient(void):
   AUdpSocketIO(),
+  APooled<UdpSocketClient>(),
   _info(std::make_pair(0, 0))
 {}
 

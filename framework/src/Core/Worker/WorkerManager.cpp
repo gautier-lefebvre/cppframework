@@ -5,7 +5,7 @@
 using namespace fwk;
 
 WorkerManager::WorkerManager(void):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _pendingTasks(),
   _delayedTasks([] (const DelayedTask *a, const DelayedTask *b) -> bool { return *a < *b; }),

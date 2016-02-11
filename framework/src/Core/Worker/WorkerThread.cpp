@@ -17,7 +17,7 @@ const std::map<ATask::Source, WorkerThread::WorkerHandler> WorkerThread::TaskHan
 };
 
 WorkerThread::WorkerThread(size_t id):
-  Threading::Lockable(),
+  Lockable(),
   AEndable(),
   _id(id),
   _thread(nullptr)

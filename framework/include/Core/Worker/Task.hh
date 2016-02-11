@@ -4,7 +4,7 @@
 #include  <chrono>
 #include  <functional>
 
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Event/EventHandle.hh"
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Network/Http/HttpResponse.hh"
@@ -14,7 +14,7 @@ namespace fwk {
    *  \class ATask Core/Worker/Task.hh
    *  \brief Superclass of all tasks of the tasks queue.
    */
-  class ATask :public Factory::AFactored {
+  class ATask {
   public:
     /**
      *  \class Source Core/Worker/Task.hh
@@ -44,12 +44,6 @@ namespace fwk {
 
   public:
     /**
-     *  \brief Inherited from Factory::AFactored. Must be implemented by subclasses.
-     */
-    virtual void  reinit(void) = 0;
-
-  public:
-    /**
      *  \return the type of task.
      */
     Source  getSource(void) const;
@@ -59,7 +53,7 @@ namespace fwk {
    *  \class SimpleTask Core/Worker/Task.hh
    *  \brief A task with a simple callback to be executed by a worker thread.
    */
-  class SimpleTask :public ATask, public Factory::TPooled<SimpleTask, 15, 10> {
+  class SimpleTask :public ATask, public APooled<SimpleTask> {
   public:
     std::function<void (void)> _callback; /*!< the callback to be called by the worker thread. */
     std::function<void (void)> _cleanup; /*!< the callback used to clean resources. Called when the tasks queue is being cleared. */
@@ -100,7 +94,7 @@ namespace fwk {
    *  \class EventTask Core/Worker/Thread.hh
    *  \brief A task created when an event is fired.
    */
-  class EventTask :public ATask, public Factory::TPooled<EventTask, 100, 20> {
+  class EventTask :public ATask, public APooled<EventTask> {
   public:
     std::chrono::steady_clock::time_point _eventCreation; /*!< time of event firing. */
     const EventHandle* _event; /*!< the event fired. */
@@ -136,7 +130,7 @@ namespace fwk {
    *  \class HttpTask Core/Worker/Task.hh
    *  \brief A task created after a HTTP response has been received.
    */
-  class HttpTask :public ATask, public Factory::TPooled<HttpTask, 20, 5> {
+  class HttpTask :public ATask, public APooled<HttpTask> {
   public:
     std::function<void (const HttpResponse*)> _callback; /*!< the callback function to call with the response. */
     std::function<void (void)> _cleanup; /*!< the method used to clean resources used with the request. */
@@ -173,7 +167,7 @@ namespace fwk {
    *  \class PeriodicTask Core/Worker/Task.hh
    *  \brief A task to be executing at regular interval.
    */
-  class PeriodicTask :public ATask, public Factory::TPooled<PeriodicTask, 10, 2> {
+  class PeriodicTask :public ATask, public APooled<PeriodicTask> {
   public:
     std::function<void (void)> _callback; /*!< the function to call at regular interval. */
     std::function<void (void)> _clean; /*!< the function to call when the task is canceled or when the tasks queue is being cleared. */
@@ -216,7 +210,7 @@ namespace fwk {
    *  \class DelayedTask Core/Worker/Thread.hh
    *  \brief A task to be executed after a delay.
    */
-  class DelayedTask :public Factory::AFactored, public Factory::TPooled<DelayedTask, 50, 10> {
+  class DelayedTask :public APooled<DelayedTask> {
   public:
     ATask*  _task; /*!< the task to be executed after the delay. */
     std::chrono::steady_clock::time_point  _timePoint; /*!< the timepoint when the task must be added to the tasks queue. */

@@ -6,8 +6,8 @@
 
 #include  "Library/Network/CURL/EasyHandle.hh"
 #include  "Library/Property/AEndable.hh"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
 #include  "Core/Network/Http/HttpRequest.hh"
 #include  "Core/Network/Http/HttpProtocol.hh"
 
@@ -16,7 +16,7 @@ namespace fwk {
    *  \class HttpConnection Core/Network/Http/HttpConnection.hh
    *  \brief An open connection to an HTTP server.
    */
-  class HttpConnection :public Threading::Lockable, public AEndable {
+  class HttpConnection :public Lockable, public AEndable {
   protected:
     /**
      *  \class upload_object Core/Network/Http/HttpConnection.hh
@@ -33,7 +33,7 @@ namespace fwk {
     HttpProtocol _protocol; /*!< protocol of the server (HTTP/HTTPS/FTP...) */
     std::string  _userAgent; /*!< user agent used for requests. */
     std::thread  *_thread; /*!< thread used by the connection. */
-    Threading::TNotifiable<std::queue<HttpRequest*>>  _pendingRequests; /*!< pending requests. */
+    TNotifiable<std::queue<HttpRequest*>>  _pendingRequests; /*!< pending requests. */
 
   public:
     /**

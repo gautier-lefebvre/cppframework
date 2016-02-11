@@ -7,8 +7,8 @@
 using namespace fwk;
 
 ByteArray::ByteArray(size_t s):
-  Factory::AFactored(),
-  Threading::Lockable(),
+  Lockable(),
+  APooled<ByteArray>(),
   _bytearray(new uint8_t[s]),
   _size(0),
   _sizemax(s) {

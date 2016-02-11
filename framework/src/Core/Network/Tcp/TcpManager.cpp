@@ -1,7 +1,6 @@
 #include  <algorithm>
 
 #include  "Library/Tool/Macro.hh"
-#include  "Library/Threading/Condition.hpp"
 #include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Core/Network/Tcp/TcpManager.hh"
 #include  "Core/Network/Exception.hh"
@@ -9,7 +8,7 @@
 
 using namespace fwk;
 
-TcpManager::TcpManager(Threading::NotifiableThread& input, Threading::NotifiableThread& output):
+TcpManager::TcpManager(NotifiableThread& input, NotifiableThread& output):
   _servers(),
   _clients(),
   _input(input),
@@ -478,7 +477,7 @@ void TcpManager::__fireEvent(EventHandle* event, TcpSocket* socket) const {
  */
 
 TcpManager::Server::Server(uint16_t port, TcpSocket* server):
-  Threading::Lockable(),
+  Lockable(),
   port(port),
   server(server),
   clients(),
@@ -517,7 +516,7 @@ TcpManager::Server::~Server(void) {
  */
 
 TcpManager::Client::Client(const std::string& hostname, uint16_t port, TcpSocketStream* socket):
-  Threading::Lockable(),
+  Lockable(),
   hostname(hostname),
   port(port),
   socket(socket),
@@ -546,6 +545,7 @@ TcpManager::Client::~Client(void) {
  */
 
 TcpSocketStreamEventArgs::TcpSocketStreamEventArgs(void):
+  APooled<TcpSocketStreamEventArgs>(),
   socket(nullptr)
 {}
 
@@ -566,6 +566,7 @@ void TcpSocketStreamEventArgs::cleanup(void) {
  */
 
 TcpSocketEventArgs::TcpSocketEventArgs(void):
+  APooled<TcpSocketEventArgs>(),
   socket(nullptr)
 {}
 

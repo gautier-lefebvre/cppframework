@@ -4,61 +4,59 @@
 #include  "Library/Exception.hh"
 
 namespace fwk {
-  namespace Factory {
+  /**
+   *  \class PoolNotInitializedException Library/Factory/Exception.hh
+   *  \brief Exception thrown when trying to get or return an object to a null Pool.
+   */
+  class PoolNotInitializedException :public fwk::Exception {
+  public:
     /**
-     *  \class PoolNotInitializedException Library/Factory/Exception.hh
-     *  \brief Exception thrown when trying to get or return an object to a null Pool.
+     *  \brief Constructor of PoolNotInitializedException.
+     *  \param message the error message.
      */
-    class PoolNotInitializedException :public fwk::Exception {
-    public:
-      /**
-       *  \brief Constructor of PoolNotInitializedException.
-       *  \param message the error message.
-       */
-      PoolNotInitializedException(const std::string& message = "This pool was not initialized") noexcept;
-
-      /**
-       *  \brief Destructor of PoolNotInitializedException.
-       */
-      virtual ~PoolNotInitializedException(void) noexcept;
-    };
+    PoolNotInitializedException(const std::string& message = "This pool was not initialized") noexcept;
 
     /**
-     *  \class PoolInvalidArgumentsException Library/Factory/Exception.hh
-     *  \brief Exception thrown when invalid values are given to initialize a Pool.
+     *  \brief Destructor of PoolNotInitializedException.
      */
-    class PoolInvalidArgumentsException :public fwk::Exception {
-    public:
-      /**
-       *  \brief Constructor of PoolInvalidArgumentsException.
-       *  \param message the error message.
-       */
-      PoolInvalidArgumentsException(const std::string& message) noexcept;
+    virtual ~PoolNotInitializedException(void) noexcept;
+  };
 
-      /**
-       *  \brief Destructor of PoolInvalidArgumentsException.
-       */
-      virtual ~PoolInvalidArgumentsException(void) noexcept;
-    };
+  /**
+   *  \class PoolInvalidArgumentsException Library/Factory/Exception.hh
+   *  \brief Exception thrown when invalid values are given to initialize a Pool.
+   */
+  class PoolInvalidArgumentsException :public fwk::Exception {
+  public:
+    /**
+     *  \brief Constructor of PoolInvalidArgumentsException.
+     *  \param message the error message.
+     */
+    PoolInvalidArgumentsException(const std::string& message) noexcept;
 
     /**
-     *  \class PoolMemoryExhaustedException Library/Factory/Exception.hh
-     *  \brief Exception thrown when catching a std::bad_alloc exception.
+     *  \brief Destructor of PoolInvalidArgumentsException.
      */
-    class PoolMemoryExhaustedException :public fwk::Exception {
-    public:
-      /**
-       *  \brief Constructor of PoolMemoryExhaustedException.
-       *  \param message the error message.
-       */
-      PoolMemoryExhaustedException(const std::string& message) noexcept;
+    virtual ~PoolInvalidArgumentsException(void) noexcept;
+  };
 
-      /**
-       *  \brief Destructor of PoolMemoryExhaustedException.
-       */
-      virtual ~PoolMemoryExhaustedException(void) noexcept;
-    };
-  }
+  /**
+   *  \class PoolMemoryExhaustedException Library/Factory/Exception.hh
+   *  \brief Exception thrown when catching a std::bad_alloc exception.
+   */
+  class PoolMemoryExhaustedException :public fwk::Exception {
+  public:
+    /**
+     *  \brief Constructor of PoolMemoryExhaustedException.
+     *  \param message the error message.
+     */
+    PoolMemoryExhaustedException(const std::string& message) noexcept;
+
+    /**
+     *  \brief Destructor of PoolMemoryExhaustedException.
+     */
+    virtual ~PoolMemoryExhaustedException(void) noexcept;
+  };
 }
 
 #endif    /* __LIBRARY_FACTORY_EXCEPTION_HH__ */

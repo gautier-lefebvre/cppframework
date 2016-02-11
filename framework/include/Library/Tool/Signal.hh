@@ -7,14 +7,14 @@
 
 #include  "Library/Collection/BidiMap.hpp"
 #include  "Library/DesignPattern/Singleton.hpp"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 
 namespace fwk {
   /**
    *  \class Signal Library/Tool/Signal.hh
    *  \brief A singleton class used to catch system signals.
    */
-  class Signal :public Singleton<fwk::Signal>, public Threading::Lockable {
+  class Signal :public Singleton<fwk::Signal>, public Lockable {
     friend class Singleton<fwk::Signal>;
   public:
     /**

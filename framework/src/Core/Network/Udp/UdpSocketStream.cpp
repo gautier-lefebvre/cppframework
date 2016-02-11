@@ -7,7 +7,8 @@ using namespace fwk;
 
 UdpSocketStream::UdpSocketStream(void):
   AUdpSocketIO(),
-  AUdpSocket()
+  AUdpSocket(),
+  APooled<UdpSocketStream>()
 {}
 
 UdpSocketStream::~UdpSocketStream(void) {

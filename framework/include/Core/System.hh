@@ -6,8 +6,8 @@
 #include  <initializer_list>
 
 #include  "Library/Property/AEndable.hh"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
 #include  "Library/Tool/Logger.hpp"
 
 /**
@@ -20,7 +20,7 @@ namespace fwk {
    *  \class System Core/System.hh
    *  \brief Main class of the framework (intended to be singleton).
    */
-  class System :public Threading::Lockable, public AEndable {
+  class System :public Lockable, public AEndable {
   private:
     /**
      *  \class Modules Core/System.hh
@@ -34,7 +34,7 @@ namespace fwk {
     };
 
   public:
-    Threading::Condition    _endCondition; /*!< the condition variable on which the main thread will wait until its end method is called. */
+    Notifiable _endCondition; /*!< the condition variable on which the main thread will wait until its end method is called. */
     std::map<Modules, bool> _modulesInitialized; /*!< state of initialization of each module. */
 
   public:

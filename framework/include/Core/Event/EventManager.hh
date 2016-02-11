@@ -5,7 +5,7 @@
 #include  <unordered_map>
 
 #include  "Library/DesignPattern/Singleton.hpp"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 #include  "Core/Event/EventInfo.hh"
 #include  "Core/Event/Exception.hh"
 
@@ -14,7 +14,7 @@ namespace fwk {
    *  \class EventManager Core/Event/EventManager.hh
    *  \brief Singleton class used to register events and subscribe to them.
    */
-  class EventManager :public Singleton<fwk::EventManager>, public Threading::Lockable {
+  class EventManager :public Singleton<fwk::EventManager>, public Lockable {
     friend class Singleton<fwk::EventManager>;
   private:
     std::unordered_map<const EventHandle*, EventInfo>  _events; /*!< registered events and their related information. */

@@ -13,8 +13,7 @@
 using namespace fwk;
 
 TcpSocket::TcpSocket(void):
-  Factory::AFactored(),
-  Threading::Lockable(),
+  Lockable(),
   _fd(-1)
 {}
 

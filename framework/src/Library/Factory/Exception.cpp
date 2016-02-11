@@ -2,20 +2,20 @@
 
 using namespace fwk;
 
-Factory::PoolNotInitializedException::PoolNotInitializedException(const std::string& msg) noexcept:
-  ::Exception(msg)
+PoolNotInitializedException::PoolNotInitializedException(const std::string& msg) noexcept:
+  Exception(msg)
 {}
 
-Factory::PoolNotInitializedException::~PoolNotInitializedException() {}
+PoolNotInitializedException::~PoolNotInitializedException() {}
 
-Factory::PoolInvalidArgumentsException::PoolInvalidArgumentsException(const std::string& msg) noexcept:
-  ::Exception(msg)
+PoolInvalidArgumentsException::PoolInvalidArgumentsException(const std::string& msg) noexcept:
+  Exception(msg)
 {}
 
-Factory::PoolInvalidArgumentsException::~PoolInvalidArgumentsException() {}
+PoolInvalidArgumentsException::~PoolInvalidArgumentsException() {}
 
-Factory::PoolMemoryExhaustedException::PoolMemoryExhaustedException(const std::string& msg) noexcept:
-  ::Exception(msg)
+PoolMemoryExhaustedException::PoolMemoryExhaustedException(const std::string& msg) noexcept:
+  Exception(msg)
 {}
 
-Factory::PoolMemoryExhaustedException::~PoolMemoryExhaustedException() {}
+PoolMemoryExhaustedException::~PoolMemoryExhaustedException() {}

@@ -1,7 +1,7 @@
 #ifndef   __CORE_NETWORK_UDP_UDPSOCKETSTREAM_HH__
 #define   __CORE_NETWORK_UDP_UDPSOCKETSTREAM_HH__
 
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Factory/APooled.hpp"
 #include  "Core/Network/Udp/AUdpSocketIO.hh"
 #include  "Core/Network/Udp/AUdpSocket.hh"
 
@@ -10,7 +10,7 @@ namespace fwk {
    *  \class UdpSocketStream Core/Network/UDP/UdpSocketStream.hh
    *  \brief A UDP client socket ("connected" to a remote server).
    */
-  class UdpSocketStream: public AUdpSocketIO, public AUdpSocket, public Factory::TPooled<UdpSocketStream, 2, 1> {
+  class UdpSocketStream: public AUdpSocketIO, public AUdpSocket, public APooled<UdpSocketStream> {
   public:
     /**
      *  \brief Constructor of UdpSocketStream.

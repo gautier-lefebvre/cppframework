@@ -5,14 +5,13 @@
 #include  <string>
 
 #include  "Library/Collection/ByteArray.hpp"
-#include  "Library/Factory/AFactored.hh"
 
 namespace fwk {
   /**
    *  \class AHttpMessage Core/Network/Http/AHttpMessage.hh
    *  \brief Superclass of Requests and Responses.
    */
-  struct AHttpMessage :public Factory::AFactored {
+  struct AHttpMessage {
   public:
     std::string  version; /*!< HTTP version of the request. Default is 1.1 */
     std::map<std::string, std::string>  headers; /*!< headers of the request. */

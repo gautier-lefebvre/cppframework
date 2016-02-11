@@ -10,7 +10,7 @@
 
 #include  "Library/Collection/BidiMap.hpp"
 #include  "Library/DesignPattern/Singleton.hpp"
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 #include  "Library/Tool/Date.hh"
 
 namespace fwk {
@@ -18,7 +18,7 @@ namespace fwk {
    *  \class Logger Library/Tool/Logger.hpp
    *  \brief A logger class, which can write logs to a file or to the terminal output.
    */
-  class Logger :public Threading::Lockable {
+  class Logger :public Lockable {
   public:
     /*! Logging levels. */
     enum class Level {
@@ -165,7 +165,7 @@ namespace fwk {
    *  \class LoggerManager Library/Tool/Logger.hpp
    *  \brief Loggers module.
    */
-  class LoggerManager :public Singleton<fwk::LoggerManager>, public Threading::Lockable {
+  class LoggerManager :public Singleton<fwk::LoggerManager>, public Lockable {
     friend class Singleton<fwk::LoggerManager>;
   public:
     typedef std::unordered_map<std::string, Logger> NameLoggerMap;

@@ -30,6 +30,7 @@ namespace fwk {
      */
     bool  isInitialized(void) const;
 
+  protected:
     /**
      *  \brief Changes the init state of the object.
      *  \param state the new state.

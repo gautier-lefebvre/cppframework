@@ -6,8 +6,7 @@
 #include  <map>
 
 #include  "Library/Collection/BidiMap.hpp"
-#include  "Library/Factory/AFactored.hh"
-#include  "Library/Factory/Pool.hpp"
+#include  "Library/Factory/APooled.hpp"
 
 namespace fwk {
   /**
@@ -19,7 +18,7 @@ namespace fwk {
      *  \class EasyHandle Library/Network/CURL/EasyHandle.hh
      *  \brief Encapsulation of CURL easy handle functions.
      */
-    class EasyHandle :public Factory::AFactored, public Factory::TPooled<curlxx::EasyHandle, 10, 2> {
+    class EasyHandle :public APooled<curlxx::EasyHandle> {
     private:
       CURL*       _handle; /*!< the curl easy handle object. */
       curl_slist* _headers; /*!< the headers of the current request. */

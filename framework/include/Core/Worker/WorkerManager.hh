@@ -6,8 +6,8 @@
 
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
-#include  "Library/Threading/Lock.hpp"
-#include  "Library/Threading/Condition.hpp"
+#include  "Library/Threading/Lockable.hpp"
+#include  "Library/Threading/Notifiable.hpp"
 #include  "Core/Event/EventHandle.hh"
 #include  "Core/Event/IEventArgs.hh"
 #include  "Core/Worker/Task.hh"
@@ -18,11 +18,11 @@ namespace fwk {
    *  \class WorkerManager Core/Worker/WorkerManager.hh
    *  \brief Singleton class handling worker threads.
    */
-  class WorkerManager :public Singleton<fwk::WorkerManager>, public Threading::Lockable, public AEndable {
+  class WorkerManager :public Singleton<fwk::WorkerManager>, public Lockable, public AEndable {
     friend class Singleton<fwk::WorkerManager>;
   public:
-    typedef Threading::TNotifiable<std::queue<ATask*>>  TaskQueue;
-    typedef Threading::TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue;
+    typedef TNotifiable<std::queue<ATask*>>  TaskQueue;
+    typedef TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue;
 
   private:
     TaskQueue _pendingTasks; /*!< tasks to execute. */

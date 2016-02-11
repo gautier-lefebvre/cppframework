@@ -1,46 +1,46 @@
-#include  "Library/Threading/Lock.hpp"
+#include  "Library/Threading/Lockable.hpp"
 #include  "Library/Tool/Logger.hpp"
 
 using namespace fwk;
 
-Threading::Lockable::Lockable(void):
+Lockable::Lockable(void):
   _lock()
 {}
 
-Threading::Lockable::~Lockable(void) {}
+Lockable::~Lockable(void) {}
 
-void  Threading::Lockable::lock(void) {
+void  Lockable::lock(void) {
   this->_lock.lock();
 }
 
-void  Threading::Lockable::unlock(void) {
+void  Lockable::unlock(void) {
   this->_lock.unlock();
 }
 
-Threading::ReadWriteLock::WriterGuard::WriterGuard(Threading::ReadWriteLock *lock):
+ReadWriteLock::WriterGuard::WriterGuard(ReadWriteLock *lock):
   _lock(lock) {
   this->_lock->writerAcquire();
 }
 
-Threading::ReadWriteLock::WriterGuard::~WriterGuard(void) {
+ReadWriteLock::WriterGuard::~WriterGuard(void) {
   this->_lock->writerRelease();
 }
 
-Threading::ReadWriteLock::ReaderGuard::ReaderGuard(Threading::ReadWriteLock *lock):
+ReadWriteLock::ReaderGuard::ReaderGuard(ReadWriteLock *lock):
   _lock(lock) {
   this->_lock->readerAcquire();
 }
 
-Threading::ReadWriteLock::ReaderGuard::~ReaderGuard(void) {
+ReadWriteLock::ReaderGuard::~ReaderGuard(void) {
   this->_lock->readerRelease();
 }
 
-Threading::ReadWriteLock::LightSwitch::LightSwitch(void):
+ReadWriteLock::LightSwitch::LightSwitch(void):
   _mutex(),
   _counter(0)
 {}
 
-void Threading::ReadWriteLock::LightSwitch::acquire(std::mutex& lock) {
+void ReadWriteLock::LightSwitch::acquire(std::mutex& lock) {
   SCOPELOCK_MUTEX(this->_mutex);
   this->_counter++;
   if (this->_counter == 1) {
@@ -48,7 +48,7 @@ void Threading::ReadWriteLock::LightSwitch::acquire(std::mutex& lock) {
   }
 }
 
-void Threading::ReadWriteLock::LightSwitch::release(std::mutex& lock) {
+void ReadWriteLock::LightSwitch::release(std::mutex& lock) {
   SCOPELOCK_MUTEX(this->_mutex);
   this->_counter--;
   if (this->_counter == 0) {
@@ -56,7 +56,7 @@ void Threading::ReadWriteLock::LightSwitch::release(std::mutex& lock) {
   }
 }
 
-Threading::ReadWriteLock::ReadWriteLock(void):
+ReadWriteLock::ReadWriteLock(void):
   _readSwitch(),
   _writeSwitch(),
   _noReaders(),
@@ -64,7 +64,7 @@ Threading::ReadWriteLock::ReadWriteLock(void):
   _readersQueue()
 {}
 
-void  Threading::ReadWriteLock::readerAcquire(void) {
+void  ReadWriteLock::readerAcquire(void) {
   ScopeLockMutex slr(this->_readersQueue);
   {
     ScopeLockMutex slw(this->_noReaders);
@@ -72,16 +72,16 @@ void  Threading::ReadWriteLock::readerAcquire(void) {
   }
 }
 
-void  Threading::ReadWriteLock::readerRelease(void) {
+void  ReadWriteLock::readerRelease(void) {
   this->_readSwitch.release(this->_noWriters);
 }
 
-void  Threading::ReadWriteLock::writerAcquire(void) {
+void  ReadWriteLock::writerAcquire(void) {
   this->_writeSwitch.acquire(this->_noReaders);
   this->_noWriters.lock();
 }
 
-void  Threading::ReadWriteLock::writerRelease(void) {
+void  ReadWriteLock::writerRelease(void) {
   this->_noWriters.unlock();
   this->_writeSwitch.release(this->_noReaders);
 }
