@@ -1,11 +1,11 @@
-NAME=       cppframework
+DISTDIR=		dist/
+NAME=       $(DISTDIR)cppframework
 
 INCLDIR=    include/
 SRCDIR=     src/
 
 LIBRARYDIR= $(SRCDIR)Library/
 LIBRARYSRC= $(LIBRARYDIR)Collection/ByteArray.cpp                 \
-            $(LIBRARYDIR)Encryption/MD5.cpp                       \
             $(LIBRARYDIR)Encryption/XOR.cpp                       \
             $(LIBRARYDIR)Factory/Exception.cpp                    \
             $(LIBRARYDIR)Network/CURL/EasyHandle.cpp              \
@@ -76,14 +76,14 @@ CXX=        g++
 
 all:        $(NAME)
 
-$(NAME):    debug
+$(NAME):    dll
 
 debug:      CXXFLAGS += -D__DEBUG__
-debug:      compile
+debug:      prog
 
-nodebug:    compile
+nodebug:    prog
 
-compile:    $(OBJPROG)
+prog:       $(OBJPROG)
 			@$(CXX) -o $(NAME) $(OBJPROG) $(LDFLAGS) && echo "Built    $(NAME)"
 
 dll:		CXXFLAGS += -c -fPIC

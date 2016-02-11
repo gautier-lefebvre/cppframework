@@ -1,16 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "Library/Collection/ByteArray.hpp"
-#include "Library/Tool/Converter.hpp"
-#include "Library/Tool/Logger.hpp"
-#include "Library/Tool/Signal.hh"
-#include "Core/System.hh"
-#include "Core/Exception.hh"
-#include "Core/Worker/WorkerManager.hh"
-#include "Core/Network/NetworkManager.hh"
-#include "Core/Network/Http/HttpClient.hh"
-#include "Core/Event/EventManager.hh"
+#include "../../dist/cppframework.hh"
 
 static void tcpServer(fwk::System* system, uint16_t port) {
   int i = 0;
