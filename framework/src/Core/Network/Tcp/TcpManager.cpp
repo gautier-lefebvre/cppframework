@@ -158,7 +158,6 @@ const TcpManager::Client& TcpManager::createClient(const std::string& hostname, 
     socket->init();
     socket->socket();
 
-
     const TcpManager::Client* connection = nullptr;
 
     {
@@ -180,7 +179,7 @@ const TcpManager::Client& TcpManager::createClient(const std::string& hostname, 
 }
 
 void TcpManager::run(const TcpManager::Client& client) {
-    {
+  {
     SCOPELOCK(&(this->_clients));
     auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const TcpManager::Client& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
 

@@ -53,34 +53,60 @@ void UdpManager::clear(void) {
   }
 }
 
-const UdpManager::Server& UdpManager::bind(uint16_t port, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist) {
+const UdpManager::Server& UdpManager::createServer(uint16_t port) {
   UdpSocketServer* socket = UdpSocketServer::getFromPool();
 
   try {
     socket->init();
     socket->socket();
-    socket->bind(port);
-    INFO(fmt::format("UDP: listening on port {0}", port));
+
+    const UdpManager::Server* server = nullptr;
+
+    {
+      SCOPELOCK(&(this->_servers));
+
+      if (std::find_if(this->_servers.begin(), this->_servers.end(), [=] (const UdpManager::Server& s) -> bool { return s.port == port; }) != this->_servers.end()) {
+        throw NetworkException(fmt::format("The port {0} was already associated to a server", port));
+      }
+
+      this->_servers.emplace_back(port, socket);
+      server = &(this->_servers.back());
+    }
+
+    return *server;
   } catch (const NetworkException& e) {
     UdpSocketServer::returnToPool(socket);
     throw e;
   }
+}
 
-  const UdpManager::Server* server = nullptr;
-
+void UdpManager::run(const UdpManager::Server& server) {
   {
     SCOPELOCK(&(this->_servers));
-    this->_servers.emplace_back(port, socket, accept, blacklist);
-    server = &(this->_servers.back());
+    auto serverIt = std::find_if(this->_servers.begin(), this->_servers.end(), [&] (const UdpManager::Server& s) -> bool { return s.port == server.port; });
+
+    if (serverIt != this->_servers.end()) {
+      try {
+        UdpManager::Server& s = (*serverIt);
+        s.server->bind(s.port);
+        s.active = true;
+        INFO(fmt::format("UDP: listening on port {0}", s.port));
+      } catch (const std::exception&) {
+        UdpSocketServer::returnToPool((*serverIt).server);
+        this->_servers.erase(serverIt);
+        throw;
+      }
+    } else {
+      throw NetworkException("This server was never created");
+    }
   }
 
   {
     SCOPELOCK(&(this->_input.condition));
     this->_input.condition.notify();
   }
+} 
 
-  return *server;
-}
 
 void UdpManager::close(uint16_t port) {
   SCOPELOCK(&(this->_servers));
@@ -127,32 +153,53 @@ void UdpManager::blacklist(uint16_t port, uint32_t addr) {
   }
 }
 
-const UdpManager::Client& UdpManager::connect(const std::string& hostname, uint16_t port) {
+const UdpManager::Client& UdpManager::createClient(const std::string& hostname, uint16_t port) {
   UdpSocketStream* socket = UdpSocketStream::getFromPool();
 
   try {
     socket->socket();
     socket->init(hostname, port);
-    INFO(fmt::format("UDP: prepared connection to {0}:{1}", hostname, port));
+
+    const UdpManager::Client* client = nullptr;
+
+    {
+      SCOPELOCK(&(this->_clients));
+
+      if (std::find_if(this->_clients.begin(), this->_clients.end(), [=] (const UdpManager::Client& c) -> bool { return c.hostname == hostname && c.port == port; }) != this->_clients.end()) {
+        throw NetworkException(fmt::format("A client to {0}:{1} already exists", hostname, port));
+      }
+
+      this->_clients.emplace_back(hostname, port, socket);
+      client = &(this->_clients.back());
+    }
+
+    return *client;
   } catch (const NetworkException& e) {
     UdpSocketStream::returnToPool(socket);
     throw e;
   }
+}
 
-  const UdpManager::Client* client = nullptr;
-
+void UdpManager::run(const UdpManager::Client& client) {
   {
     SCOPELOCK(&(this->_clients));
-    this->_clients.emplace_back(hostname, port, socket);
-    client = &(this->_clients.back());
-  }
+    auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const UdpManager::Client& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
 
-  {
-    SCOPELOCK(&(this->_input.condition));
-    this->_input.condition.notify();
-  }
+    if (clientIt != this->_clients.end()) {
+      try {
+        UdpManager::Client& c = (*clientIt);
+        c.active = true;
+        INFO(fmt::format("UDP: prepared connection to {0}:{1}", c.hostname, c.port));
 
-  return *client;
+      } catch (const std::exception&) {
+        delete (*clientIt).socket;
+        this->_clients.erase(clientIt);
+        throw;
+      }
+    } else {
+      throw NetworkException("This client was never created");
+    }
+  }
 }
 
 void UdpManager::close(const std::string& hostname, uint16_t port) {
@@ -239,16 +286,20 @@ void UdpManager::fillSetRead(fd_set& fdset, int& fdmax, uint32_t& nb) {
   {
     SCOPELOCK(&(this->_servers));
     for (auto& server : this->_servers) {
-      server.server->addToSet(fdset, fdmax);
-      nb++;
+      if (server.active) {
+        server.server->addToSet(fdset, fdmax);
+        nb++;
+      }
     }
   }
 
   {
     SCOPELOCK(&(this->_clients));
-    for (auto& connection : this->_clients) {
-      connection.socket->addToSet(fdset, fdmax);
-      nb++;
+    for (auto& client : this->_clients) {
+      if (client.active) {
+        client.socket->addToSet(fdset, fdmax);
+        nb++;
+      }
     }
   }
 }
@@ -258,11 +309,13 @@ void UdpManager::fillSetWrite(fd_set& fdset, int& fdmax, uint32_t& nb) {
     SCOPELOCK(&(this->_servers));
     // for each server -> add to set if at least one client has data to send
     for (auto& server : this->_servers) {
-      for (auto& client : server.clients) {
-        if (client->hasDataToSend()) {
-          server.server->addToSet(fdset, fdmax);
-          nb++;
-          break;
+      if (server.active) {
+        for (auto& client : server.clients) {
+          if (client->hasDataToSend()) {
+            server.server->addToSet(fdset, fdmax);
+            nb++;
+            break;
+          }
         }
       }
     }
@@ -270,9 +323,9 @@ void UdpManager::fillSetWrite(fd_set& fdset, int& fdmax, uint32_t& nb) {
 
   {
     SCOPELOCK(&(this->_clients));
-    for (auto& connection : this->_clients) {
-      if (connection.socket->hasDataToSend()) {
-        connection.socket->addToSet(fdset, fdmax);
+    for (auto& client : this->_clients) {
+      if (client.active && client.socket->hasDataToSend()) {
+        client.socket->addToSet(fdset, fdmax);
         nb++;
       }
     }
@@ -283,7 +336,7 @@ void UdpManager::send(fd_set& set) {
   {
     SCOPELOCK(&(this->_servers));
     for (auto& server : this->_servers) {
-      if (server.server->isset(set)) {
+      if (server.active && server.server->isset(set)) {
         for (auto client_it = server.clients.begin() ; client_it != server.clients.end() ; ++client_it) {
           if ((*client_it)->hasDataToSend()) {
             try {
@@ -303,7 +356,7 @@ void UdpManager::send(fd_set& set) {
   {
     SCOPELOCK(&(this->_clients));
     for (auto client_it = this->_clients.begin() ; client_it != this->_clients.end() ; ++client_it) {
-      if ((*client_it).socket->isset(set)) {
+      if ((*client_it).active && (*client_it).socket->isset(set)) {
         try {
           (*client_it).socket->sendto();
         } catch (const NetworkException& e) {
@@ -323,7 +376,7 @@ void UdpManager::recv(fd_set& set) {
     sockaddr_in addr;
 
     for (auto& server : this->_servers) {
-      if (server.server->isset(set)) {
+      if (server.active && server.server->isset(set)) {
         memset(&addr, 0, sizeof(sockaddr_in)); // reinit the addr in order not to remove a valid client because of old data
         ByteArray* datagram = nullptr;
         bool success = true; // true -> recvfrom did not except / false -> recvfrom did except
@@ -395,7 +448,7 @@ void UdpManager::recv(fd_set& set) {
   {
     SCOPELOCK(&(this->_clients));
     for (auto client_it = this->_clients.begin() ; client_it != this->_clients.end() ; ++client_it) {
-      if ((*client_it).socket->isset(set)) {
+      if ((*client_it).active && (*client_it).socket->isset(set)) {
         try {
           // receive data
           (*client_it).socket->recvfrom();
@@ -451,13 +504,14 @@ void UdpManager::__fireEvent(EventHandle* event, UdpSocketClient* socket) const 
  *  Server
  */
 
-UdpManager::Server::Server(uint16_t port, UdpSocketServer* server, const std::set<uint32_t>& accept, const std::set<uint32_t>& blacklist):
+UdpManager::Server::Server(uint16_t port, UdpSocketServer* server):
   Lockable(),
   port(port),
   server(server),
   clients(),
-  accept(accept),
-  blacklist(blacklist),
+  accept(),
+  blacklist(),
+  active(false),
   events({
     EventHandle::getFromPool(),
     EventHandle::getFromPool(),
@@ -493,6 +547,7 @@ UdpManager::Client::Client(const std::string& hostname, uint16_t port, UdpSocket
   hostname(hostname),
   port(port),
   socket(socket),
+  active(false),
   events({
     EventHandle::getFromPool(),
     EventHandle::getFromPool()

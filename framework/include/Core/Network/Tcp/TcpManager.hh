@@ -143,7 +143,7 @@ namespace fwk {
        *  \param port the port of the TCP socket.
        *  \param socket the connected socket.
        */
-      Client(const std::string&, uint16_t, TcpSocketStream*);
+      Client(const std::string& hostname, uint16_t port, TcpSocketStream* socket);
 
       /**
        *  \brief Destructor of Client.

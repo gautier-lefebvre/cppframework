@@ -70,27 +70,29 @@ static void udpServer(fwk::System* system, uint16_t port) {
   int i = 0;
 
   try {
-    const fwk::UdpManager::Server& server = fwk::NetworkManager::get().getUDP().bind(port);
+    const fwk::UdpManager::Server& server = fwk::NetworkManager::get().getUDP().createServer(port);
 
     // on accept new socket callback
-    fwk::EventManager::get().subscribeToEvent(server.events.onNewClient, [] (const fwk::IEventArgs *) {
+    server.events.onNewClient->subscribe([] (const fwk::IEventArgs *) {
       INFO("New client connected");
     }, &i);
 
     // on received data callback
-    fwk::EventManager::get().subscribeToEvent(server.events.onReceivedData, [] (const fwk::IEventArgs *) {
+    server.events.onReceivedData->subscribe([] (const fwk::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
     // on client closed callback
-    fwk::EventManager::get().subscribeToEvent(server.events.onClientClosed, [] (const fwk::IEventArgs *) {
+    server.events.onClientClosed->subscribe([] (const fwk::IEventArgs *) {
       INFO("Client closed");
     }, &i);
 
     // on server closed callback
-    fwk::EventManager::get().subscribeToEvent(server.events.onClosed, [] (const fwk::IEventArgs *) {
+    server.events.onClosed->subscribe([] (const fwk::IEventArgs *) {
       INFO("Server closed");
     }, &i);
+
+    fwk::NetworkManager::get().getUDP().run(server);
 
     system->run();
   } catch (const fwk::CoreException& e) {
@@ -102,16 +104,18 @@ static void udpClient(fwk::System* system, const std::string& hostname, uint16_t
   try {
     int i = 0;
 
-    const fwk::UdpManager::Client& client = fwk::NetworkManager::get().getUDP().connect(hostname, port);
+    const fwk::UdpManager::Client& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
 
-    fwk::EventManager::get().subscribeToEvent(client.events.onReceivedData, [] (const fwk::IEventArgs *) {
+    client.events.onReceivedData->subscribe([] (const fwk::IEventArgs *) {
       INFO("Received data");
     }, &i);
 
-    fwk::EventManager::get().subscribeToEvent(client.events.onClosed, [] (const fwk::IEventArgs *) {
+    client.events.onClosed->subscribe([] (const fwk::IEventArgs *) {
       INFO("Connection closed");
     }, &i);
     
+    fwk::NetworkManager::get().getUDP().run(client);
+
     fwk::NetworkManager::get().getUDP().push(client.socket, (void*)"Hello", 5);
 
     system->run();

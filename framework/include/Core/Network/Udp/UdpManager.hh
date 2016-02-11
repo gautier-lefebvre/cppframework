@@ -127,6 +127,7 @@ namespace fwk {
       TLockable<std::list<UdpSocketClient*>> clients; /*!< list of known clients to this server */
       std::set<uint32_t> accept; /*!< accepted IPs */
       std::set<uint32_t> blacklist; /*!< rejected IPs */
+      bool active; /*!< the server is running. */
 
       struct Events {
         EventHandle* onNewClient; /*!< Event fired whenever a new client sends a message to this server. Event argument type: UdpSocketClientEventArgs. */
@@ -143,7 +144,7 @@ namespace fwk {
        *  \param accept list of IPs accepted by this server.
        *  \param blacklist list of IPs rejected by this server.
        */
-      Server(uint16_t port, UdpSocketServer* server, const std::set<uint32_t>& accept = {}, const std::set<uint32_t>& blacklist = {});
+      Server(uint16_t port, UdpSocketServer* server);
 
       /**
        *  \brief Destructor of Server.
@@ -161,6 +162,7 @@ namespace fwk {
       std::string hostname; /*!< hostname of the UDP socket this client sends messages to */
       uint16_t port; /*!< port of the UDP socket this client sends messages to */
       UdpSocketStream *socket; /*!< socket */
+      bool active; /*!< the client is running. */
 
       struct Events {
         EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: UdpSocketStreamEventArgs. */
@@ -221,7 +223,14 @@ namespace fwk {
      *  \param blacklist the IPs to blacklist.
      *  \return the server.
      */
-    const Server&  bind(uint16_t port, const std::set<uint32_t>& accept = {}, const std::set<uint32_t>& blacklist = {});
+    const Server&  createServer(uint16_t port);
+
+    /**
+     *  \brief Binds the server on the given port and makes it listen for clients.
+     *  \throw NetworkException can't bind the server port.
+     *  \param server the server to launch.
+     */
+    void run(const Server& server);
 
     /**
      *  \brief Close the socket bound to a specific port and all its clients.
@@ -244,12 +253,18 @@ namespace fwk {
 
   public:
     /**
-     *  \brief connect to a remote UDP server.
+     *  \brief create a UDP client to send datagrams to a remote UDP server.
      *  \param hostname hostname of the UDP server to connect to.
      *  \param port port of the UDP server to connect to.
      *  \return the client.
      */
-    const Client&  connect(const std::string& hostname, uint16_t port);
+    const Client&  createClient(const std::string& hostname, uint16_t port);
+
+    /**
+     *  \brief Make the client start sending datagrams.
+     *  \param client the client.
+     */
+    void run(const Client& client);
 
     /**
      *  \brief Close the socket connected to a specific hostname:port.
