@@ -44,6 +44,7 @@ void  HttpConnection::end(void) {
       try {
         this->_thread->join();
         delete this->_thread;
+        this->_thread = nullptr;
       } catch (const std::system_error& e) {
         ERROR(e.what());
       }
@@ -63,7 +64,9 @@ void  HttpConnection::end(void) {
 void  HttpConnection::run(void) {
   SCOPELOCK(this);
   try {
-    this->_thread = new std::thread(&HttpConnection::routine, this);
+    if (this->_thread == nullptr) {
+      this->_thread = new std::thread(&HttpConnection::routine, this);
+    }
   } catch (const std::system_error& e) {
     throw NetworkException(e.what());
   }

@@ -168,6 +168,8 @@ static void http(fwk::System* system) {
 
   fwk::HttpClient::get().sendRequest(connection, request);
 
+  connection->run();
+
   system->run();
 }
 

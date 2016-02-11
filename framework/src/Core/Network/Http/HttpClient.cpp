@@ -63,11 +63,10 @@ HttpConnection * HttpClient::initConnection(const std::string& host, uint16_t po
     }
 
     this->_connections.push_back(connection);
-    connection->run();
     return connection;
-  } catch (const NetworkException& e) {
+  } catch (const std::exception&) {
     delete connection;
-    throw e;
+    throw;
   }
 }
 

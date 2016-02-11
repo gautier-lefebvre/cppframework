@@ -62,12 +62,11 @@ namespace fwk {
     void  init(const std::string& user_agent);
 
     /**
-     *  \brief Creates a new connection.
+     *  \brief Creates a new connection. Requests will not be sent until connection->run() is called.
      *
      *  If a connection to this host/port/protocol already exists,
      *  this returns the existing connection, but does not change the pipelining parameter.
      *
-     *  \throw NetworkException if the connection to the server could not be initialized (i.e. the thread did not launch).
      *  \param hostname hostname of the HTTP server.
      *  \param port port of the HTTP server.
      *  \param protocol protocol used (HTTP/HTTPS/FTP).
