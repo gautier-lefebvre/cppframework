@@ -10,6 +10,10 @@
 #include  "Core/Network/Udp/UdpManager.hh"
 
 namespace fwk {
+  /**
+   *  \class NetworkManager Core/Network/NetworkManager.hh
+   *  \brief Singleton class handling I/O operations on UDP and TCP networks.
+   */
   class NetworkManager :public Singleton<fwk::NetworkManager>, public Lockable, public AEndable, public Initializable {
     friend class Singleton<fwk::NetworkManager>;
   public:
