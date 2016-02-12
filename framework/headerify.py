@@ -50,7 +50,6 @@ class Prog:
     self.commentRegex = re.compile(r'\/\*.*\*\/')
 
   def clean(self):
-    print("CLOSING FILE")
     self.header.close()
 
   def endswith(self, pattern, extensions):
@@ -71,8 +70,6 @@ class Prog:
   def insert_file(self, file):
     if file in self.files_included:
       return
-
-    print("Including {0}".format(file))
 
     self.files_included.append(file)
 
