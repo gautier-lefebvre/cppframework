@@ -345,15 +345,15 @@ namespace fwk {
     return (os);
   }
 
-  typedef    Array2<int32_t>   Array2i;
-  typedef    Array2<float>     Array2f;
-  typedef    Array2<double>    Array2d;
-  typedef    Array2<uint32_t>  Array2u;
+  typedef    Array2<int32_t>   Array2i; /*!< Array2 of int32_t. */
+  typedef    Array2<float>     Array2f; /*!< Array2 of float. */
+  typedef    Array2<double>    Array2d; /*!< Array2 of double. */
+  typedef    Array2<uint32_t>  Array2u; /*!< Array2 of uint32_t. */
 
-  typedef    Array3<int32_t>   Array3i;
-  typedef    Array3<float>     Array3f;
-  typedef    Array3<double>    Array3d;
-  typedef    Array3<uint32_t>  Array3u;
+  typedef    Array3<int32_t>   Array3i; /*!< Array3 of int32_t. */
+  typedef    Array3<float>     Array3f; /*!< Array3 of float. */
+  typedef    Array3<double>    Array3d; /*!< Array3 of double. */
+  typedef    Array3<uint32_t>  Array3u; /*!< Array3 of uint32_t. */
 }
 
 #endif    /* __LIBRARY_COLLECTION_ARRAY_HPP__ */

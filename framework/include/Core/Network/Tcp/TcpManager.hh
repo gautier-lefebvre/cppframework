@@ -14,7 +14,7 @@
 
 namespace fwk {
   /**
-   *  \class TcpSocketStreamEventArgs Core/Network/Tcp/Manager.hh
+   *  \class TcpSocketStreamEventArgs Core/Network/Tcp/TcpManager.hh
    *  \brief Used when firing an event sending a TcpSocketStream as argument.
    */
   struct TcpSocketStreamEventArgs :public IEventArgs, public APooled<TcpSocketStreamEventArgs> {
@@ -46,7 +46,7 @@ namespace fwk {
   };
 
   /**
-   *  \class TcpSocketEventArgs Core/Network/Tcp/Manager.hh
+   *  \class TcpSocketEventArgs Core/Network/Tcp/TcpManager.hh
    *  \brief Used when firing an event sending a TcpSocket as argument.
    */
   struct TcpSocketEventArgs :public IEventArgs, public APooled<TcpSocketEventArgs> {
@@ -96,7 +96,7 @@ namespace fwk {
       std::set<uint32_t> blacklist; /*!< rejected IPs. */
       bool active; /*!< the server is running. */
 
-      struct Events {
+      struct {
         EventHandle* onAccept; /*!< Event fired whenever a new client connects to this server. Event argument type: TcpSocketStreamEventArgs. */
         EventHandle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: TcpSocketStreamEventArgs. */
         EventHandle* onClientClosed; /*!< Event fired whenever a client of this server closes. Event argument type: TcpSocketStreamEventArgs. */
@@ -108,8 +108,6 @@ namespace fwk {
        *  \brief Constructor of Server.
        *  \param port bound port.
        *  \param server socket listening to the bound port.
-       *  \param accept list of IPs accepted by this server.
-       *  \param blacklist list of IPs rejected by this server.
        */
       Server(uint16_t port, TcpSocket* server);
 
@@ -121,7 +119,7 @@ namespace fwk {
 
   public:
     /**
-     *  \class Client Core/Network/Tcp/Manager.hh
+     *  \class Client Core/Network/Tcp/TcpManager.hh
      *  \brief TCP client.
      */
     struct Client :public Lockable {
@@ -131,7 +129,7 @@ namespace fwk {
       TcpSocketStream *socket; /*!< connected socket. */
       bool active; /*!< the client is running. */
 
-      struct Events {
+      struct {
         EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: TcpSocketStreamEventArgs. */
         EventHandle* onClosed; /*!< Event fired when this socket is closed. Event argument type: TcpSocketStreamEventArgs. */
       } events; /*!< events for this client */
@@ -152,8 +150,8 @@ namespace fwk {
     };
 
   public:
-    typedef TLockable<std::list<Server>> ServerList;
-    typedef TLockable<std::list<Client>> ClientList;
+    typedef TLockable<std::list<Server>> ServerList; /*!< lockable list of TcpManager::Server. */
+    typedef TLockable<std::list<Client>> ClientList; /*!< lockable list of TcpManager:Client. */
 
   private:
     ServerList _servers; /*!< bound servers. */
@@ -286,7 +284,7 @@ namespace fwk {
      *  \brief Read from every socket in the set.
      *  \param set the set.
      */
-    void  recv(fd_set&);
+    void  recv(fd_set& set);
 
   private:
     /**

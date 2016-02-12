@@ -10,7 +10,7 @@
 
 namespace fwk {
   /**
-   *  \namespace curlxx
+   *  \namespace fwk::curlxx
    *  \brief CURL library encapsulation
    */
   namespace curlxx {

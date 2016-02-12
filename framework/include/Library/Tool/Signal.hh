@@ -18,7 +18,7 @@ namespace fwk {
     friend class Singleton<fwk::Signal>;
   public:
     /**
-     *  \class Type Library/Tool/Signal.hh
+     *  \enum Type Library/Tool/Signal.hh
      *  \brief Enumerations of system signals.
      */
     enum class Type {

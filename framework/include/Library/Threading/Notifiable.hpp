@@ -116,14 +116,14 @@ namespace fwk {
   };
 
   /**
-   *  \class TNotifiableThread Library/Threading/Notifiable.hpp
+   *  \class NotifiableThread Library/Threading/Notifiable.hpp
    *  \brief A struct containing a pointer to a thread, and a Notifiable.
    *
    *  I'm not using Notifiable<std::thread*> because I'm not sure of everything this implies.
    */
   struct NotifiableThread {
-    std::thread* thread;
-    Notifiable   condition;
+    std::thread* thread; /*!< the thread. */
+    Notifiable   condition; /*!< the condition variable. */
   };
 }
 

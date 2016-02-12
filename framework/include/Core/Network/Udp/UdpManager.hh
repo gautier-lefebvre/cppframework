@@ -129,7 +129,7 @@ namespace fwk {
       std::set<uint32_t> blacklist; /*!< rejected IPs */
       bool active; /*!< the server is running. */
 
-      struct Events {
+      struct {
         EventHandle* onNewClient; /*!< Event fired whenever a new client sends a message to this server. Event argument type: UdpSocketClientEventArgs. */
         EventHandle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: UdpSocketClientEventArgs. */
         EventHandle* onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. Event argument type: UdpSocketClientEventArgs. */
@@ -141,8 +141,6 @@ namespace fwk {
        *  \brief Constructor of Server.
        *  \param port bound port.
        *  \param server socket listening to the bound port.
-       *  \param accept list of IPs accepted by this server.
-       *  \param blacklist list of IPs rejected by this server.
        */
       Server(uint16_t port, UdpSocketServer* server);
 
@@ -164,7 +162,7 @@ namespace fwk {
       UdpSocketStream *socket; /*!< socket */
       bool active; /*!< the client is running. */
 
-      struct Events {
+      struct {
         EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: UdpSocketStreamEventArgs. */
         EventHandle* onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. Event argument type: UdpSocketStreamEventArgs. */
       } events; /*!< events for this client */
@@ -185,8 +183,8 @@ namespace fwk {
     };
 
   public:
-    typedef TLockable<std::list<Server>> ServerList;
-    typedef TLockable<std::list<Client>> ClientList;
+    typedef TLockable<std::list<Server>> ServerList; /*!< lockable list of UdpManager::Server. */
+    typedef TLockable<std::list<Client>> ClientList; /*!< lockable list of UdpManager::Client. */
 
   private:
     ServerList _servers; /*!< bound servers. */
@@ -219,8 +217,6 @@ namespace fwk {
      *  \brief Bind a socket to a specific port.
      *  \throw NetworkException can't bind this port.
      *  \param port the port to bind.
-     *  \param accept the IPs to accept. Leave empty to accept any.
-     *  \param blacklist the IPs to blacklist.
      *  \return the server.
      */
     const Server&  createServer(uint16_t port);
@@ -322,7 +318,7 @@ namespace fwk {
      *  \brief Read from every socket in the set.
      *  \param set the set.
      */
-    void  recv(fd_set&);
+    void  recv(fd_set& set);
 
   private:
     /**

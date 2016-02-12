@@ -7,7 +7,7 @@
 
 namespace fwk {
   /**
-   *  \class APooled Library/Factory/APooled.hh
+   *  \class APooled Library/Factory/APooled.hpp
    *  \brief base class from which any object that will be pooled must inherit.
    */
   template<class C>
@@ -18,6 +18,8 @@ namespace fwk {
   public:
     /**
      *  \brief Initializes the pool if it was not already created.
+     *  \param originalSize number of objects created right away.
+     *  \param hydrateSize number of objects created when the pool is empty.
      *  \param className the stored objects' class name.
      */
     static void  initPool(size_t originalSize, size_t hydrateSize, const std::string& className) {

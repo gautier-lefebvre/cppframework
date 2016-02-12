@@ -168,7 +168,7 @@ namespace fwk {
   class LoggerManager :public Singleton<fwk::LoggerManager>, public Lockable {
     friend class Singleton<fwk::LoggerManager>;
   public:
-    typedef std::unordered_map<std::string, Logger> NameLoggerMap;
+    typedef std::unordered_map<std::string, Logger> NameLoggerMap; /*!< map Logger name to Logger. */
 
   private:
     NameLoggerMap _loggers; /*!< Current list of loggers. */
@@ -211,6 +211,7 @@ namespace fwk {
      *  \brief Gets the Logger matching the specified name, or creates it and returns it if asked.
      *  \throw std::out_of_range if create is false and the logger was not initialized.
      *  \param name the logger name.
+     *  \param create if true, will create the Logger if it does not exist.
      *  \return the logger.
      */
     Logger&  getLogger(const std::string& name, bool create = false);

@@ -159,7 +159,7 @@ namespace fwk {
     /**
      *  \brief Adds a list of incompatible flags.
      *
-     *  \exception ::Exception thrown if one of the flag is not in the expected list.
+     *  \exception Exception thrown if one of the flag is not in the expected list.
      *  \param incompatible Incompatible flags.
      */
     void  incompatible(Incompatible* incompatible);
@@ -167,7 +167,7 @@ namespace fwk {
     /**
      *  \brief Adds a list of incompatible flags.
      *
-     *  \exception ::Exception thrown if one of the flag is not in the expected list.
+     *  \exception Exception thrown if one of the flag is not in the expected list.
      *  \param flags list of flags that are mutually incompatible.
      *  \param mandatory \a true if one of the flags must be present in the command line.
      */

@@ -7,7 +7,7 @@
 
 namespace fwk {
   /**
-   *  \class UdpSocketStream Core/Network/UDP/UdpSocketStream.hh
+   *  \class UdpSocketStream Core/Network/Udp/UdpSocketStream.hh
    *  \brief A UDP client socket ("connected" to a remote server).
    */
   class UdpSocketStream: public AUdpSocketIO, public AUdpSocket, public APooled<UdpSocketStream> {

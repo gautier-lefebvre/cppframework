@@ -66,7 +66,7 @@ namespace fwk {
      *  \param task pointer to the SimpleTask.
      *  \param exec true if the task must be executed, or only cleaned if necessary.
      */
-    static void  executeSimpleTask(ATask*, bool exec = true);
+    static void  executeSimpleTask(ATask* task, bool exec = true);
 
     /**
      *  \brief Executes a EventTask task.
@@ -74,7 +74,7 @@ namespace fwk {
      *  \param task pointer to the EventTask.
      *  \param exec true if the task must be executed, or only cleaned if necessary.
      */
-    static void  executeEventTask(ATask*, bool exec = true);
+    static void  executeEventTask(ATask* task, bool exec = true);
 
     /**
      *  \brief Executes a HttpTask task.
@@ -82,7 +82,7 @@ namespace fwk {
      *  \param task pointer to the HttpTask.
      *  \param exec true if the task must be executed, or only cleaned if necessary.
      */
-    static void  executeHttpTask(ATask*, bool exec = true);
+    static void  executeHttpTask(ATask* task, bool exec = true);
 
     /**
      *  \brief Executes a PeriodicTask task.
@@ -90,7 +90,7 @@ namespace fwk {
      *  \param task pointer to the PeriodicTask.
      *  \param exec true if the task must be executed, or only cleaned if necessary.
      */
-    static void  executePeriodicTask(ATask*, bool exec = true);
+    static void  executePeriodicTask(ATask* task, bool exec = true);
   };
 }
 

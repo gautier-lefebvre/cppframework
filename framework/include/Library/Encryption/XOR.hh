@@ -4,6 +4,10 @@
 #include  <cstdint>
 
 namespace fwk {
+  /**
+   *  \namespace fwk::Encryption
+   *  \brief Encryption classes.
+   */
   namespace Encryption {
     /**
      *  \class XOR Library/Encryption/XOR.hh

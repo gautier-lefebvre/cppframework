@@ -94,6 +94,9 @@ dll:         headerify $(OBJDLL)
 headerify:
 			python3 headerify.py
 
+doc:
+			doxygen
+
 %.o:         %.cpp
 			@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
 

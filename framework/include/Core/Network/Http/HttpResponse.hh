@@ -11,7 +11,7 @@ namespace fwk {
    */
   struct HttpResponse :public AHttpMessage, public APooled<HttpResponse> {
     /**
-     *  \class Status Core/Network/Http/HttpResponse.hh
+     *  \enum Status Core/Network/Http/HttpResponse.hh
      *  \brief Meaning of HTTP status.
      */
     enum class Status {

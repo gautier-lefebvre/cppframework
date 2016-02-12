@@ -7,7 +7,7 @@
 
 namespace fwk {
   /**
-   *  \class Protocol Core/Network/Http/HttpProtocol.hh
+   *  \enum HttpProtocol Core/Network/Http/HttpProtocol.hh
    *  \brief protocols used in the http client.
    */
   enum class HttpProtocol {

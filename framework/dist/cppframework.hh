@@ -8141,6 +8141,10 @@ namespace fwk {
 
 
 namespace fwk {
+  /**
+   *  \class NetworkManager Core/Network/NetworkManager.hh
+   *  \brief Singleton class handling I/O operations on UDP and TCP networks.
+   */
   class NetworkManager :public Singleton<fwk::NetworkManager>, public Lockable, public AEndable, public Initializable {
     friend class Singleton<fwk::NetworkManager>;
   public:
@@ -8819,27 +8823,58 @@ namespace fwk {
 
 
 namespace fwk {
+  /**
+   *  \class DelayedTasksThread Core/Worker/DelayedTasksThread.hh
+   *  \brief Singleton class running on a thread and adding delayed tasks to the task queue.
+   */
   class DelayedTasksThread :public Singleton<fwk::DelayedTasksThread>, public Lockable, public AEndable {
     friend class Singleton<fwk::DelayedTasksThread>;
   private:
-    std::thread *_thread;
+    std::thread *_thread; /*!< the thread on which the class runs. */
 
   private:
+    /**
+     *  \brief Deleted copy constructor of DelayedTasksThread.
+     */
     DelayedTasksThread(const DelayedTasksThread&) = delete;
+
+    /**
+     *  \brief Deleted move constructor of DelayedTasksThread.
+     */
     DelayedTasksThread(const DelayedTasksThread&&) = delete;
+
+    /**
+     *  \brief Deleted assignment constructor of DelayedTasksThread.
+     */
     DelayedTasksThread& operator=(const DelayedTasksThread&) = delete;
 
   private:
+    /**
+     *  \brief Constructor of DelayedTasksThread.
+     */
     DelayedTasksThread(void);
+
+    /**
+     *  \brief Destructor of DelayedTasksThread. Ends the thread.
+     */
     virtual ~DelayedTasksThread(void);
 
   public:
+    /**
+     *  \brief Notifies the thread to stop and waits for it to end.
+     */
     virtual void  end(void);
 
   public:
+    /**
+     *  \brief Launch the thread.
+     */
     void  run(void);
 
   private:
+    /**
+     *  \brief Routine run by the thread. Adds DelayedTask objects to the task queue when the delay is over. Ends whenever the end() method is called.
+     */
     void  routine(void) const;
   };
 }
@@ -9477,31 +9512,3 @@ namespace fwk {
   private:
     /**
      *  \brief Constructor of EventManager.
-     */
-    EventManager(void);
-
-    /**
-     *  \brief Destructor of EventManager.
-     */
-    virtual ~EventManager(void);
-
-  public:
-    /**
-     *  \brief Registers an event. An event must be registered before it can be subscribed to.
-     *  \param event the event to register.
-     */
-    void  registerEvent(const EventHandle* event);
-
-    /**
-     *  \brief Unregisters an event.
-     *  \param event the event to unregister.
-     */
-    void  unregisterEvent(const EventHandle* event);
-
-    /**
-     *  \brief Subscribe to an event. An event must be registered before it can be subscribe to.
-     *  \throw EventNotRegisteredException the event is not currently registered.
-     *  \param event the event to subscribe to.
-     *  \param callback the method to call when the event is fired.
-     *  \param key the key of the caller, used to store the callback. The easiest solution is to send the 'this' pointer. No point in subscribing twice to the same event for the same object.
-     *  The argument of the callback must be recasted (using reinterpret_cast) to the subclass of IEventArgs. See the related event to know its true type.

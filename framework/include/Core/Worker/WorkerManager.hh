@@ -21,8 +21,8 @@ namespace fwk {
   class WorkerManager :public Singleton<fwk::WorkerManager>, public Lockable, public AEndable {
     friend class Singleton<fwk::WorkerManager>;
   public:
-    typedef TNotifiable<std::queue<ATask*>>  TaskQueue;
-    typedef TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue;
+    typedef TNotifiable<std::queue<ATask*>>  TaskQueue; /*!< notifiable queue of ATask. */
+    typedef TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
 
   private:
     TaskQueue _pendingTasks; /*!< tasks to execute. */

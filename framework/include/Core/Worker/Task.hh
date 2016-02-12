@@ -17,7 +17,7 @@ namespace fwk {
   class ATask {
   public:
     /**
-     *  \class Source Core/Worker/Task.hh
+     *  \enum Source Core/Worker/Task.hh
      *  \brief Enumerations of tasks.
      */
     enum class Source {
@@ -91,7 +91,7 @@ namespace fwk {
   };
 
   /**
-   *  \class EventTask Core/Worker/Thread.hh
+   *  \class EventTask Core/Worker/Task.hh
    *  \brief A task created when an event is fired.
    */
   class EventTask :public ATask, public APooled<EventTask> {
@@ -207,7 +207,7 @@ namespace fwk {
   };
 
   /**
-   *  \class DelayedTask Core/Worker/Thread.hh
+   *  \class DelayedTask Core/Worker/Task.hh
    *  \brief A task to be executed after a delay.
    */
   class DelayedTask :public APooled<DelayedTask> {

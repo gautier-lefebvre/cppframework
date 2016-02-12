@@ -348,7 +348,7 @@ namespace fwk {
      *  The pointer to the bytearray will be copied.
      *  \param oth the ByteArrayExtractor to copy.
      */
-    ByteArrayExtractor& operator=(const ByteArrayExtractor&);
+    ByteArrayExtractor& operator=(const ByteArrayExtractor& oth);
 
     /**
      *  \brief Destructor of ByteArrayExtractor.

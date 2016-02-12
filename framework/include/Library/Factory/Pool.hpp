@@ -136,6 +136,9 @@ namespace fwk {
       }
     }
 
+    /**
+     *  \brief Empties the Pool, by deleting every object in it.
+     */
     void clear(void) {
       SCOPELOCK(this);
       while (!(this->_pool.empty())) {

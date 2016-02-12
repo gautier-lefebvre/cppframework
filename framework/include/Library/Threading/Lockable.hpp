@@ -5,7 +5,7 @@
 
 namespace fwk {
   /**
-   *  \class Lockable Library/Threading/Lock.hpp
+   *  \class Lockable Library/Threading/Lockable.hpp
    *  \brief A reentrant lock class.
    */
   class  Lockable {
@@ -37,7 +37,7 @@ namespace fwk {
   };
 
   /**
-   *  \class TLockable Library/Threading/Lock.hpp
+   *  \class TLockable Library/Threading/Lockable.hpp
    *  \brief A templated class to use when setting an object lockable.
    *  Can be useful for locking object of the STL, like `TLockable<std::list<int>>`.
    */
@@ -70,13 +70,13 @@ namespace fwk {
   };
 
   /**
-   *  \class ReadWriteLock Library/Threading/Lock.hpp
+   *  \class ReadWriteLock Library/Threading/Lockable.hpp
    *  \brief A reader writer lock with writer priority.
    */
   class  ReadWriteLock {
   public:
     /**
-     *  \class WriterGuard Library/Threading/Lock.hpp
+     *  \class WriterGuard Library/Threading/Lockable.hpp
      *  \brief A guard class which locks a ReadWriteLock as a writer in its constructor and unlocks it in its destructor.
      */
     class WriterGuard {
@@ -97,7 +97,7 @@ namespace fwk {
     };
 
     /**
-     *  \class ReaderGuard Library/Threading/Lock.hpp
+     *  \class ReaderGuard Library/Threading/Lockable.hpp
      *  \brief A guard class which locks a ReadWriteLock as a reader in its constructor and unlocks it in its destructor.
      */
     class ReaderGuard {
@@ -119,7 +119,7 @@ namespace fwk {
 
   private:
     /**
-     *  \class LightSwitch Library/Threading/Lock.hpp
+     *  \class LightSwitch Library/Threading/Lockable.hpp
      *  \brief an object used to count the number of times another mutex was locked.
      */
     class  LightSwitch {
@@ -181,8 +181,8 @@ namespace fwk {
     void  writerRelease(void);
   };
 
-  typedef std::lock_guard<fwk::Lockable> ScopeLock;
-  typedef std::lock_guard<std::mutex>    ScopeLockMutex;
+  typedef std::lock_guard<fwk::Lockable> ScopeLock; /*!< typedef of a lock_guard on a fwk::Lockable. */
+  typedef std::lock_guard<std::mutex>    ScopeLockMutex; /*!< typedef of a lock_guard on a std::mutex. */
 }
 
 #define SCOPELOCK(x)       std::lock_guard<fwk::Lockable>  lockguard(*(x));
