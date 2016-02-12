@@ -1,6 +1,8 @@
 #ifndef   __LIBRARY_NETWORK_CURL_METHOD_HH__
 #define   __LIBRARY_NETWORK_CURL_METHOD_HH__
 
+#include  <curl/curl.h>
+
 #include  "Library/Collection/BidiMap.hpp"
 
 namespace fwk {

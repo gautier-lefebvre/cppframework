@@ -1,5 +1,6 @@
-DISTDIR=		dist/
+DISTDIR=    dist/
 NAME=       $(DISTDIR)cppframework
+RULENAME=   cppframework
 
 INCLDIR=    include/
 SRCDIR=     src/
@@ -74,23 +75,26 @@ CXXFLAGS=   -I$(INCLDIR) -std=c++11 -W -Wall -Wextra -Werror
 
 CXX=        g++
 
-all:        $(NAME)
+all:         $(RULENAME)
 
-$(NAME):    dll
+$(RULENAME): dll
 
-debug:      CXXFLAGS += -D__DEBUG__
-debug:      prog
+debug:       CXXFLAGS += -D__DEBUG__
+debug:       prog
 
-nodebug:    prog
+nodebug:     prog
 
-prog:       $(OBJPROG)
+prog:        headerify $(OBJPROG)
 			@$(CXX) -o $(NAME) $(OBJPROG) $(LDFLAGS) && echo "Built    $(NAME)"
 
-dll:		CXXFLAGS += -c -fPIC
-dll:		$(OBJDLL)
+dll:         CXXFLAGS += -c -fPIC
+dll:         headerify $(OBJDLL)
 			@$(CXX) -shared -o $(NAME).so $(OBJDLL) $(LDFLAGS) && echo "Built    $(NAME).so"
 
-%.o:        %.cpp
+headerify:
+			python3 headerify.py
+
+%.o:         %.cpp
 			@$(CXX) -c $(CXXFLAGS) -MMD $< -o $@ -MF $(patsubst %.o, %.d, $@) && echo "Compiled $<"
 
 clean:
@@ -99,9 +103,9 @@ clean:
 clean_dep:
 			@rm -f $(DEPS) && echo "Dependencies removed"
 
-fclean:     clean clean_dep
+fclean:      clean clean_dep
 			@rm -f $(NAME) $(NAME).so && echo "Executable removed"
 
-re:         fclean all
+re:          fclean all
 
 -include $(DEPS)

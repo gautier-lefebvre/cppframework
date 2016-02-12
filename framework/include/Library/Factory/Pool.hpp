@@ -162,7 +162,6 @@ namespace fwk {
       }
     }
   };
-
 }
 
 #endif    /* __LIBRARY_FACTORY_POOL_HPP__ */
