@@ -28,6 +28,7 @@ Logger& Logger::operator=(const Logger& oth) {
     this->_level = oth._level;
     this->_offset = oth._offset;
     this->_file = oth._file;
+    this->_printLock = oth._printLock;
   }
   return *this;
 }
