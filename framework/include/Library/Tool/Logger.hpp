@@ -66,14 +66,16 @@ namespace fwk {
     Logger::Level   _level; /*!< lowest level of logging. */
     size_t          _offset; /*!< current number of tabulations between the timestamp and the message. */
     std::ofstream*  _file; /*!< file where the logs are written. */
+    Lockable&       _printLock; /*!< lock used before printing. */
 
   public:
     /**
      *  \brief Constructor of Logger.
      *  Default lowest level of logging is INFO.
      *  \param name name of the logger.
+     *  \param printLock lock used before printing.
      */
-    Logger(const std::string& name);
+    Logger(const std::string& name, Lockable& printLock);
 
     /**
      *  \brief Copy constructor of Logger.
@@ -104,6 +106,8 @@ namespace fwk {
     void  log(const T &msg, Logger::Level level) {
       SCOPELOCK(this);
       if (level >= this->_level) {
+        ScopeLock slprint(this->_printLock);
+
         std::ostream& os = (this->_file != nullptr ? *(this->_file) : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
 
         os << Date::getTime() << " -- ";
@@ -172,6 +176,7 @@ namespace fwk {
 
   private:
     NameLoggerMap _loggers; /*!< Current list of loggers. */
+    Lockable      _printLock; /* !< Lock used by loggers before printing. */
 
   private:
     /*! Deleted copy constructor of LoggerManager. */

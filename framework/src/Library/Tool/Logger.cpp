@@ -4,12 +4,13 @@
 
 using namespace fwk;
 
-Logger::Logger(const std::string& name):
+Logger::Logger(const std::string& name, Lockable& lock):
   Lockable(),
   _name(name),
   _level(Logger::Level::INFO),
   _offset(0),
-  _file(nullptr)
+  _file(nullptr),
+  _printLock(lock)
 {}
 
 Logger::Logger(const Logger& oth):
@@ -17,7 +18,8 @@ Logger::Logger(const Logger& oth):
   _name(oth._name),
   _level(oth._level),
   _offset(oth._offset),
-  _file(oth._file)
+  _file(oth._file),
+  _printLock(oth._printLock)
 {}
 
 Logger& Logger::operator=(const Logger& oth) {
@@ -80,7 +82,8 @@ void Logger::closeFile(void) {
 
 LoggerManager::LoggerManager(void):
   Lockable(),
-  _loggers()
+  _loggers(),
+  _printLock()
 {}
 
 LoggerManager::~LoggerManager(void) {}
@@ -111,7 +114,7 @@ Logger& LoggerManager::getLogger(const std::string& loggerName, bool create) {
     // if the logger is not in the list
     if (create) {
       // if create is true, creates it and returns it
-      this->_loggers.emplace(std::make_pair(loggerName, Logger(loggerName)));
+      this->_loggers.emplace(std::make_pair(loggerName, Logger(loggerName, this->_printLock)));
       return this->_loggers.at(loggerName);
     } else {
       // else rethrow the exception

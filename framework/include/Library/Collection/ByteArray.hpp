@@ -184,7 +184,7 @@ namespace fwk {
     size_t  find(const void* ptr, size_t size, size_t start = 0) const;
 
     /**
-     *  \brief Copies data from the start of the ByteArray and removes it from this ByteArray.
+     *  \brief Copies data from the ByteArray and removes it from this ByteArray.
      *  \param ptr a pointer to which the data must be copied.
      *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
      *  \param offset the index of the byte where the copy must start.
@@ -193,13 +193,33 @@ namespace fwk {
     size_t  extract(void* ptr, size_t size, size_t offset = 0);
 
     /**
-     *  \brief Copies data from the start of the ByteArray and keeps it in this ByteArray.
+     *  \brief Copies data from the ByteArray and removes it from this ByteArray.
+     *  \throw std::out_of_range thrown if the given ByteArray does not have enough space.
+     *  \param bytearray a ByteArray in which the data will be extracted, updating its size.
+     *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
+     *  \param offset the index of the byte where the copy must start.
+     *  \return the number of bytes copied.
+     */
+    void  extract(ByteArray* bytearray, size_t size, size_t offset = 0);
+
+    /**
+     *  \brief Copies data from the ByteArray and keeps it in this ByteArray.
      *  \param ptr a pointer to which the data must be copied.
      *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
      *  \param offset the index of the byte where the copy must start.
      *  \return the number of bytes copied.
      */
     size_t  get(void* ptr, size_t size, size_t offset = 0) const;
+
+    /**
+     *  \brief Copies data from the ByteArray and keeps it in this ByteArray.
+     *  \throw std::out_of_range thrown if the given ByteArray does not have enough space.
+     *  \param bytearray a ByteArray in which the data will be extracted, updating its size.
+     *  \param size the number of bytes to copy. If higher than the current size, only the current size will be copied.
+     *  \param offset the index of the byte where the copy must start.
+     *  \return the number of bytes copied.
+     */
+    void  get(ByteArray* bytearray, size_t size, size_t offset = 0) const;
 
   public:
     /**

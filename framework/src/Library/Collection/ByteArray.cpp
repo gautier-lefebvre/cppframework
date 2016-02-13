@@ -140,10 +140,30 @@ size_t    ByteArray::extract(void *ptr, size_t size, size_t offset) {
   return tomove;
 }
 
+void      ByteArray::extract(ByteArray* bytearray, size_t size, size_t offset) {
+  size_t  tomove = MIN(size, this->_size - offset);
+
+  if (bytearray->availableSpace() < tomove) {
+    throw std::out_of_range("ByteArray::extract: cannot copy all data to this ByteArray.");
+  }
+
+  bytearray->moveEnd(this->extract(bytearray->atEnd(), size, offset));
+}
+
 size_t    ByteArray::get(void *ptr, size_t size, size_t offset) const {
   size_t  tomove = MIN(size, this->_size - offset);
   memcpy(ptr, this->_bytearray + offset, tomove);
   return tomove;
+}
+
+void      ByteArray::get(ByteArray* bytearray, size_t size, size_t offset) const {
+  size_t  tomove = MIN(size, this->_size - offset);
+
+  if (bytearray->availableSpace() < tomove) {
+    throw std::out_of_range("ByteArray::get: cannot copy all data to this ByteArray.");
+  }
+
+  bytearray->moveEnd(this->get(bytearray->atEnd(), size, offset));
 }
 
 void    ByteArray::pushStr(const std::string& str, bool resize) {
