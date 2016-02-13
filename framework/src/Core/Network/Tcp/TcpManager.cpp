@@ -172,9 +172,9 @@ const TcpManager::Client& TcpManager::createClient(const std::string& hostname, 
     }
 
     return *connection;
-  } catch (const NetworkException& e) {
+  } catch (const NetworkException&) {
     TcpSocketStream::returnToPool(socket);
-    throw e;
+    throw;
   }
 }
 

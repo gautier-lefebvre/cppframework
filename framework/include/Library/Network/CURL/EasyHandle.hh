@@ -181,7 +181,7 @@ namespace fwk {
        *  \param key key of the header.
        *  \param value value of the header.
        */
-      void  appendHeader(const std::string& header, const std::string& value);
+      void  appendHeader(const std::string& key, const std::string& value);
     };
   }
 }

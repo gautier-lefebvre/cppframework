@@ -5,7 +5,7 @@
 
 namespace fwk {
   /**
-   *  \namespace Constant Library/Constant.hh
+   *  \namespace fwk::Constant Library/Tool/Constant.hh
    *  \brief namespace containing useful constant variables.
    */
   namespace Constant {

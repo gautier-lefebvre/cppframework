@@ -141,9 +141,9 @@ void  WorkerThread::executeSimpleTask(ATask* task, bool exec) {
           simpleTask->_cleanup();
         }
       }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
       SimpleTask::returnToPool(simpleTask);
-      throw e;
+      throw;
     }
 
     SimpleTask::returnToPool(simpleTask);
@@ -171,9 +171,8 @@ void  WorkerThread::executeEventTask(ATask* task, bool exec) {
         } catch (const EventNotRegisteredException& e) {
           WARNING(e.what());
         }
-      }
-      // if not unregistered but in the pool -> unregister now
-      else if (!eventTask->_event->isValid()) {
+      } else if (!eventTask->_event->isValid()) {
+        // if not unregistered but in the pool -> unregister now
         EventManager::get().unregisterEvent(eventTask->_event);
       }
 
@@ -182,9 +181,9 @@ void  WorkerThread::executeEventTask(ATask* task, bool exec) {
         eventTask->_args->cleanup();
       }
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
       EventTask::returnToPool(eventTask);
-      throw e;
+      throw;
     }
 
     EventTask::returnToPool(eventTask);
@@ -201,9 +200,10 @@ void  WorkerThread::executeHttpTask(ATask* task, bool exec) {
       if (httpTask->_callback) {
         httpTask->_callback(httpTask->_response);
       }
-    }
-    if (httpTask->_cleanup) {
-      httpTask->_cleanup();
+    } else {
+      if (httpTask->_cleanup) {
+        httpTask->_cleanup();
+      }
     }
     HttpResponse::returnToPool(httpTask->_response);
     HttpTask::returnToPool(httpTask);
@@ -217,8 +217,8 @@ void  WorkerThread::executePeriodicTask(ATask* task, bool exec) {
 
   if (periodicTask) {
     if (exec == false || periodicTask->_off) {
-      if (periodicTask->_clean) {
-        periodicTask->_clean();
+      if (periodicTask->_cleanup) {
+        periodicTask->_cleanup();
       }
       PeriodicTask::returnToPool(periodicTask);
     } else {

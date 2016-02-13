@@ -7,11 +7,19 @@ import re
 import traceback
 
 class Content:
+  """ Content of a header file. """
+
   def __init__(self, lines):
+    """
+    Constructor of Content.
+
+    @type  lines: [str]
+    @param lines: content of the file.
+    """
     self.lines = lines
 
   def epure(self):
-    """ Remove all comments. """
+    """ Remove all C/C++ comments, empty lines and trailing whitespace. """
 
     content = ""
     for line in self.lines:
@@ -42,22 +50,57 @@ class Content:
     self.lines = lines
 
 class Prog:
+  """ Main class of the program. """
+
   def __init__(self, folder, header):
+    """
+    Constructor of Prog.
+
+    @type  folder: str
+    @param folder: path to the folder containing the header files.
+
+    @type  header: str
+    @param header: path to the end file.
+    """
     self.files_included = []
     self.folder_path = folder
+
+    # create dist dir if necessary
+    os.makedirs(os.path.dirname(os.path.abspath(header)), exist_ok=True)
     self.header = open(header, "w+")
+
+
     self.includeRegex = re.compile(r'#include[ \t]+"(?P<path>[a-zA-Z\/\.]+)"')
     self.commentRegex = re.compile(r'\/\*.*\*\/')
 
   def clean(self):
+    """ Closes the file. """
     self.header.close()
 
   def endswith(self, pattern, extensions):
+    """
+    Checks if a string ends with at list one pattern of a list.
+
+    @type  pattern: str
+    @param pattern: the string whose end to check.
+
+    @type  extensions: [str]
+    @param extensions: list of patterns to check.
+
+    @rtype: boolean
+    @return: True if at least one pattern fits.
+    """
     for extension in extensions:
       if pattern.endswith(extension): return True
     return False
 
   def find_first_unincluded_file(self):
+    """
+    Finds the first non-included header file in the header file folder.
+
+    @rtype: str|None
+    @return: the path to the file, or None if no file found.
+    """
     extensions = [".hh", ".hpp", ".h"]
 
     for root, dirs, files in os.walk(self.folder_path):
@@ -68,6 +111,16 @@ class Prog:
     return None
 
   def insert_file(self, file):
+    """
+    Inserts the given file in the final header file.
+    When finding a relative include (i.e., #include "header.hh"),
+    inserts the file instead (and recursively inserts its relative includes).
+
+    If the file was already included by another header file, does nothing.
+
+    @type  file: str
+    @param file: path to the file to insert.
+    """
     if file in self.files_included:
       return
 
@@ -101,6 +154,7 @@ class Prog:
     self.header.write("\n")
 
   def headerify(self):
+    """ Recursively inserts all headers and their relative includes. """
     file = self.find_first_unincluded_file()
     if file:
       self.insert_file(file)
@@ -112,7 +166,7 @@ if __name__ == "__main__":
   av = sys.argv
   ac = len(av)
 
-  prog = Prog(av[1] if ac >= 2 else "./include", av[2] if ac >= 3 else "./dist/cppframework.hh")
+  prog = Prog(av[1] if ac >= 2 else "./include", av[2] if ac >= 3 else "../dist/cppframework.hh")
 
   try:
     retCode = prog.headerify()

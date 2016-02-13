@@ -162,7 +162,7 @@ curlxx::EasyHandle* HttpConnection::prepareHandle(const HttpRequest *request, Ht
 
   try {
     this->prepareHandle(handle, request, response);
-  } catch (const std::exception& e) {
+  } catch (const std::exception&) {
     curlxx::EasyHandle::returnToPool(handle);
     throw;
   }

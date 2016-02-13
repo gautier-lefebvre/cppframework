@@ -50,7 +50,7 @@ namespace fwk {
     /**
      *  \brief Initializes the pool.
      *  \throw PoolMemoryExhaustedException the memory is exhausted.
-     *  \throw PoolInvalidArgumentsException size and hydrate must be greater than 0, or the memory is exhausted.
+     *  \throw PoolInvalidArgumentsException hydrate must be greater than 0, or the memory is exhausted.
      *  Will create a first batch of objects.
      *  \param size the number of objects to create now.
      *  \param hydrate the number of objects to create when the pool is empty.
@@ -63,9 +63,7 @@ namespace fwk {
         this->_hydrate = hydrate;
         this->_name = classname;
 
-        if (!size) {
-          throw PoolInvalidArgumentsException(fmt::format("{0}: Pool original size must be greater than 0", classname));
-        } else if (!hydrate) {
+        if (!hydrate) {
           throw PoolInvalidArgumentsException(fmt::format("{0}: Pool hydrate size must be greater than 0", classname));
         } else {
           this->hydrate(size);

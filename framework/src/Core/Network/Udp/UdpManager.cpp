@@ -74,9 +74,9 @@ const UdpManager::Server& UdpManager::createServer(uint16_t port) {
     }
 
     return *server;
-  } catch (const NetworkException& e) {
+  } catch (const NetworkException&) {
     UdpSocketServer::returnToPool(socket);
-    throw e;
+    throw;
   }
 }
 
@@ -174,9 +174,9 @@ const UdpManager::Client& UdpManager::createClient(const std::string& hostname, 
     }
 
     return *client;
-  } catch (const NetworkException& e) {
+  } catch (const NetworkException&) {
     UdpSocketStream::returnToPool(socket);
-    throw e;
+    throw;
   }
 }
 
@@ -416,10 +416,10 @@ void UdpManager::recv(fd_set& set) {
 
               try {
                 client->received(datagram);
-              } catch (const NetworkException& e) {
+              } catch (const NetworkException&) {
                 WARNING("Something went wrong, a single datagram could not overflow the limit");
                 UdpSocketClient::returnToPool(client);
-                throw e;
+                throw;
               }
 
               server.clients.push_back(client);

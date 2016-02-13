@@ -170,7 +170,7 @@ namespace fwk {
   class PeriodicTask :public ATask, public APooled<PeriodicTask> {
   public:
     std::function<void (void)> _callback; /*!< the function to call at regular interval. */
-    std::function<void (void)> _clean; /*!< the function to call when the task is canceled or when the tasks queue is being cleared. */
+    std::function<void (void)> _cleanup; /*!< the function to call when the task is canceled or when the tasks queue is being cleared. */
     std::chrono::steady_clock::duration _interval; /*!< the duration between 2 executions of the task. */
     bool  _off; /*!< when set to true, the next execution of the task will call the clean function instead, and the task will be removed. */
 
@@ -195,13 +195,13 @@ namespace fwk {
     /**
      *  \brief Sets the callback function, cleanup function and interval duration.
      *  \param callback the function to call at regular interval.
-     *  \param clean the function to call when the periodic task is canceled.
+     *  \param cleanup the function to call when the periodic task is canceled.
      *  \param interval the interval between 2 executions of the task.
      */
-    void  init(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval);
+    void  init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval);
 
     /**
-     *  \brief The next execution of the task will call the clean function instead, and the task will be removed.
+     *  \brief The next execution of the task will call the cleanup function instead, and the task will be removed.
      */
     void  stop();
   };

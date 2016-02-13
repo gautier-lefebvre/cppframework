@@ -109,7 +109,7 @@ PeriodicTask::PeriodicTask(void):
   ATask(ATask::Source::PERIODIC_TASK),
   APooled<PeriodicTask>(),
   _callback(nullptr),
-  _clean(nullptr),
+  _cleanup(nullptr),
   _interval(),
   _off(true)
 {}
@@ -120,13 +120,13 @@ PeriodicTask::~PeriodicTask(void) {
 
 void  PeriodicTask::reinit(void) {
   this->_callback = nullptr;
-  this->_clean = nullptr;
+  this->_cleanup = nullptr;
   this->_off = true;
 }
 
-void  PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval) {
+void  PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval) {
   this->_callback = callback;
-  this->_clean = clean;
+  this->_cleanup = cleanup;
   this->_interval = interval;
   this->_off = false;
 }

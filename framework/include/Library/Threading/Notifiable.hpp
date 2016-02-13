@@ -68,7 +68,7 @@ namespace fwk {
      */
     template<class C, class D, class P>
     bool  wait_until(const std::chrono::time_point<C, D>& timeout_time, P pred) {
-      return this->_condvar(*this, timeout_time, pred);
+      return this->_condvar.wait_until(*this, timeout_time, pred);
     }
 
     /**

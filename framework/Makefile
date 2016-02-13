@@ -1,5 +1,6 @@
-DISTDIR=    dist/
+DISTDIR=    ../dist/
 NAME=       $(DISTDIR)cppframework
+DLLNAME=		$(NAME).so
 RULENAME=   cppframework
 
 INCLDIR=    include/
@@ -84,15 +85,18 @@ debug:       prog
 
 nodebug:     prog
 
-prog:        headerify $(OBJPROG)
+prog:        headerify $(OBJPROG) create_dist
 			@$(CXX) -o $(NAME) $(OBJPROG) $(LDFLAGS) && echo "Built    $(NAME)"
 
 dll:         CXXFLAGS += -c -fPIC
-dll:         headerify $(OBJDLL)
-			@$(CXX) -shared -o $(NAME).so $(OBJDLL) $(LDFLAGS) && echo "Built    $(NAME).so"
+dll:         headerify $(OBJDLL) create_dist
+			@$(CXX) -shared -o $(DLLNAME) $(OBJDLL) $(LDFLAGS) && echo "Built    $(DLLNAME)"
 
 headerify:
 			python3 headerify.py
+
+create_dist:
+			mkdir -p $(DISTDIR)
 
 doc:
 			doxygen
@@ -107,7 +111,7 @@ clean_dep:
 			@rm -f $(DEPS) && echo "Dependencies removed"
 
 fclean:      clean clean_dep
-			@rm -f $(NAME) $(NAME).so && echo "Executable removed"
+			@rm -f $(NAME) $(DLLNAME) && echo "Executable removed"
 
 re:          fclean all
 
