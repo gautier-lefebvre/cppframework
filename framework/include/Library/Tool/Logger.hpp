@@ -26,7 +26,8 @@ namespace fwk {
       INFO     = 1, /*!< Used to log information. */
       WARNING  = 2, /*!< Used to log minor errors. */
       ERROR    = 3, /*!< Used to log non-critical errors. */
-      CRITICAL = 4  /*!< Used to log critical errors. */
+      CRITICAL = 4, /*!< Used to log critical errors. */
+      IGNORE   = 5  /*!< Used to ignore any message. */
     };
 
   private:
@@ -105,7 +106,7 @@ namespace fwk {
     template<typename T>
     void  log(const T &msg, Logger::Level level) {
       SCOPELOCK(this);
-      if (level >= this->_level) {
+      if (this->_level != Logger::Level::IGNORE && level >= this->_level) {
         ScopeLock slprint(this->_printLock);
 
         std::ostream& os = (this->_file != nullptr ? *(this->_file) : (level >= Logger::Level::ERROR ? std::cerr : std::cout));
@@ -117,10 +118,12 @@ namespace fwk {
           os << "\t";
         }
 
-        try {
-          os << Logger::ColorToString.at(Logger::LevelToColor.at(level));
-        } catch (const std::out_of_range&) {
-          os << Logger::ColorToString.at(Logger::Color::NONE);
+        if (this->_file == nullptr) {
+          try {
+            os << Logger::ColorToString.at(Logger::LevelToColor.at(level));
+          } catch (const std::out_of_range&) {
+            os << Logger::ColorToString.at(Logger::Color::NONE);
+          }
         }
 
         os << msg << Logger::ColorToString.at(Logger::Color::NONE) << std::endl;

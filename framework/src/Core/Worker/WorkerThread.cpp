@@ -216,13 +216,19 @@ void  WorkerThread::executePeriodicTask(ATask* task, bool exec) {
   PeriodicTask *periodicTask = reinterpret_cast<PeriodicTask*>(task);
 
   if (periodicTask) {
-    if (exec == false || periodicTask->_off) {
+    if (exec && !periodicTask->_off) {
+      if (periodicTask->_callback) {
+        periodicTask->_callback();
+      }
+    }
+
+    // NB: not 'else' because the periodicTask could have been canceled in the callback.
+    if (!exec || periodicTask->_off) {
       if (periodicTask->_cleanup) {
         periodicTask->_cleanup();
       }
       PeriodicTask::returnToPool(periodicTask);
     } else {
-      periodicTask->_callback();
       WorkerManager::get().addPeriodicTask(periodicTask, false);
     }
   } else {

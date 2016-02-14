@@ -91,7 +91,7 @@ size_t  TcpSocketStream::extractData(const std::function<size_t (const ByteArray
 
   if ((size = callback(*(this->_input))) != std::string::npos) {
     dest->resize(this->_input->getSize());
-    dest->moveEnd(this->_input->extract(dest->atStart(), size));
+    this->_input->extract(dest, size);
   }
 
   return size;
@@ -103,7 +103,7 @@ size_t  TcpSocketStream::getData(const std::function<size_t (const ByteArray&)>&
 
   if ((size = callback(*(this->_input))) != std::string::npos) {
     dest->resize(this->_input->getSize());
-    dest->moveEnd(this->_input->get(dest->atStart(), size));
+    this->_input->get(dest, size);
   }
 
   return size;

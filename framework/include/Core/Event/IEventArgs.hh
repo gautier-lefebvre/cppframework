@@ -16,7 +16,8 @@ namespace fwk {
 
   public:
     /**
-     *  \brief The child class must use this method to return any pooled object to its pool after the event has been executed by each callback.
+     *  \brief The child class must use this method to return itself to its pool after the event has been executed by each callback.
+     *  This is only useful if the child class is pooled.
      */
     virtual void  cleanup(void) = 0;
   };
