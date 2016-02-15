@@ -51,18 +51,18 @@ void TcpManager::clear(void) {
   }
 }
 
-const TcpManager::Server& TcpManager::createServer(uint16_t port) {
+const TcpServer& TcpManager::createServer(uint16_t port) {
   TcpSocket* socket = new TcpSocket();
 
   try {
     socket->socket();
 
-    const TcpManager::Server* server = nullptr;
+    const TcpServer* server = nullptr;
 
     {
       SCOPELOCK(&(this->_servers));
 
-      if (std::find_if(this->_servers.begin(), this->_servers.end(), [=] (const TcpManager::Server& s) -> bool { return s.port == port; }) != this->_servers.end()) {
+      if (std::find_if(this->_servers.begin(), this->_servers.end(), [=] (const TcpServer& s) -> bool { return s.port == port; }) != this->_servers.end()) {
         throw NetworkException(fmt::format("The port {0} was already associated to a server", port));
       }
 
@@ -77,14 +77,14 @@ const TcpManager::Server& TcpManager::createServer(uint16_t port) {
   }
 }
 
-void TcpManager::run(const TcpManager::Server& server) {
+void TcpManager::run(const TcpServer& server) {
   {
     SCOPELOCK(&(this->_servers));
-    auto serverIt = std::find_if(this->_servers.begin(), this->_servers.end(), [&] (const TcpManager::Server& s) -> bool { return s.port == server.port; });
+    auto serverIt = std::find_if(this->_servers.begin(), this->_servers.end(), [&] (const TcpServer& s) -> bool { return s.port == server.port; });
 
     if (serverIt != this->_servers.end()) {
       try {
-        TcpManager::Server& s = (*serverIt);
+        TcpServer& s = (*serverIt);
         s.server->bind(s.port);
         s.server->listen(1024);
         s.active = true;
@@ -111,7 +111,7 @@ void TcpManager::close(uint16_t port) {
 
   // find the server
   auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const TcpManager::Server& elem) -> bool { return elem.port == port; });
+    [&] (const TcpServer& elem) -> bool { return elem.port == port; });
 
   // if found
   if (server_it != this->_servers.end()) {
@@ -133,7 +133,7 @@ void TcpManager::close(uint16_t port) {
   }
 }
 
-void TcpManager::close(const TcpManager::Server& server) {
+void TcpManager::close(const TcpServer& server) {
   this->close(server.port);
 }
 
@@ -142,7 +142,7 @@ void TcpManager::blacklist(uint16_t port, uint32_t addr) {
 
   // find the server
   auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const TcpManager::Server& elem) -> bool { return elem.port == port; });
+    [&] (const TcpServer& elem) -> bool { return elem.port == port; });
 
   // if found
   if (server_it != this->_servers.end()) {
@@ -151,19 +151,19 @@ void TcpManager::blacklist(uint16_t port, uint32_t addr) {
   }
 }
 
-const TcpManager::Client& TcpManager::createClient(const std::string& hostname, uint16_t port) {
+const TcpClient& TcpManager::createClient(const std::string& hostname, uint16_t port) {
   TcpSocketStream* socket = TcpSocketStream::getFromPool();
 
   try {
     socket->init();
     socket->socket();
 
-    const TcpManager::Client* connection = nullptr;
+    const TcpClient* connection = nullptr;
 
     {
       SCOPELOCK(&(this->_clients));
 
-      if (std::find_if(this->_clients.begin(), this->_clients.end(), [=] (const TcpManager::Client& c) -> bool { return c.hostname == hostname && c.port == port; }) != this->_clients.end()) {
+      if (std::find_if(this->_clients.begin(), this->_clients.end(), [=] (const TcpClient& c) -> bool { return c.hostname == hostname && c.port == port; }) != this->_clients.end()) {
         throw NetworkException(fmt::format("A client to {0}:{1} already exists", hostname, port));
       }
 
@@ -178,14 +178,14 @@ const TcpManager::Client& TcpManager::createClient(const std::string& hostname, 
   }
 }
 
-void TcpManager::run(const TcpManager::Client& client) {
+void TcpManager::run(const TcpClient& client) {
   {
     SCOPELOCK(&(this->_clients));
-    auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const TcpManager::Client& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
+    auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const TcpClient& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
 
     if (clientIt != this->_clients.end()) {
       try {
-        TcpManager::Client& c = (*clientIt);
+        TcpClient& c = (*clientIt);
         c.socket->connect(c.hostname, c.port);
         c.active = true;
         INFO(fmt::format("TCP: connected to {0}:{1}", c.hostname, c.port));
@@ -211,7 +211,7 @@ void TcpManager::close(const std::string& hostname, uint16_t port) {
 
   // find the connection
   auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
-    [&] (const TcpManager::Client& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
+    [&] (const TcpClient& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
 
   // if found
   if (client_it != this->_clients.end()) {
@@ -226,7 +226,7 @@ void TcpManager::close(const std::string& hostname, uint16_t port) {
   }
 }
 
-void TcpManager::close(const TcpManager::Client& connection) {
+void TcpManager::close(const TcpClient& connection) {
   this->close(connection.hostname, connection.port);
 }
 
@@ -257,7 +257,7 @@ void TcpManager::push(TcpSocketStream* socket, const void* data, size_t size) {
       {
         SCOPELOCK(&(this->_clients));
         auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
-          [&] (const TcpManager::Client& elem) -> bool { return elem.socket == socket; });
+          [&] (const TcpClient& elem) -> bool { return elem.socket == socket; });
 
         if (client_it != this->_clients.end()) {
           this->__onIOException((*client_it).events.onClosed, socket, e.what());
@@ -469,114 +469,4 @@ void TcpManager::__fireEvent(EventHandle* event, TcpSocketStream* socket) const 
 void TcpManager::__fireEvent(EventHandle* event, TcpSocket* socket) const {
   TcpSocketEventArgs* sargs = TcpSocketEventArgs::getFromPool(socket);
   event->fireSync(sargs);
-}
-
-/**
- *  Server
- */
-
-TcpManager::Server::Server(uint16_t port, TcpSocket* server):
-  Lockable(),
-  port(port),
-  server(server),
-  clients(),
-  accept(),
-  blacklist(),
-  active(false),
-  events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
-  })
-{
-  EventManager& eventManager = EventManager::get();
-  eventManager.registerEvent(this->events.onAccept);
-  eventManager.registerEvent(this->events.onReceivedData);
-  eventManager.registerEvent(this->events.onClientClosed);
-  eventManager.registerEvent(this->events.onClosed);
-}
-
-TcpManager::Server::~Server(void) {
-  EventManager& eventManager = EventManager::get();
-  eventManager.unregisterEvent(this->events.onAccept);
-  eventManager.unregisterEvent(this->events.onReceivedData);
-  eventManager.unregisterEvent(this->events.onClientClosed);
-  eventManager.unregisterEvent(this->events.onClosed);
-
-  EventHandle::returnToPool(this->events.onAccept);
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClientClosed);
-  EventHandle::returnToPool(this->events.onClosed);
-}
-
-/**
- *  Client
- */
-
-TcpManager::Client::Client(const std::string& hostname, uint16_t port, TcpSocketStream* socket):
-  Lockable(),
-  hostname(hostname),
-  port(port),
-  socket(socket),
-  active(false),
-  events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
-  })
-{
-  EventManager& eventManager = EventManager::get();
-  eventManager.registerEvent(this->events.onReceivedData);
-  eventManager.registerEvent(this->events.onClosed);
-}
-
-TcpManager::Client::~Client(void) {
-  EventManager& eventManager = EventManager::get();
-  eventManager.unregisterEvent(this->events.onReceivedData);
-  eventManager.unregisterEvent(this->events.onClosed);
-
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClosed);
-}
-
-/**
- *  TcpSocketStreamEventArgs
- */
-
-TcpSocketStreamEventArgs::TcpSocketStreamEventArgs(void):
-  APooled<TcpSocketStreamEventArgs>(),
-  socket(nullptr)
-{}
-
-void TcpSocketStreamEventArgs::reinit(void) {
-  this->socket = nullptr;
-}
-
-void TcpSocketStreamEventArgs::init(TcpSocketStream* socket) {
-  this->socket = socket;
-}
-
-void TcpSocketStreamEventArgs::cleanup(void) {
-  TcpSocketStreamEventArgs::returnToPool(this);
-}
-
-/**
- *  TcpSocketEventArgs
- */
-
-TcpSocketEventArgs::TcpSocketEventArgs(void):
-  APooled<TcpSocketEventArgs>(),
-  socket(nullptr)
-{}
-
-void TcpSocketEventArgs::reinit(void) {
-  this->socket = nullptr;
-}
-
-void TcpSocketEventArgs::init(TcpSocket* socket) {
-  this->socket = socket;
-}
-
-void TcpSocketEventArgs::cleanup(void) {
-  TcpSocketEventArgs::returnToPool(this);
 }

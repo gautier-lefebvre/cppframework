@@ -44,15 +44,21 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)Network/Http/HttpRequest.cpp                \
             $(COREDIR)Network/Http/HttpResponse.cpp               \
             $(COREDIR)Network/Http/HttpPipeliningConnection.cpp   \
+            $(COREDIR)Network/Tcp/TcpClient.cpp                   \
+            $(COREDIR)Network/Tcp/TcpEvents.cpp                   \
+            $(COREDIR)Network/Tcp/TcpManager.cpp                  \
+            $(COREDIR)Network/Tcp/TcpServer.cpp                   \
             $(COREDIR)Network/Tcp/TcpSocket.cpp                   \
             $(COREDIR)Network/Tcp/TcpSocketStream.cpp             \
-            $(COREDIR)Network/Tcp/TcpManager.cpp                  \
             $(COREDIR)Network/Udp/AUdpSocket.cpp                  \
             $(COREDIR)Network/Udp/AUdpSocketIO.cpp                \
-            $(COREDIR)Network/Udp/UdpSocketServer.cpp             \
-            $(COREDIR)Network/Udp/UdpSocketClient.cpp             \
-            $(COREDIR)Network/Udp/UdpSocketStream.cpp             \
+            $(COREDIR)Network/Udp/UdpClient.cpp                   \
+            $(COREDIR)Network/Udp/UdpEvents.cpp                   \
             $(COREDIR)Network/Udp/UdpManager.cpp                  \
+            $(COREDIR)Network/Udp/UdpServer.cpp                   \
+            $(COREDIR)Network/Udp/UdpSocketClient.cpp             \
+            $(COREDIR)Network/Udp/UdpSocketServer.cpp             \
+            $(COREDIR)Network/Udp/UdpSocketStream.cpp             \
             $(COREDIR)Worker/DelayedTasksThread.cpp               \
             $(COREDIR)Worker/WorkerManager.cpp                    \
             $(COREDIR)Worker/Task.cpp                             \

@@ -6,185 +6,23 @@
 
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
-#include  "Library/Factory/APooled.hpp"
 #include  "Core/Event/EventHandle.hh"
-#include  "Core/Event/IEventArgs.hh"
+#include  "Core/Network/Udp/UdpEvents.hh"
+#include  "Core/Network/Udp/UdpClient.hh"
+#include  "Core/Network/Udp/UdpServer.hh"
 #include  "Core/Network/Udp/UdpSocketServer.hh"
 #include  "Core/Network/Udp/UdpSocketClient.hh"
 #include  "Core/Network/Udp/UdpSocketStream.hh"
 
 namespace fwk {
   /**
-   *  \class UdpSocketStreamEventArgs Core/Network/Udp/UdpManager.hh
-   *  \brief Used when firing an event sending a UdpSocketStream as argument.
-   */
-  struct UdpSocketStreamEventArgs :public IEventArgs, public APooled<UdpSocketStreamEventArgs> {
-  public:
-    UdpSocketStream* socket; /*!< the SocketStream object. */
-
-  public:
-    /**
-     *  \brief Constructor of UdpSocketStreamEventArgs.
-     */
-    UdpSocketStreamEventArgs(void);
-
-  public:
-    /**
-     *  \brief Reinits the UdpSocketStreamEventArgs object.
-     */
-    virtual void  reinit(void);
-
-    /**
-     *  \brief Sends the SocketStream to its pool. Done automatically after the event has been fired.
-     */
-    virtual void  cleanup(void);
-
-    /**
-     *  \brief Sets the SocketStream.
-     *  \param socket the SocketStream.
-     */
-    virtual void  init(UdpSocketStream* socket);
-  };
-
-  /**
-   *  \class UdpSocketClientEventArgs Core/Network/Udp/UdpManager.hh
-   *  \brief Used when firing an event sending a UdpSocketClient as argument.
-   */
-  struct UdpSocketClientEventArgs :public IEventArgs, public APooled<UdpSocketClientEventArgs> {
-  public:
-    UdpSocketClient* socket; /*!< the SocketClient object. */
-
-  public:
-    /**
-     *  \brief Constructor of UdpSocketClientEventArgs.
-     */
-    UdpSocketClientEventArgs(void);
-
-  public:
-    /**
-     *  \brief Reinits the UdpSocketClientEventArgs object.
-     */
-    virtual void  reinit(void);
-
-    /**
-     *  \brief Sends the SocketClient to its pool. Done automatically after the event has been fired.
-     */
-    virtual void  cleanup(void);
-
-    /**
-     *  \brief Sets the SocketClient.
-     *  \param socket the SocketClient.
-     */
-    virtual void  init(UdpSocketClient* socket);
-  };
-
-  /**
-   *  \class UdpSocketServerEventArgs Core/Network/Udp/UdpManager.hh
-   *  \brief Used when firing an event sending a UdpSocketServer as argument.
-   */
-  struct UdpSocketServerEventArgs :public IEventArgs, public APooled<UdpSocketServerEventArgs> {
-  public:
-    UdpSocketServer* socket; /*!< the SocketServer object. */
-
-  public:
-    /**
-     *  \brief Constructor of UdpSocketServerEventArgs.
-     */
-    UdpSocketServerEventArgs(void);
-
-  public:
-    /**
-     *  \brief Reinits the UdpSocketServerEventArgs object.
-     */
-    virtual void  reinit(void);
-
-    /**
-     *  \brief Sends the SocketServer to its pool. Done automatically after the event has been fired.
-     */
-    virtual void  cleanup(void);
-
-    /**
-     *  \brief Sets the SocketServer.
-     *  \param socket the SocketServer.
-     */
-    virtual void  init(UdpSocketServer* socket);
-  };
-
-  /**
    *  \class UdpManager Core/Network/Udp/UdpManager.hh
    *  \brief UDP Manager.
    */
   class UdpManager {
   public:
-    /**
-     *  \class Server Core/Network/Udp/UdpManager.hh
-     *  \brief UDP server and known clients.
-     */
-    struct Server :public Lockable {
-    public:
-      uint16_t port; /*!< bound port */
-      UdpSocketServer* server; /*!< socket listening on the bound port */
-      TLockable<std::list<UdpSocketClient*>> clients; /*!< list of known clients to this server */
-      std::set<uint32_t> accept; /*!< accepted IPs */
-      std::set<uint32_t> blacklist; /*!< rejected IPs */
-      bool active; /*!< the server is running. */
-
-      struct {
-        EventHandle* onNewClient; /*!< Event fired whenever a new client sends a message to this server. Event argument type: UdpSocketClientEventArgs. */
-        EventHandle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: UdpSocketClientEventArgs. */
-        EventHandle* onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. Event argument type: UdpSocketClientEventArgs. */
-        EventHandle* onClosed; /*!< Event fired when this server is closed. Event argument type: UdpSocketServerEventArgs. */
-      } events; /*!< events for this server */
-
-    public:
-      /**
-       *  \brief Constructor of Server.
-       *  \param port bound port.
-       *  \param server socket listening to the bound port.
-       */
-      Server(uint16_t port, UdpSocketServer* server);
-
-      /**
-       *  \brief Destructor of Server.
-       */
-      virtual ~Server(void);
-    };
-
-  public:
-    /**
-     *  \class Client Core/Network/Udp/UdpManager.hh
-     *  \brief UDP client.
-     */
-    struct Client :public Lockable {
-    public:
-      std::string hostname; /*!< hostname of the UDP socket this client sends messages to */
-      uint16_t port; /*!< port of the UDP socket this client sends messages to */
-      UdpSocketStream *socket; /*!< socket */
-      bool active; /*!< the client is running. */
-
-      struct {
-        EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: UdpSocketStreamEventArgs. */
-        EventHandle* onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. Event argument type: UdpSocketStreamEventArgs. */
-      } events; /*!< events for this client */
-
-    public:
-      /**
-       *  \brief Constructor of Client.
-       *  \param hostname the hostname of the UDP socket to send messages to.
-       *  \param port the port of the UDP socket to send messages to.
-       *  \param socket the socket.
-       */
-      Client(const std::string& hostname, uint16_t port, UdpSocketStream* socket);
-
-      /**
-       *  \brief Destructor of Client.
-       */
-      virtual ~Client(void);
-    };
-
-  public:
-    typedef TLockable<std::list<Server>> ServerList; /*!< lockable list of UdpManager::Server. */
-    typedef TLockable<std::list<Client>> ClientList; /*!< lockable list of UdpManager::Client. */
+    typedef TLockable<std::list<UdpServer>> ServerList; /*!< lockable list of UdpServer. */
+    typedef TLockable<std::list<UdpClient>> ClientList; /*!< lockable list of UdpClient. */
 
   private:
     ServerList _servers; /*!< bound servers. */
@@ -219,14 +57,14 @@ namespace fwk {
      *  \param port the port to bind.
      *  \return the server.
      */
-    const Server&  createServer(uint16_t port);
+    const UdpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Binds the server on the given port and makes it listen for clients.
      *  \throw NetworkException can't bind the server port.
      *  \param server the server to launch.
      */
-    void run(const Server& server);
+    void run(const UdpServer& server);
 
     /**
      *  \brief Close the socket bound to a specific port and all its clients.
@@ -238,7 +76,7 @@ namespace fwk {
      *  \brief Close the socket and all its clients.
      *  \param server the server to close.
      */
-    void  close(const Server& server);
+    void  close(const UdpServer& server);
 
     /**
      *  \brief Blacklist an IP on a server.
@@ -254,13 +92,13 @@ namespace fwk {
      *  \param port port of the UDP server to connect to.
      *  \return the client.
      */
-    const Client&  createClient(const std::string& hostname, uint16_t port);
+    const UdpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client start sending datagrams.
      *  \param client the client.
      */
-    void run(const Client& client);
+    void run(const UdpClient& client);
 
     /**
      *  \brief Close the socket connected to a specific hostname:port.
@@ -273,7 +111,7 @@ namespace fwk {
      *  \brief Close the socket.
      *  \param client the client to close.
      */
-    void  close(const Client& client);
+    void  close(const UdpClient& client);
 
   public:
     /**

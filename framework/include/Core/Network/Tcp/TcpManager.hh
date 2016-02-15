@@ -2,156 +2,24 @@
 #define   __CORE_NETWORK_TCP_TCPMANAGER_HH__
 
 #include  <list>
-#include  <set>
 
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
-#include  "Library/Factory/APooled.hpp"
+#include  "Core/Network/Tcp/TcpClient.hh"
+#include  "Core/Network/Tcp/TcpEvents.hh"
+#include  "Core/Network/Tcp/TcpServer.hh"
 #include  "Core/Network/Tcp/TcpSocket.hh"
 #include  "Core/Network/Tcp/TcpSocketStream.hh"
-#include  "Core/Event/EventHandle.hh"
-#include  "Core/Event/IEventArgs.hh"
 
 namespace fwk {
-  /**
-   *  \class TcpSocketStreamEventArgs Core/Network/Tcp/TcpManager.hh
-   *  \brief Used when firing an event sending a TcpSocketStream as argument.
-   */
-  struct TcpSocketStreamEventArgs :public IEventArgs, public APooled<TcpSocketStreamEventArgs> {
-  public:
-    TcpSocketStream* socket; /*!< the SocketStream object. */
-
-  public:
-    /**
-     *  \brief Constructor of TcpSocketStreamEventArgs.
-     */
-    TcpSocketStreamEventArgs(void);
-
-  public:
-    /**
-     *  \brief Reinits the TcpSocketStreamEventArgs object.
-     */
-    virtual void  reinit(void);
-
-    /**
-     *  \brief Sends the SocketStream to its pool. Done automatically after the event has been fired.
-     */
-    virtual void  cleanup(void);
-
-    /**
-     *  \brief Sets the SocketStream.
-     *  \param ss the SocketStream.
-     */
-    void  init(TcpSocketStream* ss);
-  };
-
-  /**
-   *  \class TcpSocketEventArgs Core/Network/Tcp/TcpManager.hh
-   *  \brief Used when firing an event sending a TcpSocket as argument.
-   */
-  struct TcpSocketEventArgs :public IEventArgs, public APooled<TcpSocketEventArgs> {
-  public:
-    TcpSocket* socket; /*!< the Socket object. */
-
-  public:
-    /**
-     *  \brief Constructor of TcpSocketEventArgs.
-     */
-    TcpSocketEventArgs(void);
-
-  public:
-    /**
-     *  \brief Reinits the TcpSocketEventArgs object.
-     */
-    virtual void  reinit(void);
-
-    /**
-     *  \brief Sends the Socket to its pool. Done automatically after the event has been fired.
-     */
-    virtual void  cleanup(void);
-
-    /**
-     *  \brief Sets the Socket.
-     *  \param s the Socket.
-     */
-    void  init(TcpSocket* s);
-  };
-
   /**
    *  \class TcpManager Core/Network/Tcp/TcpManager.hh
    *  \brief TCP TcpManager.
    */
   class TcpManager {
   public:
-    /**
-     *  \class Server Core/Network/Tcp/TcpManager.hh
-     *  \brief TCP server and connected clients.
-     */
-    struct Server :public Lockable {
-    public:
-      uint16_t port; /*!< bound port. */
-      TcpSocket* server; /*!< socket listening on the bound port. */
-      TLockable<std::list<TcpSocketStream*>> clients; /*!< list of connected clients to this server. */
-      std::set<uint32_t> accept; /*!< accepted IPs. */
-      std::set<uint32_t> blacklist; /*!< rejected IPs. */
-      bool active; /*!< the server is running. */
-
-      struct {
-        EventHandle* onAccept; /*!< Event fired whenever a new client connects to this server. Event argument type: TcpSocketStreamEventArgs. */
-        EventHandle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: TcpSocketStreamEventArgs. */
-        EventHandle* onClientClosed; /*!< Event fired whenever a client of this server closes. Event argument type: TcpSocketStreamEventArgs. */
-        EventHandle* onClosed; /*!< Event fired when the bound socket is closed. Event argument type: TcpSocketEventArgs. */
-      } events; /*!< events for this server */
-
-    public:
-      /**
-       *  \brief Constructor of Server.
-       *  \param port bound port.
-       *  \param server socket listening to the bound port.
-       */
-      Server(uint16_t port, TcpSocket* server);
-
-      /**
-       *  \brief Destructor of Server.
-       */
-      virtual ~Server(void);
-    };
-
-  public:
-    /**
-     *  \class Client Core/Network/Tcp/TcpManager.hh
-     *  \brief TCP client.
-     */
-    struct Client :public Lockable {
-    public:
-      std::string hostname; /*!< hostname of the TCP socket this client is connected to. */
-      uint16_t port; /*!< port of the TCP socket this client is connected to. */
-      TcpSocketStream *socket; /*!< connected socket. */
-      bool active; /*!< the client is running. */
-
-      struct {
-        EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: TcpSocketStreamEventArgs. */
-        EventHandle* onClosed; /*!< Event fired when this socket is closed. Event argument type: TcpSocketStreamEventArgs. */
-      } events; /*!< events for this client */
-
-    public:
-      /**
-       *  \brief Constructor of Client.
-       *  \param hostname the hostname of the TCP socket.
-       *  \param port the port of the TCP socket.
-       *  \param socket the connected socket.
-       */
-      Client(const std::string& hostname, uint16_t port, TcpSocketStream* socket);
-
-      /**
-       *  \brief Destructor of Client.
-       */
-      virtual ~Client(void);
-    };
-
-  public:
-    typedef TLockable<std::list<Server>> ServerList; /*!< lockable list of TcpManager::Server. */
-    typedef TLockable<std::list<Client>> ClientList; /*!< lockable list of TcpManager:Client. */
+    typedef TLockable<std::list<TcpServer>> ServerList; /*!< lockable list of TcpServer. */
+    typedef TLockable<std::list<TcpClient>> ClientList; /*!< lockable list of TcpManager:Client. */
 
   private:
     ServerList _servers; /*!< bound servers. */
@@ -185,14 +53,14 @@ namespace fwk {
      *  \param port the port to bind (does not do the binding).
      *  \return the server.
      */
-    const Server&  createServer(uint16_t port);
+    const TcpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Bind the server of the given port and make it listen for clients.
      *  \throw NetworkException can't bind the server port.
      *  \param server the server to launch.
      */
-    void  run(const Server& server);
+    void  run(const TcpServer& server);
 
     /**
      *  \brief Close the socket bound to a specific port and all its clients.
@@ -204,7 +72,7 @@ namespace fwk {
      *  \brief Close the socket and all its clients.
      *  \param server the server to close.
      */
-    void  close(const Server& server);
+    void  close(const TcpServer& server);
 
     /**
      *  \brief Blacklist an IP on a server.
@@ -220,13 +88,13 @@ namespace fwk {
      *  \param port port of the TCP server to connect to.
      *  \return the client.
      */
-    const Client&  createClient(const std::string& hostname, uint16_t port);
+    const TcpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client connect to the server.
      *  \param client the client.
      */
-    void  run(const Client& client);
+    void  run(const TcpClient& client);
 
     /**
      *  \brief Close the socket connected to a specific hostname:port.
@@ -239,7 +107,7 @@ namespace fwk {
      *  \brief Close the socket.
      *  \param client the client to close.
      */
-    void  close(const Client& client);
+    void  close(const TcpClient& client);
 
   public:
     /**

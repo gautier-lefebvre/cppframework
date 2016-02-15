@@ -53,19 +53,19 @@ void UdpManager::clear(void) {
   }
 }
 
-const UdpManager::Server& UdpManager::createServer(uint16_t port) {
+const UdpServer& UdpManager::createServer(uint16_t port) {
   UdpSocketServer* socket = UdpSocketServer::getFromPool();
 
   try {
     socket->init();
     socket->socket();
 
-    const UdpManager::Server* server = nullptr;
+    const UdpServer* server = nullptr;
 
     {
       SCOPELOCK(&(this->_servers));
 
-      if (std::find_if(this->_servers.begin(), this->_servers.end(), [=] (const UdpManager::Server& s) -> bool { return s.port == port; }) != this->_servers.end()) {
+      if (std::find_if(this->_servers.begin(), this->_servers.end(), [=] (const UdpServer& s) -> bool { return s.port == port; }) != this->_servers.end()) {
         throw NetworkException(fmt::format("The port {0} was already associated to a server", port));
       }
 
@@ -80,14 +80,14 @@ const UdpManager::Server& UdpManager::createServer(uint16_t port) {
   }
 }
 
-void UdpManager::run(const UdpManager::Server& server) {
+void UdpManager::run(const UdpServer& server) {
   {
     SCOPELOCK(&(this->_servers));
-    auto serverIt = std::find_if(this->_servers.begin(), this->_servers.end(), [&] (const UdpManager::Server& s) -> bool { return s.port == server.port; });
+    auto serverIt = std::find_if(this->_servers.begin(), this->_servers.end(), [&] (const UdpServer& s) -> bool { return s.port == server.port; });
 
     if (serverIt != this->_servers.end()) {
       try {
-        UdpManager::Server& s = (*serverIt);
+        UdpServer& s = (*serverIt);
         s.server->bind(s.port);
         s.active = true;
         INFO(fmt::format("UDP: listening on port {0}", s.port));
@@ -113,7 +113,7 @@ void UdpManager::close(uint16_t port) {
 
   // find the server
   auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const UdpManager::Server& elem) -> bool { return elem.port == port; });
+    [&] (const UdpServer& elem) -> bool { return elem.port == port; });
 
   // if found
   if (server_it != this->_servers.end()) {
@@ -135,7 +135,7 @@ void UdpManager::close(uint16_t port) {
   }
 }
 
-void UdpManager::close(const UdpManager::Server& server) {
+void UdpManager::close(const UdpServer& server) {
   this->close(server.port);
 }
 
@@ -144,7 +144,7 @@ void UdpManager::blacklist(uint16_t port, uint32_t addr) {
 
   // find the server
   auto server_it = std::find_if(this->_servers.begin(), this->_servers.end(),
-    [&] (const UdpManager::Server& elem) -> bool { return elem.port == port; });
+    [&] (const UdpServer& elem) -> bool { return elem.port == port; });
 
   // if found
   if (server_it != this->_servers.end()) {
@@ -153,19 +153,19 @@ void UdpManager::blacklist(uint16_t port, uint32_t addr) {
   }
 }
 
-const UdpManager::Client& UdpManager::createClient(const std::string& hostname, uint16_t port) {
+const UdpClient& UdpManager::createClient(const std::string& hostname, uint16_t port) {
   UdpSocketStream* socket = UdpSocketStream::getFromPool();
 
   try {
     socket->socket();
     socket->init(hostname, port);
 
-    const UdpManager::Client* client = nullptr;
+    const UdpClient* client = nullptr;
 
     {
       SCOPELOCK(&(this->_clients));
 
-      if (std::find_if(this->_clients.begin(), this->_clients.end(), [=] (const UdpManager::Client& c) -> bool { return c.hostname == hostname && c.port == port; }) != this->_clients.end()) {
+      if (std::find_if(this->_clients.begin(), this->_clients.end(), [=] (const UdpClient& c) -> bool { return c.hostname == hostname && c.port == port; }) != this->_clients.end()) {
         throw NetworkException(fmt::format("A client to {0}:{1} already exists", hostname, port));
       }
 
@@ -180,14 +180,14 @@ const UdpManager::Client& UdpManager::createClient(const std::string& hostname, 
   }
 }
 
-void UdpManager::run(const UdpManager::Client& client) {
+void UdpManager::run(const UdpClient& client) {
   {
     SCOPELOCK(&(this->_clients));
-    auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const UdpManager::Client& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
+    auto clientIt = std::find_if(this->_clients.begin(), this->_clients.end(), [&] (const UdpClient& c) -> bool { return c.hostname == client.hostname && c.port == client.port; });
 
     if (clientIt != this->_clients.end()) {
       try {
-        UdpManager::Client& c = (*clientIt);
+        UdpClient& c = (*clientIt);
         c.active = true;
         INFO(fmt::format("UDP: prepared connection to {0}:{1}", c.hostname, c.port));
 
@@ -207,7 +207,7 @@ void UdpManager::close(const std::string& hostname, uint16_t port) {
 
   // find the connection
   auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
-    [&] (const UdpManager::Client& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
+    [&] (const UdpClient& elem) -> bool { return elem.hostname == hostname && elem.port == port; });
 
   // if found
   if (client_it != this->_clients.end()) {
@@ -222,7 +222,7 @@ void UdpManager::close(const std::string& hostname, uint16_t port) {
   }
 }
 
-void UdpManager::close(const UdpManager::Client& connection) {
+void UdpManager::close(const UdpClient& connection) {
   this->close(connection.hostname, connection.port);
 }
 
@@ -257,7 +257,7 @@ void UdpManager::push(AUdpSocketIO* socket, const void* data, size_t size) {
       {
         SCOPELOCK(&(this->_clients));
         auto client_it = std::find_if(this->_clients.begin(), this->_clients.end(),
-          [&] (const UdpManager::Client& elem) -> bool { return elem.socket == socket; });
+          [&] (const UdpClient& elem) -> bool { return elem.socket == socket; });
 
         if (client_it != this->_clients.end()) {
           this->__onIOException((*client_it).events.onClosed, reinterpret_cast<UdpSocketStream*>(socket), e.what());
@@ -498,134 +498,4 @@ void UdpManager::__fireEvent(EventHandle* event, UdpSocketClient* socket) const 
 	  UdpSocketClientEventArgs* scargs = UdpSocketClientEventArgs::getFromPool(socket);
     event->fireSync(scargs);
 	}
-}
-
-/**
- *  Server
- */
-
-UdpManager::Server::Server(uint16_t port, UdpSocketServer* server):
-  Lockable(),
-  port(port),
-  server(server),
-  clients(),
-  accept(),
-  blacklist(),
-  active(false),
-  events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
-  })
-{
-  EventManager& eventManager = EventManager::get();
-  eventManager.registerEvent(this->events.onNewClient);
-  eventManager.registerEvent(this->events.onReceivedData);
-  eventManager.registerEvent(this->events.onClientClosed);
-  eventManager.registerEvent(this->events.onClosed);
-}
-
-UdpManager::Server::~Server(void) {
-  EventManager& eventManager = EventManager::get();
-  eventManager.unregisterEvent(this->events.onNewClient);
-  eventManager.unregisterEvent(this->events.onReceivedData);
-  eventManager.unregisterEvent(this->events.onClientClosed);
-  eventManager.unregisterEvent(this->events.onClosed);
-
-  EventHandle::returnToPool(this->events.onNewClient);
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClientClosed);
-  EventHandle::returnToPool(this->events.onClosed);
-}
-
-/**
- *  Client
- */
-
-UdpManager::Client::Client(const std::string& hostname, uint16_t port, UdpSocketStream* socket):
-  hostname(hostname),
-  port(port),
-  socket(socket),
-  active(false),
-  events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
-  })
-{
-  EventManager& eventManager = EventManager::get();
-  eventManager.registerEvent(this->events.onReceivedData);
-  eventManager.registerEvent(this->events.onClosed);
-}
-
-UdpManager::Client::~Client(void) {
-  EventManager& eventManager = EventManager::get();
-  eventManager.unregisterEvent(this->events.onReceivedData);
-  eventManager.unregisterEvent(this->events.onClosed);
-
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClosed);
-}
-
-/**
- *  UdpSocketStreamEventArgs
- */
-
-UdpSocketStreamEventArgs::UdpSocketStreamEventArgs(void):
-  APooled<UdpSocketStreamEventArgs>(),
-  socket(nullptr)
-{}
-
-void UdpSocketStreamEventArgs::reinit(void) {
-  this->socket = nullptr;
-}
-
-void UdpSocketStreamEventArgs::init(UdpSocketStream* socket) {
-  this->socket = socket;
-}
-
-void UdpSocketStreamEventArgs::cleanup(void) {
-  UdpSocketStreamEventArgs::returnToPool(this);
-}
-
-/**
- *  UdpSocketServerEventArgs
- */
-
-UdpSocketServerEventArgs::UdpSocketServerEventArgs(void):
-  APooled<UdpSocketServerEventArgs>(),
-  socket(nullptr)
-{}
-
-void UdpSocketServerEventArgs::reinit(void) {
-  this->socket = nullptr;
-}
-
-void UdpSocketServerEventArgs::init(UdpSocketServer* socket) {
-  this->socket = socket;
-}
-
-void UdpSocketServerEventArgs::cleanup(void) {
-  UdpSocketServerEventArgs::returnToPool(this);
-}
-
-/**
- *  UdpSocketClientEventArgs
- */
-
-UdpSocketClientEventArgs::UdpSocketClientEventArgs(void):
-  APooled<UdpSocketClientEventArgs>(),
-  socket(nullptr)
-{}
-
-void UdpSocketClientEventArgs::reinit(void) {
-  this->socket = nullptr;
-}
-
-void UdpSocketClientEventArgs::init(UdpSocketClient* socket) {
-  this->socket = socket;
-}
-
-void UdpSocketClientEventArgs::cleanup(void) {
-  UdpSocketClientEventArgs::returnToPool(this);
 }

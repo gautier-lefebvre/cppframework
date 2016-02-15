@@ -7,7 +7,7 @@ static void tcpServer(fwk::System* system, uint16_t port) {
   int i = 0;
 
   try {
-    const fwk::TcpManager::Server& server = fwk::NetworkManager::get().getTCP().createServer(port);
+    const fwk::TcpServer& server = fwk::NetworkManager::get().getTCP().createServer(port);
 
     server.events.onAccept->subscribe([] (const fwk::IEventArgs *) {
       INFO("New client connected");
@@ -37,7 +37,7 @@ static void tcpClient(fwk::System* system, const std::string& hostname, uint16_t
   try {
     int i = 0;
 
-    const fwk::TcpManager::Client& client = fwk::NetworkManager::get().getTCP().createClient(hostname, port);
+    const fwk::TcpClient& client = fwk::NetworkManager::get().getTCP().createClient(hostname, port);
 
     client.events.onReceivedData->subscribe([] (const fwk::IEventArgs *) {
       INFO("Received data");
@@ -61,7 +61,7 @@ static void udpServer(fwk::System* system, uint16_t port) {
   int i = 0;
 
   try {
-    const fwk::UdpManager::Server& server = fwk::NetworkManager::get().getUDP().createServer(port);
+    const fwk::UdpServer& server = fwk::NetworkManager::get().getUDP().createServer(port);
 
     // on accept new socket callback
     server.events.onNewClient->subscribe([] (const fwk::IEventArgs *) {
@@ -95,7 +95,7 @@ static void udpClient(fwk::System* system, const std::string& hostname, uint16_t
   try {
     int i = 0;
 
-    const fwk::UdpManager::Client& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
+    const fwk::UdpClient& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
 
     client.events.onReceivedData->subscribe([] (const fwk::IEventArgs *) {
       INFO("Received data");
