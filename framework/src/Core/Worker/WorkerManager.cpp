@@ -1,3 +1,4 @@
+#include  "Library/Tool/Logger.hpp"
 #include  "Core/Worker/WorkerManager.hh"
 #include  "Core/Worker/DelayedTasksThread.hh"
 #include  "Core/Exception.hh"
@@ -9,7 +10,8 @@ WorkerManager::WorkerManager(void):
   AEndable(),
   _pendingTasks(),
   _delayedTasks([] (const DelayedTask *a, const DelayedTask *b) -> bool { return *a < *b; }),
-  _workers()
+  _workers(),
+  _delayedTasksEnabled(false)
 {}
 
 WorkerManager::~WorkerManager(void) {
@@ -38,6 +40,8 @@ void  WorkerManager::init(size_t nbTasksWorkers, bool delayedTasks) {
       this->_workers.push_back(new WorkerThread(i));
     }
 
+    this->_delayedTasksEnabled = delayedTasks;
+
     if (delayedTasks) {
       DelayedTasksThread::get().run();
     }
@@ -63,10 +67,15 @@ void  WorkerManager::addTask(ATask* task) {
 }
 
 void  WorkerManager::addDelayedTask(DelayedTask* delayedTask) {
-  if (delayedTask != nullptr) {
-    SCOPELOCK(&(this->_delayedTasks));
-    this->_delayedTasks.push(delayedTask);
-    this->_delayedTasks.notify();
+  if (this->_delayedTasksEnabled) {
+    if (delayedTask != nullptr) {
+      SCOPELOCK(&(this->_delayedTasks));
+      this->_delayedTasks.push(delayedTask);
+      this->_delayedTasks.notify();
+    }
+  } else {
+    DelayedTask::returnToPool(delayedTask);
+    WARNING("Delayed tasks are disabled.");
   }
 }
 

@@ -28,6 +28,7 @@ namespace fwk {
     TaskQueue _pendingTasks; /*!< tasks to execute. */
     DelayedTaskQueue _delayedTasks; /*!< tasks to be executed after a delay. */
     std::vector<WorkerThread*> _workers; /*!< list of workers threads. */
+    bool _delayedTasksEnabled; /*!< wether or not the delayed tasks are enabled. */
 
   private:
     /**
