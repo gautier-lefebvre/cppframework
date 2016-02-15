@@ -64,7 +64,7 @@ void NetworkManager::onEnd(void) {
 void NetworkManager::init(void) {
   if (!this->isInitialized()) {
     // only execute this once.
-    this->isInitialized(false);
+    this->isInitialized(true);
 
     // ignore SIGPIPE (recv and send will return error)
     signal(SIGPIPE, SIG_IGN);
