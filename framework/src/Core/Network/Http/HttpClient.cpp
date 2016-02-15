@@ -21,19 +21,16 @@ HttpClient::~HttpClient(void) {
   this->end();
 }
 
-void  HttpClient::end(void) {
+void  HttpClient::onEnd(void) {
   SCOPELOCK(this);
-  if (!(this->mustEnd())) {
-    this->mustEnd(true);
 
-    for (auto &connection : this->_connections) {
-      connection->end();
-      delete connection;
-    }
-
-    curl_global_cleanup();
-    sk_SSL_COMP_free(SSL_COMP_get_compression_methods());
+  for (auto &connection : this->_connections) {
+    connection->end();
+    delete connection;
   }
+
+  curl_global_cleanup();
+  sk_SSL_COMP_free(SSL_COMP_get_compression_methods());
 }
 
 void  HttpClient::init(const std::string& user_agent) {

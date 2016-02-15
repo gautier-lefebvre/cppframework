@@ -67,28 +67,24 @@ void  WorkerThread::cleanup(void) {
   }
 }
 
-void  WorkerThread::end(void) {
+void  WorkerThread::onEnd(void) {
   SCOPELOCK(this);
-  if (!this->mustEnd()) {
-    WorkerManager::TaskQueue& taskQueue = WorkerManager::get().getTaskQueue();
+  WorkerManager::TaskQueue& taskQueue = WorkerManager::get().getTaskQueue();
 
-    this->mustEnd(true);
-
-    {
-      ScopeLock sltasks(taskQueue);
-      taskQueue.notify_all();
-    }
-
-    if (this->_thread) {
-      try {
-        this->_thread->join();
-      } catch (const std::system_error&) {}
-
-      delete this->_thread;
-    }
-
-    this->_thread = nullptr;
+  {
+    ScopeLock sltasks(taskQueue);
+    taskQueue.notify_all();
   }
+
+  if (this->_thread) {
+    try {
+      this->_thread->join();
+    } catch (const std::system_error&) {}
+
+    delete this->_thread;
+  }
+
+  this->_thread = nullptr;
 }
 
 size_t  WorkerThread::getID(void) const {
@@ -100,7 +96,7 @@ void  WorkerThread::routine(void) {
   ATask* task;
   WorkerHandler handler;
 
-  while (!this->mustEnd()) {
+  while (!this->isEnding()) {
     task = nullptr;
 
     {

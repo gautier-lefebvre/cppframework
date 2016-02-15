@@ -52,7 +52,7 @@ namespace fwk {
      *  \brief Closes every open HTTP connections and clears pending requests.
      *  Wakes any thread waiting on a synchronous request.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

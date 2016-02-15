@@ -54,7 +54,7 @@ namespace fwk {
     /**
      *  \brief Clears the I/O threads of TCP and UDP networks, closing any server and client.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

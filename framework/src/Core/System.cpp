@@ -51,13 +51,11 @@ void System::cleanup(void) {
   LOGGER_DESTROY;
 }
 
-void System::end(void) {
+void System::onEnd(void) {
   SCOPELOCK(this);
-  if (!this->mustEnd()) {
-    ScopeLock sl(this->_endCondition);
-    this->mustEnd(true);
-    this->_endCondition.notify_all();
-  }
+
+  ScopeLock sl(this->_endCondition);
+  this->_endCondition.notify_all();
 }
 
 void System::initHTTP(const std::string& userAgent) {
@@ -140,5 +138,5 @@ void System::run(void) {
 
   // wait for sigint
   SCOPELOCK(&(this->_endCondition));
-  this->_endCondition.wait([this] () -> bool { return this->mustEnd(); });
+  this->_endCondition.wait([this] () -> bool { return this->isEnding(); });
 }

@@ -31,7 +31,7 @@ void HttpPipeliningConnection::routine(void) {
   curlxx::MultiHandle multiHandle;
   curlxx::EasyHandle* easyHandle;
 
-  while (!(this->mustEnd())) {
+  while (!(this->isEnding())) {
     pipelined.clear();
 
     {

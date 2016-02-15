@@ -48,7 +48,7 @@ namespace fwk {
     /**
      *  \brief Notifies the thread to stop and waits for it to end.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

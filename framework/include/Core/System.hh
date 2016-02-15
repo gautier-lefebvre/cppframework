@@ -54,7 +54,7 @@ namespace fwk {
     /**
      *  \brief wakes the main thread.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

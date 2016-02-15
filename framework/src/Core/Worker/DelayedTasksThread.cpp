@@ -17,35 +17,31 @@ void  DelayedTasksThread::run(void) {
   this->_thread = new std::thread(&DelayedTasksThread::routine, this);
 }
 
-void  DelayedTasksThread::end(void) {
+void  DelayedTasksThread::onEnd(void) {
   SCOPELOCK(this);
-  if (!this->mustEnd()) {
-    WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
+  WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
 
-    this->mustEnd(true);
-
-    {
-      ScopeLock sldtasks(delayedTaskQueue);
-      delayedTaskQueue.notify_all();
-    }
-
-    if (this->_thread) {
-      try {
-        this->_thread->join();
-      } catch (const std::system_error&) {}
-
-      delete this->_thread;
-    }
-
-    this->_thread = nullptr;
+  {
+    ScopeLock sldtasks(delayedTaskQueue);
+    delayedTaskQueue.notify_all();
   }
+
+  if (this->_thread) {
+    try {
+      this->_thread->join();
+    } catch (const std::system_error&) {}
+
+    delete this->_thread;
+  }
+
+  this->_thread = nullptr;
 }
 
 void  DelayedTasksThread::routine(void) const {
   WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
   DelayedTask* delayedTask;
 
-  while (!this->mustEnd()) {
+  while (!this->isEnding()) {
     delayedTask = nullptr;
 
     {
@@ -54,7 +50,7 @@ void  DelayedTasksThread::routine(void) const {
         delayedTaskQueue.wait();
       } else {
         if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
-          if (this->mustEnd()) { break; }
+          if (this->isEnding()) { break; }
           if (!delayedTaskQueue.empty()) {
             if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
               delayedTaskQueue.pop();

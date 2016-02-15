@@ -54,7 +54,7 @@ namespace fwk {
     /**
      *  \brief Clears pending requests. Wakes any thread waiting on a synchronous request.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

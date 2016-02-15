@@ -20,48 +20,45 @@ NetworkManager::~NetworkManager(void) {
   this->end();
 }
 
-void NetworkManager::end(void) {
+void NetworkManager::onEnd(void) {
   SCOPELOCK(this);
-  if (!(this->mustEnd())) {
-    this->mustEnd(true);
 
-    // wake both threads
-    {
-      ScopeLock sl(this->_output.condition);
-      this->_output.condition.notify_all();
-    }
-
-    {
-      ScopeLock sl(this->_input.condition);
-      this->_input.condition.notify_all();
-    }
-
-    // wait for threads to end
-    try {
-      if (this->_input.thread) {
-        this->_input.thread->join();
-        delete this->_input.thread;
-      }
-      this->_input.thread = nullptr;
-    } catch (const std::system_error& e) {
-      WARNING(e.what());
-    }
-
-    try {
-      if (this->_output.thread) {
-        this->_output.thread->join();
-        delete this->_output.thread;
-      }
-      this->_output.thread = nullptr;
-    } catch (const std::system_error& e) {
-      WARNING(e.what());
-    }
-
-    // close every TCP servers / connections
-    this->_tcp.clear();
-    // close every UDP servers / connections
-    this->_udp.clear();
+  // wake both threads
+  {
+    ScopeLock sl(this->_output.condition);
+    this->_output.condition.notify_all();
   }
+
+  {
+    ScopeLock sl(this->_input.condition);
+    this->_input.condition.notify_all();
+  }
+
+  // wait for threads to end
+  try {
+    if (this->_input.thread) {
+      this->_input.thread->join();
+      delete this->_input.thread;
+    }
+    this->_input.thread = nullptr;
+  } catch (const std::system_error& e) {
+    WARNING(e.what());
+  }
+
+  try {
+    if (this->_output.thread) {
+      this->_output.thread->join();
+      delete this->_output.thread;
+    }
+    this->_output.thread = nullptr;
+  } catch (const std::system_error& e) {
+    WARNING(e.what());
+  }
+
+  // close every TCP servers / connections
+  this->_tcp.clear();
+  // close every UDP servers / connections
+  this->_udp.clear();
 }
 
 void NetworkManager::init(void) {
@@ -92,7 +89,7 @@ void NetworkManager::inputRoutine(void) {
   timeval  clock;
   uint32_t nb;
 
-  while (!(this->mustEnd())) {
+  while (!(this->isEnding())) {
     // reset
     FD_ZERO(&rset);
     rmax = 0;
@@ -114,7 +111,7 @@ void NetworkManager::inputRoutine(void) {
     clock.tv_usec = 0;
     select(rmax + 1, &rset, nullptr, nullptr, &clock);
 
-    if (this->mustEnd()) { break; }
+    if (this->isEnding()) { break; }
 
     // read available sockets
     this->_tcp.recv(rset);
@@ -127,7 +124,7 @@ void NetworkManager::outputRoutine(void) {
   int      wmax;
   uint32_t nb;
 
-  while (!(this->mustEnd())) {
+  while (!(this->isEnding())) {
     // reset
     FD_ZERO(&wset);
     wmax = 0;

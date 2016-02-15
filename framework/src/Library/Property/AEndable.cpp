@@ -3,15 +3,27 @@
 using namespace fwk;
 
 AEndable::AEndable(void):
-  _end(false)
+  _end(false),
+  _endLock()
 {}
 
 AEndable::~AEndable(void) {}
 
-bool  AEndable::mustEnd(void) const {
+void  AEndable::end(void) {
+  {
+    SCOPELOCK(&(this->_endLock));
+    if (!(this->isEnding())) {
+      this->isEnding(true);
+    }
+  }
+
+  this->onEnd();
+}
+
+bool  AEndable::isEnding(void) const {
   return this->_end;
 }
 
-void  AEndable::mustEnd(bool state) {
+void  AEndable::isEnding(bool state) {
   this->_end = state;
 }

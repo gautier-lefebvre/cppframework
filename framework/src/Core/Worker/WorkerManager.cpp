@@ -16,21 +16,18 @@ WorkerManager::~WorkerManager(void) {
   this->end();
 }
 
-void  WorkerManager::end(void) {
+void  WorkerManager::onEnd(void) {
   SCOPELOCK(this);
-  if (!this->mustEnd()) {
-    this->_end = true;
 
-    for (auto& worker : this->_workers) {
-      worker->end();
-      delete worker;
-    }
-
-    DelayedTasksThread::destroy();
-
-    this->_workers.clear();
-    WorkerThread::cleanup();
+  for (auto& worker : this->_workers) {
+    worker->end();
+    delete worker;
   }
+
+  DelayedTasksThread::destroy();
+
+  this->_workers.clear();
+  WorkerThread::cleanup();
 }
 
 void  WorkerManager::init(size_t nbTasksWorkers, bool delayedTasks) {

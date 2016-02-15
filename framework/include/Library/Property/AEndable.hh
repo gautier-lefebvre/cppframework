@@ -1,6 +1,8 @@
 #ifndef    __LIBRARY_PROPERTY_AENDABLE_HH__
 #define    __LIBRARY_PROPERTY_AENDABLE_HH__
 
+#include  "Library/Threading/Lockable.hpp"
+
 namespace fwk {
   /**
    *  \class AEndable Library/Property/AEndable.hh
@@ -8,7 +10,8 @@ namespace fwk {
    */
   class AEndable {
   protected:
-    bool  _end; /*!< set to true when the child class must end. */
+    bool     _end; /*!< set to true when the child class must end. */
+    Lockable _endLock;
 
   public:
     /**
@@ -25,22 +28,27 @@ namespace fwk {
 
   public:
     /**
-     *  \brief Tells the child class that it must stop.
+     *  \brief End procedure of the child class.
      */
-    virtual void  end(void) = 0;
+    virtual void  onEnd(void) = 0;
 
   public:
+    /**
+     *  \brief Checks if the method was not already called and calls onEnd.
+     */
+    void  end(void);
+
     /**
      *  \brief Checks if the end method has been called.
      *  \return true if the end method has been called.
      */
-    bool  mustEnd(void) const;
+    bool  isEnding(void) const;
 
     /**
      *  \brief Changes the end states of the object.
      *  \param state the new state.
      */
-    void  mustEnd(bool state);
+    void  isEnding(bool state);
   };
 }
 

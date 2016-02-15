@@ -60,7 +60,7 @@ namespace fwk {
     /**
      *  \brief Stops every worker threads and clears the tasks queues.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

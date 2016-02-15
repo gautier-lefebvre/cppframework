@@ -45,7 +45,7 @@ namespace fwk {
     /**
      *  \brief Waits until the task being executed is over, then stops the thread.
      */
-    virtual void  end(void);
+    virtual void  onEnd(void);
 
   public:
     /**

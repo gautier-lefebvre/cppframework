@@ -31,32 +31,30 @@ HttpConnection::~HttpConnection(void) {
   this->end();
 }
 
-void  HttpConnection::end(void) {
+void  HttpConnection::onEnd(void) {
   SCOPELOCK(this);
-  if (!(this->mustEnd())) {
-    {
-      ScopeLock sl(this->_pendingRequests);
-      this->_end = true;
-      this->_pendingRequests.notify_all();
-    }
 
-    if (this->_thread) {
-      try {
-        this->_thread->join();
-        delete this->_thread;
-        this->_thread = nullptr;
-      } catch (const std::system_error& e) {
-        ERROR(e.what());
-      }
-    }
+  {
+    ScopeLock sl(this->_pendingRequests);
+    this->_pendingRequests.notify_all();
+  }
 
-    {
-      ScopeLock slrequest(this->_pendingRequests);
-      while (!(this->_pendingRequests.empty())) {
-        HttpRequest* request = this->_pendingRequests.front();
-        this->setResponse(request, nullptr);
-        this->_pendingRequests.pop();
-      }
+  if (this->_thread) {
+    try {
+      this->_thread->join();
+      delete this->_thread;
+      this->_thread = nullptr;
+    } catch (const std::system_error& e) {
+      ERROR(e.what());
+    }
+  }
+
+  {
+    ScopeLock sl(this->_pendingRequests);
+    while (!(this->_pendingRequests.empty())) {
+      HttpRequest* request = this->_pendingRequests.front();
+      this->setResponse(request, nullptr);
+      this->_pendingRequests.pop();
     }
   }
 }
@@ -98,7 +96,7 @@ void  HttpConnection::addRequest(::HttpRequest *request) {
 
 void  HttpConnection::routine(void) {
   ::HttpRequest *request;
-  while (!(this->mustEnd())) {
+  while (!(this->isEnding())) {
     request = nullptr;
 
     {
