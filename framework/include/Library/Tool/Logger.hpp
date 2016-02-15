@@ -126,7 +126,13 @@ namespace fwk {
           }
         }
 
-        os << msg << Logger::ColorToString.at(Logger::Color::NONE) << std::endl;
+        os << msg;
+
+        if (this->_file == nullptr) {
+          os << Logger::ColorToString.at(Logger::Color::NONE);
+        }
+
+        os << std::endl;
       }
     }
 
