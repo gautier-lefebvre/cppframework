@@ -191,7 +191,7 @@ void TcpManager::run(const TcpClient& client) {
         INFO(fmt::format("TCP: connected to {0}:{1}", c.hostname, c.port));
 
       } catch (const std::exception&) {
-        delete (*clientIt).socket;
+        TcpSocketStream::returnToPool((*clientIt).socket);
         this->_clients.erase(clientIt);
         throw;
       }

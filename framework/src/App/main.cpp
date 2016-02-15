@@ -49,7 +49,7 @@ static void tcpClient(fwk::System* system, const std::string& hostname, uint16_t
 
     fwk::NetworkManager::get().getTCP().run(client);
 
-    fwk::NetworkManager::get().getTCP().push(client.socket, (void*)"Hello", 5);
+    fwk::NetworkManager::get().getTCP().push(client.socket, (void*)"Hello\n", 6);
 
     system->run();
   } catch (const fwk::CoreException& e) {
@@ -169,6 +169,8 @@ int main(int ac, char ** av) {
     std::cerr << "usage: " << av[0] << " \"http\"|\"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
     return -1;
   }
+
+  fwk::LoggerManager::get().init("cppframework", fwk::Logger::Level::DEBUG);
 
   fwk::System* system = new fwk::System();
   fwk::Signal::get().setCallback(fwk::Signal::Type::INT, [&] (void) -> bool {
