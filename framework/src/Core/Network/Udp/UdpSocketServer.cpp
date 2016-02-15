@@ -60,6 +60,7 @@ ByteArray*  UdpSocketServer::recvfrom(struct sockaddr_in& addr) {
   // read data in buffer
   ssize_t ret = ::recvfrom(this->_fd, this->_buffer->atStart(), this->_buffer->getSizeMax(), 0, reinterpret_cast<sockaddr*>(&(addr)), &addrlen);
 
+
   if (ret < 0) {
     throw NetworkException(std::string("recvfrom: ") + strerror(errno));
   } else if (static_cast<size_t>(ret) > AUdpSocketIO::BUFFER_SIZE) {

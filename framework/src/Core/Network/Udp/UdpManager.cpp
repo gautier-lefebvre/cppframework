@@ -399,6 +399,9 @@ void UdpManager::recv(fd_set& set) {
             //                        add client + add datagram
             if (client_it != server.clients.end()) {
               (*client_it)->received(datagram);
+
+              // fire data received event
+              this->__fireEvent(server.events.onReceivedData, *client_it);
             } else {
               uint32_t remote_ip = static_cast<uint32_t>(addr.sin_addr.s_addr);
 
