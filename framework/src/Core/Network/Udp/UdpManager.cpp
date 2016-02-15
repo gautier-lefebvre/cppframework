@@ -192,7 +192,7 @@ void UdpManager::run(const UdpClient& client) {
         INFO(fmt::format("UDP: prepared connection to {0}:{1}", c.hostname, c.port));
 
       } catch (const std::exception&) {
-        delete (*clientIt).socket;
+        UdpSocketStream::returnToPool((*clientIt).socket);
         this->_clients.erase(clientIt);
         throw;
       }

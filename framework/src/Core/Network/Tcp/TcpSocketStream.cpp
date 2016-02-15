@@ -19,7 +19,9 @@ TcpSocketStream::TcpSocketStream(void):
   _output(nullptr)
 {}
 
-TcpSocketStream::~TcpSocketStream(void) {}
+TcpSocketStream::~TcpSocketStream(void) {
+  this->reinit();
+}
 
 void  TcpSocketStream::reinit(void) {
   SCOPELOCK(this);

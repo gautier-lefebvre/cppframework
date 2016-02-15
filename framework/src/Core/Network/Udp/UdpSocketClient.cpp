@@ -11,7 +11,9 @@ UdpSocketClient::UdpSocketClient(void):
   _info(std::make_pair(0, 0))
 {}
 
-UdpSocketClient::~UdpSocketClient(void) {}
+UdpSocketClient::~UdpSocketClient(void) {
+  this->reinit();
+}
 
 void  UdpSocketClient::reinit(void) {
   SCOPELOCK(this);
