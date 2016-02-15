@@ -10,14 +10,19 @@ AEndable::AEndable(void):
 AEndable::~AEndable(void) {}
 
 void  AEndable::end(void) {
+  bool callOnEnd = false;
+
   {
     SCOPELOCK(&(this->_endLock));
     if (!(this->isEnding())) {
       this->isEnding(true);
+      callOnEnd = true;
     }
   }
 
-  this->onEnd();
+  if (callOnEnd) {
+    this->onEnd();
+  }
 }
 
 bool  AEndable::isEnding(void) const {
