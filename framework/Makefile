@@ -34,8 +34,6 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)System.cpp                                  \
             $(COREDIR)Event/Exception.cpp                         \
             $(COREDIR)Event/EventHandle.cpp                       \
-            $(COREDIR)Event/EventInfo.cpp                         \
-            $(COREDIR)Event/EventManager.cpp                      \
             $(COREDIR)Network/Exception.cpp                       \
             $(COREDIR)Network/NetworkManager.cpp                  \
             $(COREDIR)Network/Http/AHttpMessage.cpp               \

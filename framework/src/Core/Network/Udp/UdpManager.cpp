@@ -5,7 +5,6 @@
 #include  "Library/Tool/Macro.hh"
 #include  "Core/Network/Udp/UdpManager.hh"
 #include  "Core/Network/Exception.hh"
-#include  "Core/Event/EventManager.hh"
 
 using namespace fwk;
 

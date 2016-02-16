@@ -67,7 +67,7 @@ void  EventTask::reinit(void) {
   this->_args = nullptr;
 }
 
-void  EventTask::init(const EventHandle* ebase, IEventArgs* args) {
+void  EventTask::init(EventHandle* ebase, IEventArgs* args) {
   this->_eventCreation = ebase->lastOutOfPoolTimePoint();
   this->_event = ebase;
   this->_args = args;

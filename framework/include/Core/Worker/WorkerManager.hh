@@ -114,7 +114,7 @@ namespace fwk {
      *  \param event the event.
      *  \param args the event arguments.
      */
-    void  addEventTask(const EventHandle* event, IEventArgs* args);
+    void  addEventTask(EventHandle* event, IEventArgs* args);
 
     /**
      *  \brief Adds an HttpTask to the task queue.

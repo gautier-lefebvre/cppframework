@@ -1,7 +1,6 @@
 #include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Library/Tool/Converter.hpp"
 #include  "Library/Tool/Logger.hpp"
-#include  "Core/Event/EventManager.hh"
 #include  "Core/Worker/WorkerThread.hh"
 #include  "Core/Worker/WorkerManager.hh"
 #include  "Core/Event/Exception.hh"
@@ -153,36 +152,26 @@ void  WorkerThread::executeEventTask(ATask* task, bool exec) {
 
   if (eventTask) {
     try {
-      // execute only if the event was not unregistered before it was executed
-      if (eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
-        try {
-          const EventInfo& eventInfo = EventManager::get().getInfo(eventTask->_event);
-
-          if (exec) {
-            for (auto& subscriber : eventInfo.subscribers) {
-              subscriber.second(eventTask->_args);
-            }
-          }
-
-        } catch (const EventNotRegisteredException& e) {
-          WARNING(e.what());
+      // execute only if the event was not reinit between being added to the task queue and being executed.
+      if (eventTask->_event && eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
+        // call every subscriber.
+        if (exec) {
+          eventTask->_event->exec(eventTask->_args);
         }
-      } else if (!eventTask->_event->isValid()) {
-        // if not unregistered but in the pool -> unregister now
-        EventManager::get().unregisterEvent(eventTask->_event);
       }
 
-      // return the arguments and its attributes to their factory
+      // return the arguments to its pool.
       if (eventTask->_args) {
         eventTask->_args->cleanup();
       }
+
+      EventTask::returnToPool(eventTask);
 
     } catch (const std::exception&) {
       EventTask::returnToPool(eventTask);
       throw;
     }
 
-    EventTask::returnToPool(eventTask);
   } else {
     CRITICAL("Cant reinterpret_cast an EventTask");
   }

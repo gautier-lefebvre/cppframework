@@ -97,8 +97,8 @@ namespace fwk {
   class EventTask :public ATask, public APooled<EventTask> {
   public:
     std::chrono::steady_clock::time_point _eventCreation; /*!< time of event firing. */
-    const EventHandle* _event; /*!< the event fired. */
-    IEventArgs*        _args; /*!< the event arguments. */
+    EventHandle* _event; /*!< the event fired. */
+    IEventArgs*  _args; /*!< the event arguments. */
 
   public:
     /**
@@ -123,7 +123,7 @@ namespace fwk {
      *  \param event the fired event.
      *  \param args the event arguments.
      */
-    void  init(const EventHandle* event, IEventArgs* args);
+    void  init(EventHandle* event, IEventArgs* args);
   };
 
   /**

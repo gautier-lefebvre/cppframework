@@ -1,34 +1,57 @@
 #include  "Core/Event/EventHandle.hh"
-#include  "Core/Event/EventManager.hh"
+#include  "Core/Worker/WorkerManager.hh"
+#include  "Core/Worker/WorkerThread.hh"
 
 using namespace fwk;
 
 EventHandle::EventHandle(void):
-  APooled<EventHandle>()
+  APooled<EventHandle>(),
+  Lockable(),
+  _subscribers()
 {}
 
-void EventHandle::reinit(void) {}
-
-void EventHandle::fireAsync(IEventArgs* args) const {
-  EventManager::get().fireEventAsync(this, args);
+void EventHandle::reinit(void) {
+  SCOPELOCK(this);
+  this->_subscribers.clear();
 }
 
-void EventHandle::fireSync(IEventArgs* args) const {
-  EventManager::get().fireEventSync(this, args);
+void EventHandle::fireAsync(IEventArgs* args) {
+  SCOPELOCK(this);
+  WorkerManager::get().addEventTask(this, args);
 }
 
-void EventHandle::subscribe(const std::function<void (const IEventArgs*)>& callback, const void *key) const {
-  EventManager::get().subscribeToEvent(this, callback, key);
+void EventHandle::fireSync(IEventArgs* args) {
+  EventTask* eventTask = nullptr;
+
+  try {
+    eventTask = EventTask::getFromPool(this, args);
+    WorkerThread::executeEventTask(eventTask, true);
+  } catch (const std::exception& e) {
+    CRITICAL(e.what());
+    EventTask::returnToPool(eventTask);
+  }
 }
 
-void EventHandle::unsubscribe(const void *key) const {
-  EventManager::get().unsubscribeFromEvent(this, key);
+void EventHandle::subscribe(const std::function<void (const IEventArgs*)>& callback, const void *key) {
+  SCOPELOCK(this);
+  this->_subscribers[key] = callback;
 }
 
-void EventHandle::registerToManager(void) const {
-  EventManager::get().registerEvent(this);
+void EventHandle::unsubscribe(const void *key) {
+  SCOPELOCK(this);
+  this->_subscribers.erase(key);
 }
 
-void EventHandle::unregisterFromManager(void) const {
-  EventManager::get().unregisterEvent(this);
+void EventHandle::exec(const IEventArgs* args) {
+  SCOPELOCK(this);
+
+  for (auto& it : this->_subscribers) {
+    try {
+      if (it.second) {
+        it.second(args);
+      }
+    } catch (const std::exception& e) {
+      CRITICAL(e.what());
+    }
+  }
 }

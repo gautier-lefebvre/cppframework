@@ -89,7 +89,7 @@ void  WorkerManager::addSimpleTask(const std::function<void (void)>& cb, const s
   this->addTask(simpleTask);
 }
 
-void  WorkerManager::addEventTask(const EventHandle* event, IEventArgs* args) {
+void  WorkerManager::addEventTask(EventHandle* event, IEventArgs* args) {
   if (event != nullptr) {
     EventTask* eventTask = EventTask::getFromPool(event, args);
     this->addTask(eventTask);

@@ -4,7 +4,6 @@
 #include  "Library/ThirdParty/cppformat/format.hh"
 #include  "Core/Network/Tcp/TcpManager.hh"
 #include  "Core/Network/Exception.hh"
-#include  "Core/Event/EventManager.hh"
 
 using namespace fwk;
 

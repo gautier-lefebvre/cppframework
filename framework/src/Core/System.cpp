@@ -1,7 +1,6 @@
 #include  "Core/System.hh"
 #include  "Library/Tool/Logger.hpp"
 #include  "Library/Tool/Signal.hh"
-#include  "Core/Event/EventManager.hh"
 #include  "Core/Network/Http/HttpClient.hh"
 #include  "Core/Network/NetworkManager.hh"
 #include  "Core/Worker/WorkerManager.hh"
@@ -40,7 +39,6 @@ void System::cleanup(void) {
   HttpClient::destroy();
   NetworkManager::destroy();
   WorkerManager::destroy();
-  EventManager::destroy();
   Signal::destroy();
 
   // destroy core factory
