@@ -104,8 +104,8 @@ namespace fwk {
      *  \param args the arguments which will be passed to the constructor of the templated class.
      */
     template<typename... Args>
-    TNotifiable(const Args&... args):
-      C(args...),
+    TNotifiable(Args&&... args):
+      C(std::forward<Args>(args)...),
       Notifiable()
     {}
 

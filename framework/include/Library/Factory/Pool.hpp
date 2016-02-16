@@ -110,9 +110,9 @@ namespace fwk {
      *  \return the object popped from the pool, initialized.
      */
     template<typename... Args>
-    C*  get(const Args&... args) {
+    C*  get(Args&&... args) {
       C* item = this->get();
-      item->init(args...);
+      item->init(std::forward<Args>(args)...);
       return item;
     }
 

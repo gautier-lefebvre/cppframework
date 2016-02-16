@@ -1,6 +1,8 @@
 #ifndef    __LIBRARY_PROPERTY_INITIALIZABLE_HPP__
 #define    __LIBRARY_PROPERTY_INITIALIZABLE_HPP__
 
+#include  <utility>
+
 namespace fwk {
   /**
    *  \class Initializable Library/Property/Initializable.hpp
@@ -51,8 +53,8 @@ namespace fwk {
      *  Whatever arguments are passed to the constructor are passed to the templated class.
      */
     template<typename... Args>
-    TInitializable(const Args&... args):
-      C(args...),
+    TInitializable(Args&&... args):
+      C(std::forward<Args>(args)...),
       Initializable()
     {}
 

@@ -40,8 +40,8 @@ namespace fwk {
      *  \return the object.
      */
     template<typename... Args>
-    static C*  getFromPool(const Args&... args) {
-      return APooled<C>::_pool.get(args...);
+    static C*  getFromPool(Args&&... args) {
+      return APooled<C>::_pool.get(std::forward<Args>(args)...);
     }
 
     /**

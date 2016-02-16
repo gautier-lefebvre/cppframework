@@ -58,8 +58,8 @@ namespace fwk {
      *  \param args the arguments which will be passed to the constructor of the templated class.
      */
     template<typename... Args>
-    TLockable(const Args&... args):
-      C(args...),
+    TLockable(Args&&... args):
+      C(std::forward<Args>(args)...),
       Lockable()
     {}
 
