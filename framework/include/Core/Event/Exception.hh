@@ -14,7 +14,7 @@ namespace fwk {
      *  \brief Constructor of EventNotRegisteredException.
      *  \param message the error message.
      */
-    EventNotRegisteredException(const std::string& message = "This event was not registered") noexcept;
+    EventNotRegisteredException(const std::string&& message = "This event was not registered") noexcept;
 
     /**
      *  \brief Destructor of EventNotRegisteredException.

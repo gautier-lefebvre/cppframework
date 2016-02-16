@@ -119,8 +119,7 @@ static void udpClient(fwk::System* system, const std::string& hostname, uint16_t
 static void http(fwk::System* system) {
   fwk::HttpRequest* request;
   fwk::HttpConnection* connection = fwk::HttpClient::get().initConnection(
-    // "jsonplaceholder.typicode.com",
-    "ldqlkjdlqs.com",
+    "jsonplaceholder.typicode.com",
     80,
     fwk::HttpProtocol::HTTP,
     true);
