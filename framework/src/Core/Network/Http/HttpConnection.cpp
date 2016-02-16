@@ -123,6 +123,7 @@ HttpResponse*  HttpConnection::sendRequest(const ::HttpRequest *request) const {
     response = this->exec(request);
   } catch (const NetworkException& e) {
     response = HttpResponse::getFromPool();
+    response->init();
     response->_isValid = false;
     response->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
     response->reason = e.what();
@@ -140,6 +141,7 @@ void HttpConnection::prepareHandle(curlxx::EasyHandle* handle, const HttpRequest
     handle->setPort(this->_port);
     handle->setMethod(request->method);
     handle->setHeaders(request->headers);
+    handle->enableFollowLocation(true);
 
     // set body or set file
     if (request->file.isFile) {
@@ -149,7 +151,6 @@ void HttpConnection::prepareHandle(curlxx::EasyHandle* handle, const HttpRequest
     }
 
     // set response callbacks
-    response->init();
     handle->setResponseCallbacks(response, &write_callback, &header_callback);
   } catch (const std::exception& e) {
     throw NetworkException(e.what());
@@ -171,6 +172,8 @@ curlxx::EasyHandle* HttpConnection::prepareHandle(const HttpRequest *request, Ht
 
 HttpResponse* HttpConnection::exec(const HttpRequest *request) const {
   HttpResponse* response = HttpResponse::getFromPool();
+  response->init();
+
   curlxx::EasyHandle* handle = nullptr;
 
   try {
@@ -232,6 +235,18 @@ size_t  HttpConnection::header_callback(void *data, size_t size, size_t nmemb, v
     response->headers[key] = value;
   } else {
     trim(header);
+
+    // no headers yet -> status line
+    if (response->headers.empty()) {
+      size_t i, spaces = 0;
+      for (i = 0; i < header.length() - 1; ++i) {
+        // 2 spaces before "HTTPN/M STATUS {REASON}"
+        if (header[i] == ' ' && ++spaces >= 2) {
+          response->reason = std::string(header.c_str() + i + 1);
+          break;
+        }
+      }
+    }
 
     if (header.length() == 0) {
       return size * nmemb;

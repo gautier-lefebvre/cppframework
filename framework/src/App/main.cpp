@@ -118,14 +118,19 @@ static void udpClient(fwk::System* system, const std::string& hostname, uint16_t
 
 static void http(fwk::System* system) {
   fwk::HttpRequest* request;
-  fwk::HttpConnection* connection = fwk::HttpClient::get().initConnection("jsonplaceholder.typicode.com", 80, fwk::HttpProtocol::HTTP, true);
+  fwk::HttpConnection* connection = fwk::HttpClient::get().initConnection(
+    // "jsonplaceholder.typicode.com",
+    "ldqlkjdlqs.com",
+    80,
+    fwk::HttpProtocol::HTTP,
+    true);
 
   request = fwk::HttpRequest::getFromPool();
   request->init();
   request->method = "GET";
   request->url = "/posts";
   request->success = [] (const fwk::HttpResponse* response) -> void {
-    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    INFO(fmt::format("Response: {} {} / Size: {}", response->status, response->reason, response->body->getSize()));
   };
   request->error = [] (const fwk::HttpResponse* response) -> void {
     WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));

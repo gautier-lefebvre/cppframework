@@ -174,6 +174,10 @@ void curlxx::EasyHandle::setResponseCallbacks(void* responsePtr, size_t (*body)(
   this->setOpt(CURLOPT_HEADERDATA, responsePtr);
 }
 
+void curlxx::EasyHandle::enableFollowLocation(bool enable) const {
+  this->setOpt(CURLOPT_FOLLOWLOCATION, enable ? 1L : 0L);
+}
+
 CURL* curlxx::EasyHandle::getHandle(void) const {
   return this->_handle;
 }
