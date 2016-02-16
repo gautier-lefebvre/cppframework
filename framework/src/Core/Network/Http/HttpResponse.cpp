@@ -4,8 +4,10 @@ using namespace fwk;
 
 HttpResponse::HttpResponse(void):
   AHttpMessage(),
+  APooled<HttpResponse>(),
   status(0),
-  reason("")
+  reason(""),
+  _isValid(false)
 {}
 
 HttpResponse::~HttpResponse(void) {}
@@ -14,4 +16,5 @@ void  HttpResponse::reinit(void) {
   this->AHttpMessage::reinit();
   this->status = 0;
   this->reason = "";
+  this->_isValid = false;
 }

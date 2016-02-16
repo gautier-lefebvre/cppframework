@@ -4,6 +4,7 @@ using namespace fwk;
 
 HttpRequest::HttpRequest(void):
   AHttpMessage(),
+  APooled<HttpRequest>(),
   method(""),
   url(""),
   success(nullptr),

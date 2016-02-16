@@ -67,11 +67,15 @@ namespace fwk {
       GATEWAY_TIMEOUT                 = 504,
       HTTP_VERSION_NOT_SUPPORTED      = 505,
       INSUFFICIENT_STORAGE            = 507,
-      NOT_EXTENDED                    = 510
+      NOT_EXTENDED                    = 510,
+
+      INVALID_RESPONSE                = 1000,
     };
 
     uint32_t  status; /*!< status of the response (200, 400, ...). */
-    std::string reason; /*!< reason of the response ("Success", "Bad Request", ...). This does not work with cURL. */
+    std::string  reason; /*!< reason of the response ("Success", "Bad Request", ...). This does not work with cURL. */
+
+    bool  _isValid; /*!< set to false when the response was not actually read, but there was an error. */
 
     /**
      *  \brief Constructor of HttpResponse.

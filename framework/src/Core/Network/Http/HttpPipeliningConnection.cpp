@@ -78,7 +78,8 @@ void  HttpPipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::Mult
 
       // set general error response
       std::get<2>(it.second) = true;
-      std::get<1>(it.second)->status = 400;
+      std::get<1>(it.second)->_isValid = false;
+      std::get<1>(it.second)->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
       std::get<1>(it.second)->reason = e.what();
 
       // add http task or wake waiting thread
@@ -118,7 +119,8 @@ void  HttpPipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::Mult
   // set general error status
   for (auto& it : pipelined) {
     if (std::get<2>(it.second) == false) {
-      std::get<1>(it.second)->status = 400;
+      std::get<1>(it.second)->_isValid = false;
+      std::get<1>(it.second)->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
       std::get<1>(it.second)->reason = "HTTP pipelining failed";
 
       // add http job or wake waiting thread
@@ -138,6 +140,7 @@ void HttpPipeliningConnection::getAnswers(HandlesMap& pipelined, curlxx::MultiHa
       if (easyHandle != nullptr) {
         // set status
         auto& handleData = pipelined.at(easyHandle);
+        std::get<1>(handleData)->_isValid = true;
         std::get<1>(handleData)->status = easyHandle->getStatus();
         std::get<2>(handleData) = true;
 

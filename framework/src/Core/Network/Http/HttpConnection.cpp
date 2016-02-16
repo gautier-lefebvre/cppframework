@@ -123,7 +123,8 @@ HttpResponse*  HttpConnection::sendRequest(const ::HttpRequest *request) const {
     response = this->exec(request);
   } catch (const NetworkException& e) {
     response = HttpResponse::getFromPool();
-    response->status = 400;
+    response->_isValid = false;
+    response->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
     response->reason = e.what();
   }
 
@@ -178,6 +179,7 @@ HttpResponse* HttpConnection::exec(const HttpRequest *request) const {
     // send request and get status
     handle->perform();
     response->status = handle->getStatus();
+    response->_isValid = true;
 
     curlxx::EasyHandle::returnToPool(handle);
 
