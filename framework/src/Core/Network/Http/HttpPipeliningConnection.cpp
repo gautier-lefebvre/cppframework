@@ -80,7 +80,6 @@ void  HttpPipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::Mult
       // set general error response
       std::get<2>(it.second) = true;
       std::get<1>(it.second)->_isValid = false;
-      DEBUG("YELLO");
       std::get<1>(it.second)->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
       std::get<1>(it.second)->reason = e.what();
 
@@ -122,7 +121,6 @@ void  HttpPipeliningConnection::sendPipeline(HandlesMap& pipelined, curlxx::Mult
   for (auto& it : pipelined) {
     if (std::get<2>(it.second) == false) {
       std::get<1>(it.second)->_isValid = false;
-      DEBUG("YELLO");
       std::get<1>(it.second)->status = static_cast<uint32_t>(HttpResponse::Status::INVALID_RESPONSE);
       std::get<1>(it.second)->reason = "HTTP pipelining failed";
 
