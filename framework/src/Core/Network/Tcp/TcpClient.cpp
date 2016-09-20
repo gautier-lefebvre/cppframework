@@ -9,12 +9,12 @@ TcpClient::TcpClient(const std::string& hostname, uint16_t port, TcpSocketStream
   socket(socket),
   active(false),
   events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
+    EventHandle<TcpSocketStream*>::getFromPool(),
+    EventHandle<TcpSocketStream*>::getFromPool()
   })
 {}
 
 TcpClient::~TcpClient(void) {
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClosed);
+  EventHandle<TcpSocketStream*>::returnToPool(this->events.onReceivedData);
+  EventHandle<TcpSocketStream*>::returnToPool(this->events.onClosed);
 }

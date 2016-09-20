@@ -33,7 +33,6 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)FactoryManager.cpp                          \
             $(COREDIR)System.cpp                                  \
             $(COREDIR)Event/Exception.cpp                         \
-            $(COREDIR)Event/EventHandle.cpp                       \
             $(COREDIR)Network/Exception.cpp                       \
             $(COREDIR)Network/NetworkManager.cpp                  \
             $(COREDIR)Network/Http/AHttpMessage.cpp               \
@@ -43,7 +42,6 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)Network/Http/HttpResponse.cpp               \
             $(COREDIR)Network/Http/HttpPipeliningConnection.cpp   \
             $(COREDIR)Network/Tcp/TcpClient.cpp                   \
-            $(COREDIR)Network/Tcp/TcpEvents.cpp                   \
             $(COREDIR)Network/Tcp/TcpManager.cpp                  \
             $(COREDIR)Network/Tcp/TcpServer.cpp                   \
             $(COREDIR)Network/Tcp/TcpSocket.cpp                   \
@@ -51,7 +49,6 @@ CORESRC=    $(COREDIR)Exception.cpp                               \
             $(COREDIR)Network/Udp/AUdpSocket.cpp                  \
             $(COREDIR)Network/Udp/AUdpSocketIO.cpp                \
             $(COREDIR)Network/Udp/UdpClient.cpp                   \
-            $(COREDIR)Network/Udp/UdpEvents.cpp                   \
             $(COREDIR)Network/Udp/UdpManager.cpp                  \
             $(COREDIR)Network/Udp/UdpServer.cpp                   \
             $(COREDIR)Network/Udp/UdpSocketClient.cpp             \

@@ -8,13 +8,13 @@ UdpClient::UdpClient(const std::string& hostname, uint16_t port, UdpSocketStream
   socket(socket),
   active(false),
   events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
+    EventHandle<UdpSocketStream*>::getFromPool(),
+    EventHandle<UdpSocketStream*>::getFromPool()
   })
 {}
 
 UdpClient::~UdpClient(void) {
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClosed);
+  EventHandle<UdpSocketStream*>::returnToPool(this->events.onReceivedData);
+  EventHandle<UdpSocketStream*>::returnToPool(this->events.onClosed);
 }
 

@@ -5,7 +5,7 @@
 #include  <set>
 
 #include  "Library/Threading/Lockable.hpp"
-#include  "Core/Event/EventHandle.hh"
+#include  "Core/Event/EventHandle.hpp"
 #include  "Core/Network/Udp/UdpSocketClient.hh"
 #include  "Core/Network/Udp/UdpSocketServer.hh"
 
@@ -24,10 +24,10 @@ namespace fwk {
     bool active; /*!< the server is running. */
 
     struct {
-      EventHandle* onNewClient; /*!< Event fired whenever a new client sends a message to this server. Event argument type: UdpSocketClientEventArgs. */
-      EventHandle* onReceivedData; /*!< Event fired whenever data is read from a client of this server. Event argument type: UdpSocketClientEventArgs. */
-      EventHandle* onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. Event argument type: UdpSocketClientEventArgs. */
-      EventHandle* onClosed; /*!< Event fired when this server is closed. Event argument type: UdpSocketServerEventArgs. */
+      EventHandle<UdpSocketClient*>* onNewClient; /*!< Event fired whenever a new client sends a message to this server. */
+      EventHandle<UdpSocketClient*>* onReceivedData; /*!< Event fired whenever data is read from a client of this server. */
+      EventHandle<UdpSocketClient*>* onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. */
+      EventHandle<UdpSocketServer*>* onClosed; /*!< Event fired when this server is closed. */
     } events; /*!< events for this server */
 
   public:

@@ -8,8 +8,6 @@
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
-#include  "Core/Event/EventHandle.hh"
-#include  "Core/Event/IEventArgs.hh"
 #include  "Core/Worker/Task.hh"
 #include  "Core/Worker/WorkerThread.hh"
 
@@ -111,10 +109,10 @@ namespace fwk {
 
     /**
      *  \brief Adds an EventTask to the task queue.
-     *  \param event the event.
-     *  \param args the event arguments.
+     *  \param eventTimePoint the time point when the event was taken out of the pool. This parameter is only used to determine whether or not the event must be executed when it is fired (in the case of an asynchronous event).
+     *  \param callback the function to call when the event is fired.
      */
-    void  addEventTask(EventHandle* event, IEventArgs* args);
+    void  addEventTask(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback);
 
     /**
      *  \brief Adds an HttpTask to the task queue.

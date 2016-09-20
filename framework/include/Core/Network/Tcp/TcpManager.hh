@@ -6,7 +6,6 @@
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
 #include  "Core/Network/Tcp/TcpClient.hh"
-#include  "Core/Network/Tcp/TcpEvents.hh"
 #include  "Core/Network/Tcp/TcpServer.hh"
 #include  "Core/Network/Tcp/TcpSocket.hh"
 #include  "Core/Network/Tcp/TcpSocketStream.hh"
@@ -161,21 +160,7 @@ namespace fwk {
      *  \param ss the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle* event, TcpSocketStream* ss, const std::string& message);
-
-    /**
-     *  \brief Fires an event with the socket as argument.
-     *  \param event the event to fire.
-     *  \param socket the socket to send as argument of the event.
-     */
-    void  __fireEvent(EventHandle *event, TcpSocketStream* socket) const;
-
-    /**
-     *  \brief Fires an event with the socket as argument.
-     *  \param event the event to fire.
-     *  \param socket the socket to send as argument of the event.
-     */
-    void  __fireEvent(EventHandle *event, TcpSocket* socket) const;
+    void  __onIOException(EventHandle<TcpSocketStream*>* event, TcpSocketStream* ss, const std::string& message);
   };
 }
 

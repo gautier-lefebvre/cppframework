@@ -89,11 +89,9 @@ void  WorkerManager::addSimpleTask(const std::function<void (void)>& cb, const s
   this->addTask(simpleTask);
 }
 
-void  WorkerManager::addEventTask(EventHandle* event, IEventArgs* args) {
-  if (event != nullptr) {
-    EventTask* eventTask = EventTask::getFromPool(event, args);
-    this->addTask(eventTask);
-  }
+void  WorkerManager::addEventTask(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback) {
+  EventTask* eventTask = EventTask::getFromPool(eventTimePoint, callback);
+  this->addTask(eventTask);
 }
 
 void  WorkerManager::addHttpTask(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {

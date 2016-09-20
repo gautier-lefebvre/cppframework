@@ -152,17 +152,9 @@ void  WorkerThread::executeEventTask(ATask* task, bool exec) {
 
   if (eventTask) {
     try {
-      // execute only if the event was not reinit between being added to the task queue and being executed.
-      if (eventTask->_event && eventTask->_event->isValid() && eventTask->_eventCreation == eventTask->_event->lastOutOfPoolTimePoint()) {
-        // call every subscriber.
-        if (exec) {
-          eventTask->_event->exec(eventTask->_args);
-        }
-      }
-
-      // return the arguments to its pool.
-      if (eventTask->_args) {
-        eventTask->_args->cleanup();
+      // call every subscriber.
+      if (exec) {
+        eventTask->_callback(eventTask->_eventCreation);
       }
 
       EventTask::returnToPool(eventTask);

@@ -6,8 +6,7 @@
 
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
-#include  "Core/Event/EventHandle.hh"
-#include  "Core/Network/Udp/UdpEvents.hh"
+#include  "Core/Event/EventHandle.hpp"
 #include  "Core/Network/Udp/UdpClient.hh"
 #include  "Core/Network/Udp/UdpServer.hh"
 #include  "Core/Network/Udp/UdpSocketServer.hh"
@@ -165,7 +164,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle *event, UdpSocketClient *socket, const std::string& message);
+    void  __onIOException(EventHandle<UdpSocketClient*>* event, UdpSocketClient *socket, const std::string& message);
 
     /**
      *  \brief Called when there is an I/O exception. Fires the given event with the socket as argument.
@@ -173,28 +172,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle *event, UdpSocketStream *socket, const std::string& message);
-
-    /**
-     *  \brief Fires an event with the socket as argument.
-     *  \param event the event to fire.
-     *  \param socket the socket to send as argument of the event.
-     */
-    void  __fireEvent(EventHandle *event, UdpSocketStream *socket) const;
-
-    /**
-     *  \brief Fires an event with the socket as argument.
-     *  \param event the event to fire.
-     *  \param socket the socket to send as argument of the event.
-     */
-    void  __fireEvent(EventHandle *event, UdpSocketClient *socket) const;
-
-    /**
-     *  \brief Fires an event with the socket as argument.
-     *  \param event the event to fire.
-     *  \param socket the socket to send as argument of the event.
-     */
-    void  __fireEvent(EventHandle *event, UdpSocketServer *socket) const;
+    void  __onIOException(EventHandle<UdpSocketStream*>* event, UdpSocketStream *socket, const std::string& message);
   };
 }
 

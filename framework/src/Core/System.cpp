@@ -136,5 +136,5 @@ void System::run(void) {
 
   // wait for sigint
   SCOPELOCK(&(this->_endCondition));
-  this->_endCondition.wait([this] () -> bool { return this->isEnding(); });
+  this->_endCondition.wait([this] (void) -> bool { return this->isEnding(); });
 }

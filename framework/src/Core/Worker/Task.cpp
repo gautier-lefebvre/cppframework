@@ -54,8 +54,7 @@ EventTask::EventTask(void):
   ATask(ATask::Source::EVENT),
   APooled<EventTask>(),
   _eventCreation(),
-  _event(nullptr),
-  _args(nullptr)
+  _callback(nullptr)
 {}
 
 EventTask::~EventTask(void) {
@@ -63,14 +62,13 @@ EventTask::~EventTask(void) {
 }
 
 void  EventTask::reinit(void) {
-  this->_event = nullptr;
-  this->_args = nullptr;
+  this->_eventCreation = std::chrono::steady_clock::time_point::min();
+  this->_callback = nullptr;
 }
 
-void  EventTask::init(EventHandle* ebase, IEventArgs* args) {
-  this->_eventCreation = ebase->lastOutOfPoolTimePoint();
-  this->_event = ebase;
-  this->_args = args;
+void  EventTask::init(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback) {
+  this->_eventCreation = eventTimePoint;
+  this->_callback = callback;
 }
 
 /**

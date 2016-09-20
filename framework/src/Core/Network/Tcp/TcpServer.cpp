@@ -11,16 +11,16 @@ TcpServer::TcpServer(uint16_t port, TcpSocket* server):
   blacklist(),
   active(false),
   events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
+    EventHandle<TcpSocketStream*>::getFromPool(),
+    EventHandle<TcpSocketStream*>::getFromPool(),
+    EventHandle<TcpSocketStream*>::getFromPool(),
+    EventHandle<TcpSocket*>::getFromPool()
   })
 {}
 
 TcpServer::~TcpServer(void) {
-  EventHandle::returnToPool(this->events.onAccept);
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClientClosed);
-  EventHandle::returnToPool(this->events.onClosed);
+  EventHandle<TcpSocketStream*>::returnToPool(this->events.onAccept);
+  EventHandle<TcpSocketStream*>::returnToPool(this->events.onReceivedData);
+  EventHandle<TcpSocketStream*>::returnToPool(this->events.onClientClosed);
+  EventHandle<TcpSocket*>::returnToPool(this->events.onClosed);
 }

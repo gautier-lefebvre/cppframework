@@ -2,7 +2,7 @@
 #define   __CORE_NETWORK_UDP_UDPCLIENT_HH__
 
 #include  "Library/Threading/Lockable.hpp"
-#include  "Core/Event/EventHandle.hh"
+#include  "Core/Event/EventHandle.hpp"
 #include  "Core/Network/Udp/UdpSocketStream.hh"
 
 namespace fwk {
@@ -18,8 +18,8 @@ namespace fwk {
     bool active; /*!< the client is running. */
 
     struct {
-      EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: UdpSocketStreamEventArgs. */
-      EventHandle* onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. Event argument type: UdpSocketStreamEventArgs. */
+      EventHandle<UdpSocketStream*>* onReceivedData; /*!< Event fired whenever data is read from this socket. */
+      EventHandle<UdpSocketStream*>* onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. */
     } events; /*!< events for this client */
 
   public:

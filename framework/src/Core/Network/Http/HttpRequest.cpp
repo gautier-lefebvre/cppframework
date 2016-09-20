@@ -43,7 +43,7 @@ void  HttpRequest::cleanResponse(void) {
 
 bool  HttpRequest::wait(void) {
   SCOPELOCK(&(this->asynchronous.lock));
-  this->asynchronous.lock.wait([this] () -> bool { return !this->asynchronous.isValid || this->asynchronous.response; });
+  this->asynchronous.lock.wait([this] (void) -> bool { return !this->asynchronous.isValid || this->asynchronous.response; });
 
   return this->asynchronous.isValid || this->asynchronous.response;
 }

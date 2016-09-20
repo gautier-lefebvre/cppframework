@@ -25,12 +25,12 @@ void UdpManager::clear(void) {
     for (auto server_it = this->_servers.begin(); server_it != this->_servers.end() ; ++server_it) {
       for (auto& client : (*server_it).clients) {
         // fire onClientClosed event
-        this->__fireEvent((*server_it).events.onClientClosed, client);
+        (*server_it).events.onClientClosed->fireSync(client);
         // close client
         UdpSocketClient::returnToPool(client);
       }
       // fire onClosed event
-      this->__fireEvent((*server_it).events.onClosed, (*server_it).server);
+      (*server_it).events.onClosed->fireSync((*server_it).server);
       // close server
       UdpSocketServer::returnToPool((*server_it).server);
       // remove server
@@ -43,7 +43,7 @@ void UdpManager::clear(void) {
     SCOPELOCK(&(this->_clients));
     for (auto client_it = this->_clients.begin(); client_it != this->_clients.end() ; ++client_it) {
       // fire onClosed event
-      this->__fireEvent((*client_it).events.onClosed, (*client_it).socket);
+      (*client_it).events.onClosed->fireSync((*client_it).socket);
       // close connection
       UdpSocketStream::returnToPool((*client_it).socket);
       // remove connection
@@ -118,13 +118,13 @@ void UdpManager::close(uint16_t port) {
   if (server_it != this->_servers.end()) {
     for (auto& client : (*server_it).clients) {
       // fire onClientClosed event
-      this->__fireEvent((*server_it).events.onClientClosed, client);
+      (*server_it).events.onClientClosed->fireSync(client);
       // send client back to pool
       UdpSocketClient::returnToPool(client);
     }
 
     // fire server close event
-    this->__fireEvent((*server_it).events.onClosed, (*server_it).server);
+    (*server_it).events.onClosed->fireSync((*server_it).server);
     // close server
     UdpSocketServer::returnToPool((*server_it).server);
 
@@ -211,7 +211,7 @@ void UdpManager::close(const std::string& hostname, uint16_t port) {
   // if found
   if (client_it != this->_clients.end()) {
     // fire close event
-    this->__fireEvent((*client_it).events.onClosed, (*client_it).socket);
+    (*client_it).events.onClosed->fireSync((*client_it).socket);
     // close socket
     UdpSocketStream::returnToPool((*client_it).socket);
 
@@ -400,7 +400,7 @@ void UdpManager::recv(fd_set& set) {
               (*client_it)->received(datagram);
 
               // fire data received event
-              this->__fireEvent(server.events.onReceivedData, *client_it);
+              server.events.onReceivedData->fireSync(*client_it);
             } else {
               uint32_t remote_ip = static_cast<uint32_t>(addr.sin_addr.s_addr);
 
@@ -426,9 +426,9 @@ void UdpManager::recv(fd_set& set) {
 
               server.clients.push_back(client);
               // fire new client event
-              this->__fireEvent(server.events.onNewClient, client);
+              server.events.onNewClient->fireSync(client);
               // fire data received event
-              this->__fireEvent(server.events.onReceivedData, client);
+              server.events.onReceivedData->fireSync(client);
             }
           } catch (const NetworkException& e) {
             ByteArray::returnToPool(datagram);
@@ -438,7 +438,7 @@ void UdpManager::recv(fd_set& set) {
           // if recvfrom excepted and client in list -> remove client
           if (client_it != server.clients.end()) {
             // fire onClientClosed event
-            this->__fireEvent(server.events.onClientClosed, *client_it);
+            server.events.onClientClosed->fireSync(*client_it);
             // remove client
             client_it = server.clients.erase(client_it);
           }
@@ -455,7 +455,7 @@ void UdpManager::recv(fd_set& set) {
           // receive data
           (*client_it).socket->recvfrom();
           // fire onReceivedData event
-          this->__fireEvent((*client_it).events.onReceivedData, (*client_it).socket);
+          (*client_it).events.onReceivedData->fireSync((*client_it).socket);
         } catch (const NetworkException& e) {
           // fire onClosed event + close socket
           this->__onIOException((*client_it).events.onClosed, (*client_it).socket, e.what());
@@ -467,37 +467,16 @@ void UdpManager::recv(fd_set& set) {
   }
 }
 
-void UdpManager::__onIOException(EventHandle* event, UdpSocketClient* socket, const std::string&) {
+void UdpManager::__onIOException(EventHandle<UdpSocketClient*>* event, UdpSocketClient* socket, const std::string&) {
   // fire closed event
-  this->__fireEvent(event, socket);
+  event->fireSync(socket);
   // close socket
   UdpSocketClient::returnToPool(socket);
 }
 
-void UdpManager::__onIOException(EventHandle* event, UdpSocketStream* socket, const std::string&) {
+void UdpManager::__onIOException(EventHandle<UdpSocketStream*>* event, UdpSocketStream* socket, const std::string&) {
   // fire closed event
-  this->__fireEvent(event, socket);
+  event->fireSync(socket);
   // close socket
   UdpSocketStream::returnToPool(socket);
-}
-
-void UdpManager::__fireEvent(EventHandle* event, UdpSocketStream* socket) const {
-	if (event && socket) {
-	  UdpSocketStreamEventArgs* ssargs = UdpSocketStreamEventArgs::getFromPool(socket);
-    event->fireSync(ssargs);
-	}
-}
-
-void UdpManager::__fireEvent(EventHandle* event, UdpSocketServer* socket) const {
-	if (event && socket) {
-	  UdpSocketServerEventArgs* ssargs = UdpSocketServerEventArgs::getFromPool(socket);
-    event->fireSync(ssargs);
-	}
-}
-
-void UdpManager::__fireEvent(EventHandle* event, UdpSocketClient* socket) const {
-	if (event && socket) {
-	  UdpSocketClientEventArgs* scargs = UdpSocketClientEventArgs::getFromPool(socket);
-    event->fireSync(scargs);
-	}
 }

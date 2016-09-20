@@ -4,7 +4,7 @@
 #include  <string>
 
 #include  "Library/Threading/Lockable.hpp"
-#include  "Core/Event/EventHandle.hh"
+#include  "Core/Event/EventHandle.hpp"
 #include  "Core/Network/Tcp/TcpSocketStream.hh"
 
 namespace fwk {
@@ -20,8 +20,8 @@ namespace fwk {
     bool active; /*!< the client is running. */
 
     struct {
-      EventHandle* onReceivedData; /*!< Event fired whenever data is read from this socket. Event argument type: TcpSocketStreamEventArgs. */
-      EventHandle* onClosed; /*!< Event fired when this socket is closed. Event argument type: TcpSocketStreamEventArgs. */
+      EventHandle<TcpSocketStream*>* onReceivedData; /*!< Event fired whenever data is read from this socket. */
+      EventHandle<TcpSocketStream*>* onClosed; /*!< Event fired when this socket is closed. */
     } events; /*!< events for this client */
 
   public:

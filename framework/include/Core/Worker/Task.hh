@@ -5,8 +5,6 @@
 #include  <functional>
 
 #include  "Library/Factory/APooled.hpp"
-#include  "Core/Event/EventHandle.hh"
-#include  "Core/Event/IEventArgs.hh"
 #include  "Core/Network/Http/HttpResponse.hh"
 
 namespace fwk {
@@ -97,8 +95,7 @@ namespace fwk {
   class EventTask :public ATask, public APooled<EventTask> {
   public:
     std::chrono::steady_clock::time_point _eventCreation; /*!< time of event firing. */
-    EventHandle* _event; /*!< the event fired. */
-    IEventArgs*  _args; /*!< the event arguments. */
+    std::function<void (const std::chrono::steady_clock::time_point&)> _callback; /*!< the callback (bound with event arguments). */
 
   public:
     /**
@@ -119,11 +116,11 @@ namespace fwk {
 
   public:
     /**
-     *  \brief Sets the event and its arguments.
-     *  \param event the fired event.
-     *  \param args the event arguments.
+     *  \brief Sets the event and its callback.
+     *  \param eventTimePoint the timepoint where the event was created (using event-> lastOutOfPoolTimePoint()).
+     *  \param callback the method to call when the event is executed.
      */
-    void  init(EventHandle* event, IEventArgs* args);
+    void  init(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback);
   };
 
   /**

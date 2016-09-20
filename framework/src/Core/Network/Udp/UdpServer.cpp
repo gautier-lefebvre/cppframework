@@ -11,16 +11,16 @@ UdpServer::UdpServer(uint16_t port, UdpSocketServer* server):
   blacklist(),
   active(false),
   events({
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool(),
-    EventHandle::getFromPool()
+    EventHandle<UdpSocketClient*>::getFromPool(),
+    EventHandle<UdpSocketClient*>::getFromPool(),
+    EventHandle<UdpSocketClient*>::getFromPool(),
+    EventHandle<UdpSocketServer*>::getFromPool()
   })
 {}
 
 UdpServer::~UdpServer(void) {
-  EventHandle::returnToPool(this->events.onNewClient);
-  EventHandle::returnToPool(this->events.onReceivedData);
-  EventHandle::returnToPool(this->events.onClientClosed);
-  EventHandle::returnToPool(this->events.onClosed);
+  EventHandle<UdpSocketClient*>::returnToPool(this->events.onNewClient);
+  EventHandle<UdpSocketClient*>::returnToPool(this->events.onReceivedData);
+  EventHandle<UdpSocketClient*>::returnToPool(this->events.onClientClosed);
+  EventHandle<UdpSocketServer*>::returnToPool(this->events.onClosed);
 }

@@ -86,7 +86,6 @@ namespace fwk {
 
       // if the pool is empty, try to hydrate
       if (this->_pool.empty()) {
-        // if the pool was never initialized, throw exception.
         if (this->isInitialized()) {
           this->hydrate(this->_hydrate);
         } else {
