@@ -94,8 +94,8 @@ namespace fwk {
    */
   class EventTask :public ATask, public APooled<EventTask> {
   public:
-    std::chrono::steady_clock::time_point _eventCreation; /*!< time of event firing. */
-    std::function<void (const std::chrono::steady_clock::time_point&)> _callback; /*!< the callback (bound with event arguments). */
+    const void* _key; /*!< the key used to purge. */
+    std::function<void (void)> _callback; /*!< the callback (bound with event arguments). */
 
   public:
     /**
@@ -117,10 +117,10 @@ namespace fwk {
   public:
     /**
      *  \brief Sets the event and its callback.
-     *  \param eventTimePoint the timepoint where the event was created (using event-> lastOutOfPoolTimePoint()).
+     *  \param key the key used to purge.
      *  \param callback the method to call when the event is executed.
      */
-    void  init(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback);
+    void  init(const void* key, const std::function<void (void)>& callback);
   };
 
   /**

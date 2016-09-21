@@ -20,8 +20,8 @@ namespace fwk {
     bool active; /*!< the client is running. */
 
     struct {
-      EventHandle<TcpSocketStream*>* onReceivedData; /*!< Event fired whenever data is read from this socket. */
-      EventHandle<TcpSocketStream*>* onClosed; /*!< Event fired when this socket is closed. */
+      EventHandle<TcpSocketStream*> onReceivedData; /*!< Event fired whenever data is read from this socket. */
+      EventHandle<TcpSocketStream*> onClosed; /*!< Event fired when this socket is closed. */
     } events; /*!< events for this client */
 
   public:

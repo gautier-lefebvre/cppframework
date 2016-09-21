@@ -1,9 +1,10 @@
 #ifndef    __CORE_WORKER_WORKERMANAGER_HH__
 #define    __CORE_WORKER_WORKERMANAGER_HH__
 
-#include  <queue>
+#include  <list>
 #include  <chrono>
 
+#include  "Library/Collection/OrderedList.hpp"
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Threading/Lockable.hpp"
@@ -19,8 +20,8 @@ namespace fwk {
   class WorkerManager :public Singleton<fwk::WorkerManager>, public Lockable, public AEndable {
     friend class Singleton<fwk::WorkerManager>;
   public:
-    typedef TNotifiable<std::queue<ATask*>>  TaskQueue; /*!< notifiable queue of ATask. */
-    typedef TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
+    typedef TNotifiable<std::list<ATask*>>  TaskQueue; /*!< notifiable queue of ATask. */
+    typedef TNotifiable<OrderedList<DelayedTask*>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
 
   private:
     TaskQueue _pendingTasks; /*!< tasks to execute. */
@@ -108,11 +109,11 @@ namespace fwk {
     void  addSimpleTask(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
 
     /**
-     *  \brief Adds an EventTask to the task queue.
-     *  \param eventTimePoint the time point when the event was taken out of the pool. This parameter is only used to determine whether or not the event must be executed when it is fired (in the case of an asynchronous event).
+     *  \brief Adds an EventTask to the task queue. You should use event->fireSync(...) or event->fireAsync() instead of this method.
+     *  \param key the key used to purge. The easiest way is to send 'this' from the event.
      *  \param callback the function to call when the event is fired.
      */
-    void  addEventTask(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback);
+    void  addEventTask(const void * key, const std::function<void (void)>& callback);
 
     /**
      *  \brief Adds an HttpTask to the task queue.
@@ -151,6 +152,13 @@ namespace fwk {
      *  \param startNow true if the task must be first executed right away, false if the task must be first executed after the specified duration.
      */
     void  addPeriodicTask(PeriodicTask* periodicTask, bool startNow = true);
+
+  public:
+    /**
+     *  \brief Removes all EventTasks added with the given key.
+     *  \param key the key given in addEventTask.
+     */
+    void purgeEventTasks(const void *key);
   };
 }
 

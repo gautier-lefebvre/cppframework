@@ -52,7 +52,7 @@ namespace fwk {
      *  \param port the port to bind (does not do the binding).
      *  \return the server.
      */
-    const TcpServer&  createServer(uint16_t port);
+    TcpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Bind the server of the given port and make it listen for clients.
@@ -87,7 +87,7 @@ namespace fwk {
      *  \param port port of the TCP server to connect to.
      *  \return the client.
      */
-    const TcpClient&  createClient(const std::string& hostname, uint16_t port);
+    TcpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client connect to the server.
@@ -160,7 +160,7 @@ namespace fwk {
      *  \param ss the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<TcpSocketStream*>* event, TcpSocketStream* ss, const std::string& message);
+    void  __onIOException(EventHandle<TcpSocketStream*>& event, TcpSocketStream* ss, const std::string& message);
   };
 }
 

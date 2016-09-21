@@ -49,11 +49,11 @@ void  DelayedTasksThread::routine(void) const {
       if (delayedTaskQueue.empty()) {
         delayedTaskQueue.wait();
       } else {
-        if (delayedTaskQueue.wait_until(delayedTaskQueue.top()->_timePoint) == std::cv_status::timeout) {
+        if (delayedTaskQueue.wait_until(delayedTaskQueue.front()->_timePoint) == std::cv_status::timeout) {
           if (this->isEnding()) { break; }
           if (!delayedTaskQueue.empty()) {
-            if ((delayedTask = delayedTaskQueue.top())->_timePoint <= std::chrono::steady_clock::now()) {
-              delayedTaskQueue.pop();
+            if ((delayedTask = delayedTaskQueue.front())->_timePoint <= std::chrono::steady_clock::now()) {
+              delayedTaskQueue.pop_front();
             } else {
               delayedTask = nullptr;
             }

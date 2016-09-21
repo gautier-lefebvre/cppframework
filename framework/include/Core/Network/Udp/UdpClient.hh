@@ -18,8 +18,8 @@ namespace fwk {
     bool active; /*!< the client is running. */
 
     struct {
-      EventHandle<UdpSocketStream*>* onReceivedData; /*!< Event fired whenever data is read from this socket. */
-      EventHandle<UdpSocketStream*>* onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. */
+      EventHandle<UdpSocketStream*> onReceivedData; /*!< Event fired whenever data is read from this socket. */
+      EventHandle<UdpSocketStream*> onClosed; /*!< Event fired when this socket is closed. Does not work well with UDP protocol. */
     } events; /*!< events for this client */
 
   public:

@@ -23,10 +23,10 @@ namespace fwk {
     bool active; /*!< the server is running. */
 
     struct {
-      EventHandle<TcpSocketStream*>* onAccept; /*!< Event fired whenever a new client connects to this >server. */
-      EventHandle<TcpSocketStream*>* onReceivedData; /*!< Event fired whenever data is read from a client of this server. */
-      EventHandle<TcpSocketStream*>* onClientClosed; /*!< Event fired whenever a client of this server closes. */
-      EventHandle<TcpSocket*>* onClosed; /*!< Event fired when the bound socket is closed. */
+      EventHandle<TcpSocketStream*> onAccept; /*!< Event fired whenever a new client connects to this >server. */
+      EventHandle<TcpSocketStream*> onReceivedData; /*!< Event fired whenever data is read from a client of this server. */
+      EventHandle<TcpSocketStream*> onClientClosed; /*!< Event fired whenever a client of this server closes. */
+      EventHandle<TcpSocket*> onClosed; /*!< Event fired when the bound socket is closed. */
     } events; /*!< events for this server */
 
   public:

@@ -28,31 +28,17 @@ void FactoryManager::init(void) {
     curlxx::EasyHandle::initPool(1, 1, "curlxx::EasyHandle");
 
     // Core
-    // -- Events
-    EventHandle<TcpSocketStream*>::initPool(1, 1, "EventHandle<TcpSocketStream*>");
-    EventHandle<TcpSocket*>::initPool(1, 1, "EventHandle<TcpSocket*>");
-    EventHandle<UdpSocketStream*>::initPool(1, 1, "EventHandle<UdpSocketStream*>");
-    EventHandle<UdpSocketClient*>::initPool(1, 1, "EventHandle<UdpSocketClient*>");
-    EventHandle<UdpSocketServer*>::initPool(1, 1, "EventHandle<UdpSocketServer*>");
-
     // -- HTTP
     HttpRequest::initPool(1, 1, "HttpRequest");
     HttpResponse::initPool(1, 1, "HttpResponse");
 
     // // -- TCP
     TcpSocketStream::initPool(20, 10, "TcpSocketStream");
-    // // ---- TCP Events
-    // TcpSocketEventArgs::initPool(10, 2, "TcpSocketEventArgs");
-    // TcpSocketStreamEventArgs::initPool(40, 20, "TcpSocketStreamEventArgs");
 
     // // -- UDP
     UdpSocketClient::initPool(20, 10, "UdpSocketClient");
     UdpSocketStream::initPool(20, 10, "UdpSocketStream");
     UdpSocketServer::initPool(20, 10, "UdpSocketServer");
-    // // -- UDP Events
-    // UdpSocketStreamEventArgs::initPool(40, 20, "UdpSocketStreamEventArgs");
-    // UdpSocketServerEventArgs::initPool(40, 20, "UdpSocketServerEventArgs");
-    // UdpSocketClientEventArgs::initPool(40, 20, "UdpSocketClientEventArgs");
 
     // -- Tasks
     SimpleTask::initPool(40, 20, "SimpleTask");
@@ -73,13 +59,6 @@ void FactoryManager::end(void) {
     curlxx::EasyHandle::destroyPool();
 
     // Core
-    // -- Events
-    EventHandle<TcpSocketStream*>::destroyPool();
-    EventHandle<TcpSocket*>::destroyPool();
-    EventHandle<UdpSocketStream*>::destroyPool();
-    EventHandle<UdpSocketClient*>::destroyPool();
-    EventHandle<UdpSocketServer*>::destroyPool();
-
     // -- HTTP
     HttpRequest::destroyPool();
     HttpResponse::destroyPool();

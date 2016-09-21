@@ -61,7 +61,7 @@ WorkerManager::DelayedTaskQueue&  WorkerManager::getDelayedTaskQueue(void) {
 void  WorkerManager::addTask(ATask* task) {
   if (task != nullptr) {
     SCOPELOCK(&(this->_pendingTasks));
-    this->_pendingTasks.push(task);
+    this->_pendingTasks.push_back(task);
     this->_pendingTasks.notify();
   }
 }
@@ -89,8 +89,8 @@ void  WorkerManager::addSimpleTask(const std::function<void (void)>& cb, const s
   this->addTask(simpleTask);
 }
 
-void  WorkerManager::addEventTask(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback) {
-  EventTask* eventTask = EventTask::getFromPool(eventTimePoint, callback);
+void  WorkerManager::addEventTask(const void* key, const std::function<void (void)>& callback) {
+  EventTask* eventTask = EventTask::getFromPool(key, callback);
   this->addTask(eventTask);
 }
 
@@ -127,5 +127,46 @@ void  WorkerManager::addPeriodicTask(PeriodicTask* periodicTask, bool startNow) 
     } else {
       this->addDelayedTask(periodicTask, periodicTask->_interval);
     }
+  }
+}
+
+void WorkerManager::purgeEventTasks(const void* key) {
+  {
+    SCOPELOCK(&(this->_pendingTasks));
+    for (auto it = this->_pendingTasks.begin() ; it != this->_pendingTasks.end() ; ++it) {
+      if ((*it)->getSource() == ATask::Source::EVENT) {
+        EventTask* task = reinterpret_cast<EventTask*>(*it);
+        if (task) {
+          if (task->_key == key) {
+            EventTask::returnToPool(task);
+            it = this->_pendingTasks.erase(it);
+          }
+        } else {
+          CRITICAL("Could not reinterpret_cast an EventTask");
+        }
+      }
+    }
+
+    this->_pendingTasks.notify_all();
+  }
+
+  {
+    SCOPELOCK(&(this->_delayedTasks));
+    for (auto it = this->_delayedTasks.begin() ; it != this->_delayedTasks.end() ; ++it) {
+      if ((*it)->_task->getSource() == ATask::Source::EVENT) {
+        EventTask* task = reinterpret_cast<EventTask*>((*it)->_task);
+        if (task) {
+          if (task->_key == key) {
+            EventTask::returnToPool(task);
+            DelayedTask::returnToPool((*it));
+            it = this->_delayedTasks.erase(it);
+          }
+        } else {
+          CRITICAL("Could not reinterpret_cast an EventTask");
+        }
+      }
+    }
+
+    this->_delayedTasks.notify_all();
   }
 }

@@ -56,7 +56,7 @@ namespace fwk {
      *  \param port the port to bind.
      *  \return the server.
      */
-    const UdpServer&  createServer(uint16_t port);
+    UdpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Binds the server on the given port and makes it listen for clients.
@@ -91,7 +91,7 @@ namespace fwk {
      *  \param port port of the UDP server to connect to.
      *  \return the client.
      */
-    const UdpClient&  createClient(const std::string& hostname, uint16_t port);
+    UdpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client start sending datagrams.
@@ -164,7 +164,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<UdpSocketClient*>* event, UdpSocketClient *socket, const std::string& message);
+    void  __onIOException(EventHandle<UdpSocketClient*>& event, UdpSocketClient *socket, const std::string& message);
 
     /**
      *  \brief Called when there is an I/O exception. Fires the given event with the socket as argument.
@@ -172,7 +172,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<UdpSocketStream*>* event, UdpSocketStream *socket, const std::string& message);
+    void  __onIOException(EventHandle<UdpSocketStream*>& event, UdpSocketStream *socket, const std::string& message);
   };
 }
 

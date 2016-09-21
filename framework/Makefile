@@ -73,7 +73,7 @@ DEPS=       $(OBJPROG:.o=.d)
 LDPTHREAD=  -lpthread
 LDFLAGS=    $(LDPTHREAD) -lssl -lcrypto -lcurl
 
-CXXFLAGS=   -I$(INCLDIR) -std=c++11 -W -Wall -Wextra -Werror
+CXXFLAGS=   -I$(INCLDIR) -std=c++11 -O6 -W -Wall -Wextra -Werror
 
 CXX=        g++
 

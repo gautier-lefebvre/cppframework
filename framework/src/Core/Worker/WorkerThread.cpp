@@ -37,7 +37,7 @@ void  WorkerThread::cleanup(void) {
 
   while (!taskQueue.empty()) {
     task = taskQueue.front();
-    taskQueue.pop();
+    taskQueue.pop_front();
 
     try {
       handler = WorkerThread::TaskHandlerMap.at(task->getSource());
@@ -50,8 +50,8 @@ void  WorkerThread::cleanup(void) {
   }
 
   while (!delayedTaskQueue.empty()) {
-    delayedTask = delayedTaskQueue.top();
-    delayedTaskQueue.pop();
+    delayedTask = delayedTaskQueue.front();
+    delayedTaskQueue.pop_front();
 
     try {
       handler = WorkerThread::TaskHandlerMap.at(delayedTask->_task->getSource());
@@ -104,7 +104,7 @@ void  WorkerThread::routine(void) {
         taskQueue.wait();
       } else {
         task = taskQueue.front();
-        taskQueue.pop();
+        taskQueue.pop_front();
       }
     }
 
@@ -154,7 +154,7 @@ void  WorkerThread::executeEventTask(ATask* task, bool exec) {
     try {
       // call every subscriber.
       if (exec) {
-        eventTask->_callback(eventTask->_eventCreation);
+        eventTask->_callback();
       }
 
       EventTask::returnToPool(eventTask);
