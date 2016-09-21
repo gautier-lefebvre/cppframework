@@ -9,19 +9,19 @@ static void tcpServer(fwk::System* system, uint16_t port) {
   try {
     const fwk::TcpServer& server = fwk::NetworkManager::get().getTCP().createServer(port);
 
-    server.events.onAccept->subscribe([] (fwk::TcpSocketStream*) {
+    server.events.onAccept.subscribe([] (fwk::TcpSocketStream*) {
       INFO("New client connected");
     }, &i);
 
-    server.events.onReceivedData->subscribe([] (fwk::TcpSocketStream*) {
+    server.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
       INFO("Received data");
     }, &i);
 
-    server.events.onClientClosed->subscribe([] (fwk::TcpSocketStream*) {
+    server.events.onClientClosed.subscribe([] (fwk::TcpSocketStream*) {
       INFO("Client closed");
     }, &i);
 
-    server.events.onClosed->subscribe([] (fwk::TcpSocket*) {
+    server.events.onClosed.subscribe([] (fwk::TcpSocket*) {
       INFO("Server closed");
     }, &i);
 
@@ -39,11 +39,11 @@ static void tcpClient(fwk::System* system, const std::string& hostname, uint16_t
 
     const fwk::TcpClient& client = fwk::NetworkManager::get().getTCP().createClient(hostname, port);
 
-    client.events.onReceivedData->subscribe([] (fwk::TcpSocketStream*) {
+    client.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
       INFO("Received data");
     }, &i);
 
-    client.events.onClosed->subscribe([] (fwk::TcpSocketStream*) {
+    client.events.onClosed.subscribe([] (fwk::TcpSocketStream*) {
       INFO("Connection closed");
     }, &i);
 
@@ -64,22 +64,22 @@ static void udpServer(fwk::System* system, uint16_t port) {
     const fwk::UdpServer& server = fwk::NetworkManager::get().getUDP().createServer(port);
 
     // on accept new socket callback
-    server.events.onNewClient->subscribe([] (fwk::UdpSocketClient*) {
+    server.events.onNewClient.subscribe([] (fwk::UdpSocketClient*) {
       INFO("New client connected");
     }, &i);
 
     // on received data callback
-    server.events.onReceivedData->subscribe([] (fwk::UdpSocketClient*) {
+    server.events.onReceivedData.subscribe([] (fwk::UdpSocketClient*) {
       INFO("Received data");
     }, &i);
 
     // on client closed callback
-    server.events.onClientClosed->subscribe([] (fwk::UdpSocketClient*) {
+    server.events.onClientClosed.subscribe([] (fwk::UdpSocketClient*) {
       INFO("Client closed");
     }, &i);
 
     // on server closed callback
-    server.events.onClosed->subscribe([] (fwk::UdpSocketServer*) {
+    server.events.onClosed.subscribe([] (fwk::UdpSocketServer*) {
       INFO("Server closed");
     }, &i);
 
@@ -97,14 +97,14 @@ static void udpClient(fwk::System* system, const std::string& hostname, uint16_t
 
     const fwk::UdpClient& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
 
-    client.events.onReceivedData->subscribe([] (fwk::UdpSocketStream*) {
+    client.events.onReceivedData.subscribe([] (fwk::UdpSocketStream*) {
       INFO("Received data");
     }, &i);
 
-    client.events.onClosed->subscribe([] (fwk::UdpSocketStream*) {
+    client.events.onClosed.subscribe([] (fwk::UdpSocketStream*) {
       INFO("Connection closed");
     }, &i);
-    
+
     fwk::NetworkManager::get().getUDP().run(client);
 
     fwk::NetworkManager::get().getUDP().push(client.socket, (void*)"Hello", 5);

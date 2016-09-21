@@ -14,7 +14,7 @@ namespace fwk {
    *  Pooled.
    */
   template<typename... Args>
-  class EventHandle :public APooled<EventHandle<Args...>>, public Lockable {
+  class EventHandle :public Lockable {
   private:
     std::map<const void *, std::function<void (Args...)>> _subscribers; /*!< the subscribers of the event. */
 
@@ -23,18 +23,15 @@ namespace fwk {
      *  \brief Constructor of EventHandle.
      */
     EventHandle(void):
-      APooled<EventHandle<Args...>>(),
       Lockable(),
       _subscribers()
     {}
 
-  public:
     /**
-     *  \brief Inherited from APooled. Does nothing.
+     *  \brief Destructor of EventHandle. Will purge the WorkerManager of all current asynchronous triggering of this event.
      */
-    virtual void reinit(void) {
-      SCOPELOCK(this);
-      this->_subscribers.clear();
+    ~EventHandle(void) {
+      WorkerManager::get().purgeEventTasks(this);
     }
 
   private:
@@ -43,8 +40,8 @@ namespace fwk {
      *  \param args the arguments passed to the subscribers of the event when it is fired.
      *  \returns the callback to give an EventTask
      */
-    std::function<void (const std::chrono::steady_clock::time_point&)> wrapArguments(Args... args) {
-      return [this, &args...] (const std::chrono::steady_clock::time_point& eventTaskTimePoint) -> void {
+    std::function<void (void)> wrapArguments(Args&&... args) {
+      return [this, &args...] (void) -> void {
         this->exec(eventTaskTimePoint, std::forward<Args>(args)...);
       };
     }
@@ -56,7 +53,7 @@ namespace fwk {
      */
     void  fireAsync(Args... args) {
       SCOPELOCK(this);
-      WorkerManager::get().addEventTask(this->lastOutOfPoolTimePoint(), this->wrapArguments(std::forward<Args>(args)...));
+      WorkerManager::get().addEventTask(this, this->wrapArguments(std::forward<Args>(args)...));
     }
 
     /**
@@ -67,7 +64,7 @@ namespace fwk {
       EventTask* eventTask = nullptr;
 
       try {
-        eventTask = EventTask::getFromPool(this->lastOutOfPoolTimePoint(), this->wrapArguments(std::forward<Args>(args)...));
+        eventTask = EventTask::getFromPool(this, this->wrapArguments(std::forward<Args>(args)...));
         WorkerThread::executeEventTask(eventTask, true);
       } catch (const std::exception& e) {
         CRITICAL(e.what());
@@ -94,6 +91,13 @@ namespace fwk {
       this->_subscribers.erase(key);
     }
 
+  /**
+   *  \brief Purges the task queue of this event asynchronous firing.
+   */
+  void purgeTaskQueue() const {
+    WorkerManager::get().purgeEventTasks(this);
+  }
+
   public:
     /**
      *  \brief Calls every callbacks. Must only be called by the worker threads.
@@ -101,19 +105,17 @@ namespace fwk {
      *  \param eventTaskTimePoint the timepoint when the EventTask was created. If this timepoint is different than this->lastOutOfPoolTimePoint(), then the EventTask must not be executed.
      *  \param args the arguments to pass to the callbacks.
      */
-    void  exec(const std::chrono::steady_clock::time_point& eventTaskTimePoint, Args&&... args) {
+    void  exec(Args&&... args) {
       SCOPELOCK(this);
 
-      // execute only if the event was not reinit between being added to the task queue and being executed.
-      if (this->isValid() && eventTaskTimePoint == this->lastOutOfPoolTimePoint()) {
-        for (auto& it : this->_subscribers) {
-          try {
-            if (it.second) {
-              it.second(args...);
-            }
-          } catch (const std::exception& e) {
-            CRITICAL(e.what());
+      // call every subscribers
+      for (auto& it : this->_subscribers) {
+        try {
+          if (it.second) {
+            it.second(args...);
           }
+        } catch (const std::exception& e) {
+          CRITICAL(e.what());
         }
       }
     }

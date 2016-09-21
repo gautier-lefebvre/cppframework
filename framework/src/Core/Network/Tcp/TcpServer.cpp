@@ -10,17 +10,7 @@ TcpServer::TcpServer(uint16_t port, TcpSocket* server):
   accept(),
   blacklist(),
   active(false),
-  events({
-    EventHandle<TcpSocketStream*>::getFromPool(),
-    EventHandle<TcpSocketStream*>::getFromPool(),
-    EventHandle<TcpSocketStream*>::getFromPool(),
-    EventHandle<TcpSocket*>::getFromPool()
-  })
+  events()
 {}
 
-TcpServer::~TcpServer(void) {
-  EventHandle<TcpSocketStream*>::returnToPool(this->events.onAccept);
-  EventHandle<TcpSocketStream*>::returnToPool(this->events.onReceivedData);
-  EventHandle<TcpSocketStream*>::returnToPool(this->events.onClientClosed);
-  EventHandle<TcpSocket*>::returnToPool(this->events.onClosed);
-}
+TcpServer::~TcpServer(void) {}

@@ -160,7 +160,7 @@ namespace fwk {
      *  \param ss the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<TcpSocketStream*>* event, TcpSocketStream* ss, const std::string& message);
+    void  __onIOException(EventHandle<TcpSocketStream*>& event, TcpSocketStream* ss, const std::string& message);
   };
 }
 

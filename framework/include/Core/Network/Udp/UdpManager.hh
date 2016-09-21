@@ -164,7 +164,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<UdpSocketClient*>* event, UdpSocketClient *socket, const std::string& message);
+    void  __onIOException(EventHandle<UdpSocketClient*>& event, UdpSocketClient *socket, const std::string& message);
 
     /**
      *  \brief Called when there is an I/O exception. Fires the given event with the socket as argument.
@@ -172,7 +172,7 @@ namespace fwk {
      *  \param socket the socket to send as argument of the event.
      *  \param message the message of the exception.
      */
-    void  __onIOException(EventHandle<UdpSocketStream*>* event, UdpSocketStream *socket, const std::string& message);
+    void  __onIOException(EventHandle<UdpSocketStream*>& event, UdpSocketStream *socket, const std::string& message);
   };
 }
 

@@ -8,13 +8,7 @@ TcpClient::TcpClient(const std::string& hostname, uint16_t port, TcpSocketStream
   port(port),
   socket(socket),
   active(false),
-  events({
-    EventHandle<TcpSocketStream*>::getFromPool(),
-    EventHandle<TcpSocketStream*>::getFromPool()
-  })
+  events()
 {}
 
-TcpClient::~TcpClient(void) {
-  EventHandle<TcpSocketStream*>::returnToPool(this->events.onReceivedData);
-  EventHandle<TcpSocketStream*>::returnToPool(this->events.onClosed);
-}
+TcpClient::~TcpClient(void) {}

@@ -24,10 +24,10 @@ namespace fwk {
     bool active; /*!< the server is running. */
 
     struct {
-      EventHandle<UdpSocketClient*>* onNewClient; /*!< Event fired whenever a new client sends a message to this server. */
-      EventHandle<UdpSocketClient*>* onReceivedData; /*!< Event fired whenever data is read from a client of this server. */
-      EventHandle<UdpSocketClient*>* onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. */
-      EventHandle<UdpSocketServer*>* onClosed; /*!< Event fired when this server is closed. */
+      EventHandle<UdpSocketClient*> onNewClient; /*!< Event fired whenever a new client sends a message to this server. */
+      EventHandle<UdpSocketClient*> onReceivedData; /*!< Event fired whenever data is read from a client of this server. */
+      EventHandle<UdpSocketClient*> onClientClosed; /*!< Event fired whenever a known client is removed. Does not work well as UDP is not a connected protocol. */
+      EventHandle<UdpSocketServer*> onClosed; /*!< Event fired when this server is closed. */
     } events; /*!< events for this server */
 
   public:

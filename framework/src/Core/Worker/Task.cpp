@@ -53,7 +53,7 @@ void  SimpleTask::init(const std::function<void (void)>& cb, const std::function
 EventTask::EventTask(void):
   ATask(ATask::Source::EVENT),
   APooled<EventTask>(),
-  _eventCreation(),
+  _key(nullptr),
   _callback(nullptr)
 {}
 
@@ -62,12 +62,12 @@ EventTask::~EventTask(void) {
 }
 
 void  EventTask::reinit(void) {
-  this->_eventCreation = std::chrono::steady_clock::time_point::min();
+  this->_key = nullptr;
   this->_callback = nullptr;
 }
 
-void  EventTask::init(const std::chrono::steady_clock::time_point& eventTimePoint, const std::function<void (const std::chrono::steady_clock::time_point&)>& callback) {
-  this->_eventCreation = eventTimePoint;
+void  EventTask::init(const void* key, const std::function<void (void)>& callback) {
+  this->_key = key;
   this->_callback = callback;
 }
 
