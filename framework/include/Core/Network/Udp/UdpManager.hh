@@ -56,7 +56,7 @@ namespace fwk {
      *  \param port the port to bind.
      *  \return the server.
      */
-    const UdpServer&  createServer(uint16_t port);
+    UdpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Binds the server on the given port and makes it listen for clients.
@@ -91,7 +91,7 @@ namespace fwk {
      *  \param port port of the UDP server to connect to.
      *  \return the client.
      */
-    const UdpClient&  createClient(const std::string& hostname, uint16_t port);
+    UdpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client start sending datagrams.

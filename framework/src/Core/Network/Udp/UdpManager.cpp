@@ -52,14 +52,14 @@ void UdpManager::clear(void) {
   }
 }
 
-const UdpServer& UdpManager::createServer(uint16_t port) {
+UdpServer& UdpManager::createServer(uint16_t port) {
   UdpSocketServer* socket = UdpSocketServer::getFromPool();
 
   try {
     socket->init();
     socket->socket();
 
-    const UdpServer* server = nullptr;
+    UdpServer* server = nullptr;
 
     {
       SCOPELOCK(&(this->_servers));
@@ -152,14 +152,14 @@ void UdpManager::blacklist(uint16_t port, uint32_t addr) {
   }
 }
 
-const UdpClient& UdpManager::createClient(const std::string& hostname, uint16_t port) {
+UdpClient& UdpManager::createClient(const std::string& hostname, uint16_t port) {
   UdpSocketStream* socket = UdpSocketStream::getFromPool();
 
   try {
     socket->socket();
     socket->init(hostname, port);
 
-    const UdpClient* client = nullptr;
+    UdpClient* client = nullptr;
 
     {
       SCOPELOCK(&(this->_clients));

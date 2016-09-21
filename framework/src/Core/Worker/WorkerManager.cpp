@@ -140,7 +140,7 @@ void WorkerManager::purgeEventTasks(const void* key) {
           it = this->_pendingTasks.erase(it);
         }
       } else {
-        CRITICAL('Could not reinterpret_cast an EventTask');
+        CRITICAL("Could not reinterpret_cast an EventTask");
       }
     }
   }

@@ -50,13 +50,13 @@ void TcpManager::clear(void) {
   }
 }
 
-const TcpServer& TcpManager::createServer(uint16_t port) {
+TcpServer& TcpManager::createServer(uint16_t port) {
   TcpSocket* socket = new TcpSocket();
 
   try {
     socket->socket();
 
-    const TcpServer* server = nullptr;
+    TcpServer* server = nullptr;
 
     {
       SCOPELOCK(&(this->_servers));
@@ -150,14 +150,14 @@ void TcpManager::blacklist(uint16_t port, uint32_t addr) {
   }
 }
 
-const TcpClient& TcpManager::createClient(const std::string& hostname, uint16_t port) {
+TcpClient& TcpManager::createClient(const std::string& hostname, uint16_t port) {
   TcpSocketStream* socket = TcpSocketStream::getFromPool();
 
   try {
     socket->init();
     socket->socket();
 
-    const TcpClient* connection = nullptr;
+    TcpClient* connection = nullptr;
 
     {
       SCOPELOCK(&(this->_clients));

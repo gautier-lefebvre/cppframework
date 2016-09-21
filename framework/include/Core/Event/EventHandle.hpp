@@ -42,7 +42,7 @@ namespace fwk {
      */
     std::function<void (void)> wrapArguments(Args&&... args) {
       return [this, &args...] (void) -> void {
-        this->exec(eventTaskTimePoint, std::forward<Args>(args)...);
+        this->exec(std::forward<Args>(args)...);
       };
     }
 
@@ -77,7 +77,7 @@ namespace fwk {
      *  \param callback the function called when the event is fired.
      *  \param key the key of the subscriber (must be unique for this event).
      */
-    void  subscribe(const std::function<void (Args&&...)>& callback, const void *key){
+    void  subscribe(const std::function<void (Args&&...)>& callback, const void *key) {
       SCOPELOCK(this);
       this->_subscribers[key] = callback;
     }

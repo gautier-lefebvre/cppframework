@@ -52,7 +52,7 @@ namespace fwk {
      *  \param port the port to bind (does not do the binding).
      *  \return the server.
      */
-    const TcpServer&  createServer(uint16_t port);
+    TcpServer&  createServer(uint16_t port);
 
     /**
      *  \brief Bind the server of the given port and make it listen for clients.
@@ -87,7 +87,7 @@ namespace fwk {
      *  \param port port of the TCP server to connect to.
      *  \return the client.
      */
-    const TcpClient&  createClient(const std::string& hostname, uint16_t port);
+    TcpClient&  createClient(const std::string& hostname, uint16_t port);
 
     /**
      *  \brief Make the client connect to the server.
