@@ -50,8 +50,8 @@ void  WorkerThread::cleanup(void) {
   }
 
   while (!delayedTaskQueue.empty()) {
-    delayedTask = delayedTaskQueue.top();
-    delayedTaskQueue.pop();
+    delayedTask = delayedTaskQueue.front();
+    delayedTaskQueue.pop_front();
 
     try {
       handler = WorkerThread::TaskHandlerMap.at(delayedTask->_task->getSource());

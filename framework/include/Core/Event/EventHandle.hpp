@@ -31,7 +31,7 @@ namespace fwk {
      *  \brief Destructor of EventHandle. Will purge the WorkerManager of all current asynchronous triggering of this event.
      */
     ~EventHandle(void) {
-      WorkerManager::get().purgeEventTasks(this);
+      this->purgeTaskQueue();
     }
 
   private:
@@ -94,7 +94,8 @@ namespace fwk {
   /**
    *  \brief Purges the task queue of this event asynchronous firing.
    */
-  void purgeTaskQueue() const {
+  void purgeTaskQueue() {
+    SCOPELOCK(this);
     WorkerManager::get().purgeEventTasks(this);
   }
 

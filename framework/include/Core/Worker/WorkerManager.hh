@@ -4,6 +4,7 @@
 #include  <list>
 #include  <chrono>
 
+#include  "Library/Collection/OrderedList.hpp"
 #include  "Library/DesignPattern/Singleton.hpp"
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Threading/Lockable.hpp"
@@ -20,7 +21,7 @@ namespace fwk {
     friend class Singleton<fwk::WorkerManager>;
   public:
     typedef TNotifiable<std::list<ATask*>>  TaskQueue; /*!< notifiable queue of ATask. */
-    typedef TNotifiable<std::priority_queue<DelayedTask*, std::vector<DelayedTask*>, std::function<bool (const DelayedTask*, const DelayedTask*)>>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
+    typedef TNotifiable<OrderedList<DelayedTask*>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
 
   private:
     TaskQueue _pendingTasks; /*!< tasks to execute. */
