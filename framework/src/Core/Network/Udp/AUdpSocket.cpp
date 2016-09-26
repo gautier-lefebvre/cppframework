@@ -10,48 +10,48 @@
 using namespace fwk;
 
 AUdpSocket::AUdpSocket(void):
-  Lockable(),
-  _fd(-1),
-  _buffer(nullptr)
+    Lockable(),
+    _fd(-1),
+    _buffer(nullptr)
 {}
 
 AUdpSocket::~AUdpSocket(void) {
-  this->reinit();
+    this->reinit();
 }
 
 void AUdpSocket::reinit(void) {
-  SCOPELOCK(this);
+    SCOPELOCK(this);
 
-  this->close();
-  ByteArray::returnToPool(this->_buffer);
-  this->_buffer = nullptr;
+    this->close();
+    ByteArray::returnToPool(this->_buffer);
+    this->_buffer = nullptr;
 }
 
 void AUdpSocket::init(void) {
-  SCOPELOCK(this);
-  this->_buffer = ByteArray::getFromPool(AUdpSocketIO::BUFFER_SIZE);
+    SCOPELOCK(this);
+    this->_buffer = ByteArray::getFromPool(AUdpSocketIO::BUFFER_SIZE);
 }
 
 void AUdpSocket::socket(void) {
-  SCOPELOCK(this);
-  if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-    throw NetworkException(std::string("socket: ") + strerror(errno));
-  }
+    SCOPELOCK(this);
+    if ((this->_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        throw NetworkException(std::string("socket: ") + strerror(errno));
+    }
 }
 
 void AUdpSocket::close(void) {
-  SCOPELOCK(this);
-  if (this->_fd != -1) {
-    ::close(this->_fd);
-  }
-  this->_fd = -1;
+    SCOPELOCK(this);
+    if (this->_fd != -1) {
+        ::close(this->_fd);
+    }
+    this->_fd = -1;
 }
 
 void AUdpSocket::addToSet(fd_set& set, int& max) const {
-  FD_SET(this->_fd, &set);
-  max = MAX(max, this->_fd);
+    FD_SET(this->_fd, &set);
+    max = MAX(max, this->_fd);
 }
 
 bool  AUdpSocket::isset(fd_set& set) const {
-  return (FD_ISSET(this->_fd, &set) != 0);
+    return (FD_ISSET(this->_fd, &set) != 0);
 }
