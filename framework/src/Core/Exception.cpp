@@ -3,7 +3,7 @@
 using namespace fwk;
 
 CoreException::CoreException(const std::string& msg) noexcept:
-    Exception(msg)
+  Exception(msg)
 {}
 
 CoreException::~CoreException() {}

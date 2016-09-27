@@ -3,14 +3,14 @@
 using namespace fwk;
 
 UdpServer::UdpServer(uint16_t port, UdpSocketServer* server):
-    Lockable(),
-    port(port),
-    server(server),
-    clients(),
-    accept(),
-    blacklist(),
-    active(false),
-    events()
+  Lockable(),
+  port(port),
+  server(server),
+  clients(),
+  accept(),
+  blacklist(),
+  active(false),
+  events()
 {}
 
 UdpServer::~UdpServer(void) {}

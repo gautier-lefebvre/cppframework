@@ -7,13 +7,13 @@ using namespace fwk;
  */
 
 ATask::ATask(ATask::Source source):
-    _source(source)
+  _source(source)
 {}
 
 ATask::~ATask(void) {}
 
 ATask::Source ATask::getSource(void) const {
-    return this->_source;
+  return this->_source;
 }
 
 /**
@@ -21,29 +21,29 @@ ATask::Source ATask::getSource(void) const {
  */
 
 SimpleTask::SimpleTask(void):
-    ATask(ATask::Source::SIMPLE),
-    APooled<SimpleTask>(),
-    _callback(nullptr),
-    _cleanup(nullptr)
+  ATask(ATask::Source::SIMPLE),
+  APooled<SimpleTask>(),
+  _callback(nullptr),
+  _cleanup(nullptr)
 {}
 
 SimpleTask::~SimpleTask(void) {
-    this->reinit();
+  this->reinit();
 }
 
 void  SimpleTask::reinit(void) {
-    this->_callback = nullptr;
-    this->_cleanup = nullptr;
+  this->_callback = nullptr;
+  this->_cleanup = nullptr;
 }
 
 void  SimpleTask::init(const std::function<void (void)>& cb) {
-    this->_callback = cb;
-    this->_cleanup = nullptr;
+  this->_callback = cb;
+  this->_cleanup = nullptr;
 }
 
 void  SimpleTask::init(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
-    this->_callback = cb;
-    this->_cleanup = cl;
+  this->_callback = cb;
+  this->_cleanup = cl;
 }
 
 /**
@@ -51,24 +51,24 @@ void  SimpleTask::init(const std::function<void (void)>& cb, const std::function
  */
 
 EventTask::EventTask(void):
-    ATask(ATask::Source::EVENT),
-    APooled<EventTask>(),
-    _key(nullptr),
-    _callback(nullptr)
+  ATask(ATask::Source::EVENT),
+  APooled<EventTask>(),
+  _key(nullptr),
+  _callback(nullptr)
 {}
 
 EventTask::~EventTask(void) {
-    this->reinit();
+  this->reinit();
 }
 
 void  EventTask::reinit(void) {
-    this->_key = nullptr;
-    this->_callback = nullptr;
+  this->_key = nullptr;
+  this->_callback = nullptr;
 }
 
 void  EventTask::init(const void* key, const std::function<void (void)>& callback) {
-    this->_key = key;
-    this->_callback = callback;
+  this->_key = key;
+  this->_callback = callback;
 }
 
 /**
@@ -76,27 +76,27 @@ void  EventTask::init(const void* key, const std::function<void (void)>& callbac
  */
 
 HttpTask::HttpTask(void):
-    ATask(ATask::Source::HTTP_CALLBACK),
-    APooled<HttpTask>(),
-    _callback(nullptr),
-    _cleanup(nullptr),
-    _response(nullptr)
+  ATask(ATask::Source::HTTP_CALLBACK),
+  APooled<HttpTask>(),
+  _callback(nullptr),
+  _cleanup(nullptr),
+  _response(nullptr)
 {}
 
 HttpTask::~HttpTask(void) {
-    this->reinit();
+  this->reinit();
 }
 
 void  HttpTask::reinit(void) {
-    this->_callback = nullptr;
-    this->_cleanup = nullptr;
-    this->_response = nullptr;
+  this->_callback = nullptr;
+  this->_cleanup = nullptr;
+  this->_response = nullptr;
 }
 
 void  HttpTask::init(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {
-    this->_callback = cb;
-    this->_cleanup = cl;
-    this->_response = resp;
+  this->_callback = cb;
+  this->_cleanup = cl;
+  this->_response = resp;
 }
 
 /**
@@ -104,33 +104,33 @@ void  HttpTask::init(const std::function<void (const HttpResponse*)>& cb, const 
  */
 
 PeriodicTask::PeriodicTask(void):
-    ATask(ATask::Source::PERIODIC_TASK),
-    APooled<PeriodicTask>(),
-    _callback(nullptr),
-    _cleanup(nullptr),
-    _interval(),
-    _off(true)
+  ATask(ATask::Source::PERIODIC_TASK),
+  APooled<PeriodicTask>(),
+  _callback(nullptr),
+  _cleanup(nullptr),
+  _interval(),
+  _off(true)
 {}
 
 PeriodicTask::~PeriodicTask(void) {
-    this->reinit();
+  this->reinit();
 }
 
 void  PeriodicTask::reinit(void) {
-    this->_callback = nullptr;
-    this->_cleanup = nullptr;
-    this->_off = true;
+  this->_callback = nullptr;
+  this->_cleanup = nullptr;
+  this->_off = true;
 }
 
 void  PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval) {
-    this->_callback = callback;
-    this->_cleanup = cleanup;
-    this->_interval = interval;
-    this->_off = false;
+  this->_callback = callback;
+  this->_cleanup = cleanup;
+  this->_interval = interval;
+  this->_off = false;
 }
 
 void  PeriodicTask::stop() {
-    this->_off = true;
+  this->_off = true;
 }
 
 /**
@@ -138,37 +138,37 @@ void  PeriodicTask::stop() {
  */
 
 DelayedTask::DelayedTask(void):
-    APooled<DelayedTask>(),
-    _task(nullptr),
-    _timePoint()
+  APooled<DelayedTask>(),
+  _task(nullptr),
+  _timePoint()
 {}
 
 DelayedTask::~DelayedTask(void) {
-    this->reinit();
+  this->reinit();
 }
 
 void  DelayedTask::reinit(void) {
-    this->_task = nullptr;
+  this->_task = nullptr;
 }
 
 void  DelayedTask::init(ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
-    this->_task = task;
-    this->_timePoint = timepoint;
+  this->_task = task;
+  this->_timePoint = timepoint;
 }
 
 void  DelayedTask::init(ATask* task, const std::chrono::steady_clock::duration& interval) {
-    this->_task = task;
-    this->_timePoint = std::chrono::steady_clock::now() + interval;
+  this->_task = task;
+  this->_timePoint = std::chrono::steady_clock::now() + interval;
 }
 
 bool  DelayedTask::operator<(const DelayedTask& oth) const {
-    return this->_timePoint < oth._timePoint;
+  return this->_timePoint < oth._timePoint;
 }
 
 bool  DelayedTask::operator>(const DelayedTask& oth) const {
-    return this->_timePoint > oth._timePoint;
+  return this->_timePoint > oth._timePoint;
 }
 
 bool  DelayedTask::operator==(const ATask *oth) const {
-    return this->_task == oth;
+  return this->_task == oth;
 }

@@ -8,261 +8,261 @@
 #include  "Core/Network/Http/HttpResponse.hh"
 
 namespace fwk {
+  /**
+   *  \class ATask Core/Worker/Task.hh
+   *  \brief Superclass of all tasks of the tasks queue.
+   */
+  class ATask {
+  public:
     /**
-     *  \class ATask Core/Worker/Task.hh
-     *  \brief Superclass of all tasks of the tasks queue.
+     *  \enum Source Core/Worker/Task.hh
+     *  \brief Enumerations of tasks.
      */
-    class ATask {
-    public:
-        /**
-         *  \enum Source Core/Worker/Task.hh
-         *  \brief Enumerations of tasks.
-         */
-        enum class Source {
-            SIMPLE, /*!< SimpleTask */
-            EVENT, /*!< EventTask */
-            HTTP_CALLBACK, /*!< HttpTask */
-            PERIODIC_TASK /*!< PeriodicTask */
-        };
-
-    private:
-        Source  _source; /*!< the type of task. */
-
-    public:
-        /**
-         *  \brief Constructor of ATask.
-         *  \param source the task type.
-         */
-        ATask(Source source);
-
-        /**
-         *  \brief Destructor of ATask.
-         */
-        virtual ~ATask(void);
-
-    public:
-        /**
-         *  \return the type of task.
-         */
-        Source  getSource(void) const;
+    enum class Source {
+      SIMPLE, /*!< SimpleTask */
+      EVENT, /*!< EventTask */
+      HTTP_CALLBACK, /*!< HttpTask */
+      PERIODIC_TASK /*!< PeriodicTask */
     };
 
+  private:
+    Source  _source; /*!< the type of task. */
+
+  public:
     /**
-     *  \class SimpleTask Core/Worker/Task.hh
-     *  \brief A task with a simple callback to be executed by a worker thread.
+     *  \brief Constructor of ATask.
+     *  \param source the task type.
      */
-    class SimpleTask :public ATask, public APooled<SimpleTask> {
-    public:
-        std::function<void (void)> _callback; /*!< the callback to be called by the worker thread. */
-        std::function<void (void)> _cleanup; /*!< the callback used to clean resources. Called when the tasks queue is being cleared. */
-
-    public:
-        /**
-         *  \brief Constructor of SimpleTask.
-         */
-        SimpleTask(void);
-
-        /**
-         *  \brief Destructor of SimpleTask.
-         */
-        virtual ~SimpleTask(void);
-
-    public:
-        /**
-         *  \brief Sets the callbacks to nullptr.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the callback. Sets the cleanup method to nullptr.
-         *  \param callback the callback to be executed by a worker thread.
-         */
-        void  init(const std::function<void (void)>& callback);
-
-        /**
-         *  \brief Sets the callback and cleanup method.
-         *  \param callback the callback to be executed by a worker thread.
-         *  \param cleanup the callback to be used to clean resources. Called when the tasks queue is being cleared.
-         */
-        void  init(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
-    };
+    ATask(Source source);
 
     /**
-     *  \class EventTask Core/Worker/Task.hh
-     *  \brief A task created when an event is fired.
+     *  \brief Destructor of ATask.
      */
-    class EventTask :public ATask, public APooled<EventTask> {
-    public:
-        const void* _key; /*!< the key used to purge. */
-        std::function<void (void)> _callback; /*!< the callback (bound with event arguments). */
+    virtual ~ATask(void);
 
-    public:
-        /**
-         *  \brief Constructor of EventTask.
-         */
-        EventTask(void);
+  public:
+    /**
+     *  \return the type of task.
+     */
+    Source  getSource(void) const;
+  };
 
-        /**
-         *  \brief Destructor of EventTask.
-         */
-        virtual ~EventTask(void);
+  /**
+   *  \class SimpleTask Core/Worker/Task.hh
+   *  \brief A task with a simple callback to be executed by a worker thread.
+   */
+  class SimpleTask :public ATask, public APooled<SimpleTask> {
+  public:
+    std::function<void (void)> _callback; /*!< the callback to be called by the worker thread. */
+    std::function<void (void)> _cleanup; /*!< the callback used to clean resources. Called when the tasks queue is being cleared. */
 
-    public:
-        /**
-         *  brief Sets attributes to null values.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the event and its callback.
-         *  \param key the key used to purge.
-         *  \param callback the method to call when the event is executed.
-         */
-        void  init(const void* key, const std::function<void (void)>& callback);
-    };
+  public:
+    /**
+     *  \brief Constructor of SimpleTask.
+     */
+    SimpleTask(void);
 
     /**
-     *  \class HttpTask Core/Worker/Task.hh
-     *  \brief A task created after a HTTP response has been received.
+     *  \brief Destructor of SimpleTask.
      */
-    class HttpTask :public ATask, public APooled<HttpTask> {
-    public:
-        std::function<void (const HttpResponse*)> _callback; /*!< the callback function to call with the response. */
-        std::function<void (void)> _cleanup; /*!< the method used to clean resources used with the request. */
-        HttpResponse* _response; /*!< the response received. */
+    virtual ~SimpleTask(void);
 
-    public:
-        /**
-         *  \brief Constructor of HttpTask.
-         */
-        HttpTask(void);
+  public:
+    /**
+     *  \brief Sets the callbacks to nullptr.
+     */
+    virtual void  reinit(void);
 
-        /**
-         *  \brief Destructor of HttpTask.
-         */
-        virtual ~HttpTask(void);
-
-    public:
-        /**
-         *  \brief Sets the attributes to their null values.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the callback function, the cleanup function and the HTTP response.
-         *  \param callback the callback method to call.
-         *  \param cleanup the cleanup method used to clean resources used in the request. It is only called when the tasks queue is being cleared, so never after the callback method.
-         *  \param response the HTTP response received.
-         */
-        void  init(const std::function<void (const HttpResponse*)>& callback, const std::function<void (void)>& cleanup, HttpResponse* response);
-    };
+  public:
+    /**
+     *  \brief Sets the callback. Sets the cleanup method to nullptr.
+     *  \param callback the callback to be executed by a worker thread.
+     */
+    void  init(const std::function<void (void)>& callback);
 
     /**
-     *  \class PeriodicTask Core/Worker/Task.hh
-     *  \brief A task to be executing at regular interval.
+     *  \brief Sets the callback and cleanup method.
+     *  \param callback the callback to be executed by a worker thread.
+     *  \param cleanup the callback to be used to clean resources. Called when the tasks queue is being cleared.
      */
-    class PeriodicTask :public ATask, public APooled<PeriodicTask> {
-    public:
-        std::function<void (void)> _callback; /*!< the function to call at regular interval. */
-        std::function<void (void)> _cleanup; /*!< the function to call when the task is canceled or when the tasks queue is being cleared. */
-        std::chrono::steady_clock::duration _interval; /*!< the duration between 2 executions of the task. */
-        bool  _off; /*!< when set to true, the next execution of the task will call the clean function instead, and the task will be removed. */
+    void  init(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
+  };
 
-    public:
-        /**
-         *  \brief Constructor of PeriodicTask.
-         */
-        PeriodicTask(void);
+  /**
+   *  \class EventTask Core/Worker/Task.hh
+   *  \brief A task created when an event is fired.
+   */
+  class EventTask :public ATask, public APooled<EventTask> {
+  public:
+    const void* _key; /*!< the key used to purge. */
+    std::function<void (void)> _callback; /*!< the callback (bound with event arguments). */
 
-        /**
-         *  \brief Destructor of PeriodicTask.
-         */
-        virtual ~PeriodicTask(void);
-
-    public:
-        /**
-         *  \brief Sets all variables to their null values.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the callback function, cleanup function and interval duration.
-         *  \param callback the function to call at regular interval.
-         *  \param cleanup the function to call when the periodic task is canceled.
-         *  \param interval the interval between 2 executions of the task.
-         */
-        void  init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval);
-
-        /**
-         *  \brief The next execution of the task will call the cleanup function instead, and the task will be removed.
-         */
-        void  stop();
-    };
+  public:
+    /**
+     *  \brief Constructor of EventTask.
+     */
+    EventTask(void);
 
     /**
-     *  \class DelayedTask Core/Worker/Task.hh
-     *  \brief A task to be executed after a delay.
+     *  \brief Destructor of EventTask.
      */
-    class DelayedTask :public APooled<DelayedTask> {
-    public:
-        ATask*  _task; /*!< the task to be executed after the delay. */
-        std::chrono::steady_clock::time_point  _timePoint; /*!< the timepoint when the task must be added to the tasks queue. */
+    virtual ~EventTask(void);
 
-    public:
-        /**
-         *  \brief Constructor of DelayedTask.
-         */
-        DelayedTask(void);
+  public:
+    /**
+     *  brief Sets attributes to null values.
+     */
+    virtual void  reinit(void);
 
-        /**
-         *  \brief Destructor of DelayedTask.
-         */
-        virtual ~DelayedTask(void);
+  public:
+    /**
+     *  \brief Sets the event and its callback.
+     *  \param key the key used to purge.
+     *  \param callback the method to call when the event is executed.
+     */
+    void  init(const void* key, const std::function<void (void)>& callback);
+  };
 
-    public:
-        /**
-         *  \brief Sets the task to nullptr.
-         */
-        virtual void  reinit(void);
+  /**
+   *  \class HttpTask Core/Worker/Task.hh
+   *  \brief A task created after a HTTP response has been received.
+   */
+  class HttpTask :public ATask, public APooled<HttpTask> {
+  public:
+    std::function<void (const HttpResponse*)> _callback; /*!< the callback function to call with the response. */
+    std::function<void (void)> _cleanup; /*!< the method used to clean resources used with the request. */
+    HttpResponse* _response; /*!< the response received. */
 
-    public:
-        /**
-         *  \brief Sets the task and time point.
-         *  \param task the task to be added to the task queue at the time point.
-         *  \param tp the time point when the task must be added to the task queue.
-         */
-        void  init(ATask* task, const std::chrono::steady_clock::time_point& tp);
+  public:
+    /**
+     *  \brief Constructor of HttpTask.
+     */
+    HttpTask(void);
 
-        /**
-         *  \brief Sets the task and time point.
-         *  \param task the task to be added to the task queue after the duration.
-         *  \param duration the duration to wait before adding the task to the task queue.
-         */
-        void  init(ATask* task, const std::chrono::steady_clock::duration& duration);
+    /**
+     *  \brief Destructor of HttpTask.
+     */
+    virtual ~HttpTask(void);
 
-    public:
-        /**
-         *  \param oth the DelayedTask to compare.
-         *  \return true if the timepoint of the given delayed tasks is higher than the timepoint of the current object.
-         */
-        bool  operator<(const DelayedTask& oth) const;
+  public:
+    /**
+     *  \brief Sets the attributes to their null values.
+     */
+    virtual void  reinit(void);
 
-        /**
-         *  \param oth the DelayedTask to compare.
-         *  \return true if the timepoint of the given delayed tasks is lower than the timepoint of the current object.
-         */
-        bool  operator>(const DelayedTask& oth) const;
+  public:
+    /**
+     *  \brief Sets the callback function, the cleanup function and the HTTP response.
+     *  \param callback the callback method to call.
+     *  \param cleanup the cleanup method used to clean resources used in the request. It is only called when the tasks queue is being cleared, so never after the callback method.
+     *  \param response the HTTP response received.
+     */
+    void  init(const std::function<void (const HttpResponse*)>& callback, const std::function<void (void)>& cleanup, HttpResponse* response);
+  };
 
-        /**
-         *  \param task the task to compare.
-         *  \return true if the given task is the task to add to the task queue of the current object.
-         */
-        bool  operator==(const ATask* task) const;
-    };
+  /**
+   *  \class PeriodicTask Core/Worker/Task.hh
+   *  \brief A task to be executing at regular interval.
+   */
+  class PeriodicTask :public ATask, public APooled<PeriodicTask> {
+  public:
+    std::function<void (void)> _callback; /*!< the function to call at regular interval. */
+    std::function<void (void)> _cleanup; /*!< the function to call when the task is canceled or when the tasks queue is being cleared. */
+    std::chrono::steady_clock::duration _interval; /*!< the duration between 2 executions of the task. */
+    bool  _off; /*!< when set to true, the next execution of the task will call the clean function instead, and the task will be removed. */
+
+  public:
+    /**
+     *  \brief Constructor of PeriodicTask.
+     */
+    PeriodicTask(void);
+
+    /**
+     *  \brief Destructor of PeriodicTask.
+     */
+    virtual ~PeriodicTask(void);
+
+  public:
+    /**
+     *  \brief Sets all variables to their null values.
+     */
+    virtual void  reinit(void);
+
+  public:
+    /**
+     *  \brief Sets the callback function, cleanup function and interval duration.
+     *  \param callback the function to call at regular interval.
+     *  \param cleanup the function to call when the periodic task is canceled.
+     *  \param interval the interval between 2 executions of the task.
+     */
+    void  init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval);
+
+    /**
+     *  \brief The next execution of the task will call the cleanup function instead, and the task will be removed.
+     */
+    void  stop();
+  };
+
+  /**
+   *  \class DelayedTask Core/Worker/Task.hh
+   *  \brief A task to be executed after a delay.
+   */
+  class DelayedTask :public APooled<DelayedTask> {
+  public:
+    ATask*  _task; /*!< the task to be executed after the delay. */
+    std::chrono::steady_clock::time_point  _timePoint; /*!< the timepoint when the task must be added to the tasks queue. */
+
+  public:
+    /**
+     *  \brief Constructor of DelayedTask.
+     */
+    DelayedTask(void);
+
+    /**
+     *  \brief Destructor of DelayedTask.
+     */
+    virtual ~DelayedTask(void);
+
+  public:
+    /**
+     *  \brief Sets the task to nullptr.
+     */
+    virtual void  reinit(void);
+
+  public:
+    /**
+     *  \brief Sets the task and time point.
+     *  \param task the task to be added to the task queue at the time point.
+     *  \param tp the time point when the task must be added to the task queue.
+     */
+    void  init(ATask* task, const std::chrono::steady_clock::time_point& tp);
+
+    /**
+     *  \brief Sets the task and time point.
+     *  \param task the task to be added to the task queue after the duration.
+     *  \param duration the duration to wait before adding the task to the task queue.
+     */
+    void  init(ATask* task, const std::chrono::steady_clock::duration& duration);
+
+  public:
+    /**
+     *  \param oth the DelayedTask to compare.
+     *  \return true if the timepoint of the given delayed tasks is higher than the timepoint of the current object.
+     */
+    bool  operator<(const DelayedTask& oth) const;
+
+    /**
+     *  \param oth the DelayedTask to compare.
+     *  \return true if the timepoint of the given delayed tasks is lower than the timepoint of the current object.
+     */
+    bool  operator>(const DelayedTask& oth) const;
+
+    /**
+     *  \param task the task to compare.
+     *  \return true if the given task is the task to add to the task queue of the current object.
+     */
+    bool  operator==(const ATask* task) const;
+  };
 }
 
 #endif    /* __CORE_WORKER_TASK_HH__ */
