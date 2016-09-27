@@ -4,67 +4,67 @@
 using namespace fwk;
 
 DelayedTasksThread::DelayedTasksThread(void):
-  Lockable(),
-  AEndable(),
-  _thread(nullptr)
+    Lockable(),
+    AEndable(),
+    _thread(nullptr)
 {}
 
 DelayedTasksThread::~DelayedTasksThread(void) {
-  this->end();
+    this->end();
 }
 
 void  DelayedTasksThread::run(void) {
-  this->_thread = new std::thread(&DelayedTasksThread::routine, this);
+    this->_thread = new std::thread(&DelayedTasksThread::routine, this);
 }
 
 void  DelayedTasksThread::onEnd(void) {
-  SCOPELOCK(this);
-  WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
+    SCOPELOCK(this);
+    WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
 
-  {
-    ScopeLock sldtasks(delayedTaskQueue);
-    delayedTaskQueue.notify_all();
-  }
+    {
+        ScopeLock sldtasks(delayedTaskQueue);
+        delayedTaskQueue.notify_all();
+    }
 
-  if (this->_thread) {
-    try {
-      this->_thread->join();
-    } catch (const std::system_error&) {}
+    if (this->_thread) {
+        try {
+            this->_thread->join();
+        } catch (const std::system_error&) {}
 
-    delete this->_thread;
-  }
+        delete this->_thread;
+    }
 
-  this->_thread = nullptr;
+    this->_thread = nullptr;
 }
 
 void  DelayedTasksThread::routine(void) const {
-  WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
-  DelayedTask* delayedTask;
+    WorkerManager::DelayedTaskQueue& delayedTaskQueue = WorkerManager::get().getDelayedTaskQueue();
+    DelayedTask* delayedTask;
 
-  while (!this->isEnding()) {
-    delayedTask = nullptr;
+    while (!this->isEnding()) {
+        delayedTask = nullptr;
 
-    {
-      SCOPELOCK(&delayedTaskQueue);
-      if (delayedTaskQueue.empty()) {
-        delayedTaskQueue.wait();
-      } else {
-        if (delayedTaskQueue.wait_until(delayedTaskQueue.front()->_timePoint) == std::cv_status::timeout) {
-          if (this->isEnding()) { break; }
-          if (!delayedTaskQueue.empty()) {
-            if ((delayedTask = delayedTaskQueue.front())->_timePoint <= std::chrono::steady_clock::now()) {
-              delayedTaskQueue.pop_front();
+        {
+            SCOPELOCK(&delayedTaskQueue);
+            if (delayedTaskQueue.empty()) {
+                delayedTaskQueue.wait();
             } else {
-              delayedTask = nullptr;
+                if (delayedTaskQueue.wait_until(delayedTaskQueue.front()->_timePoint) == std::cv_status::timeout) {
+                    if (this->isEnding()) { break; }
+                    if (!delayedTaskQueue.empty()) {
+                        if ((delayedTask = delayedTaskQueue.front())->_timePoint <= std::chrono::steady_clock::now()) {
+                            delayedTaskQueue.pop_front();
+                        } else {
+                            delayedTask = nullptr;
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
 
-    if (delayedTask != nullptr) {
-      WorkerManager::get().addTask(delayedTask->_task);
-      DelayedTask::returnToPool(delayedTask);
+        if (delayedTask != nullptr) {
+            WorkerManager::get().addTask(delayedTask->_task);
+            DelayedTask::returnToPool(delayedTask);
+        }
     }
-  }
 }

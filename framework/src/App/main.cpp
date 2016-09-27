@@ -4,233 +4,233 @@
 #include "../../../dist/cppframework.hh"
 
 static void tcpServer(fwk::System* system, uint16_t port) {
-  int i = 0;
+    int i = 0;
 
-  try {
-    fwk::TcpServer& server = fwk::NetworkManager::get().getTCP().createServer(port);
+    try {
+        fwk::TcpServer& server = fwk::NetworkManager::get().getTCP().createServer(port);
 
-    server.events.onAccept.subscribe([] (fwk::TcpSocketStream*) {
-      INFO("New client connected");
-    }, &i);
+        server.events.onAccept.subscribe([] (fwk::TcpSocketStream*) {
+            INFO("New client connected");
+        }, &i);
 
-    server.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
-      INFO("Received data");
-    }, &i);
+        server.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
+            INFO("Received data");
+        }, &i);
 
-    server.events.onClientClosed.subscribe([] (fwk::TcpSocketStream*) {
-      INFO("Client closed");
-    }, &i);
+        server.events.onClientClosed.subscribe([] (fwk::TcpSocketStream*) {
+            INFO("Client closed");
+        }, &i);
 
-    server.events.onClosed.subscribe([] (fwk::TcpSocket*) {
-      INFO("Server closed");
-    }, &i);
+        server.events.onClosed.subscribe([] (fwk::TcpSocket*) {
+            INFO("Server closed");
+        }, &i);
 
-    fwk::NetworkManager::get().getTCP().run(server);
+        fwk::NetworkManager::get().getTCP().run(server);
 
-    system->run();
-  } catch (const fwk::CoreException& e) {
-    CRITICAL(e.what());
-  }
+        system->run();
+    } catch (const fwk::CoreException& e) {
+        CRITICAL(e.what());
+    }
 }
 
 static void tcpClient(fwk::System* system, const std::string& hostname, uint16_t port) {
-  try {
-    int i = 0;
+    try {
+        int i = 0;
 
-    fwk::TcpClient& client = fwk::NetworkManager::get().getTCP().createClient(hostname, port);
+        fwk::TcpClient& client = fwk::NetworkManager::get().getTCP().createClient(hostname, port);
 
-    client.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
-      INFO("Received data");
-    }, &i);
+        client.events.onReceivedData.subscribe([] (fwk::TcpSocketStream*) {
+            INFO("Received data");
+        }, &i);
 
-    client.events.onClosed.subscribe([] (fwk::TcpSocketStream*) {
-      INFO("Connection closed");
-    }, &i);
+        client.events.onClosed.subscribe([] (fwk::TcpSocketStream*) {
+            INFO("Connection closed");
+        }, &i);
 
-    fwk::NetworkManager::get().getTCP().run(client);
+        fwk::NetworkManager::get().getTCP().run(client);
 
-    fwk::NetworkManager::get().getTCP().push(client.socket, (void*)"Hello\n", 6);
+        fwk::NetworkManager::get().getTCP().push(client.socket, (void*)"Hello\n", 6);
 
-    system->run();
-  } catch (const fwk::CoreException& e) {
-    CRITICAL(e.what());
-  }
+        system->run();
+    } catch (const fwk::CoreException& e) {
+        CRITICAL(e.what());
+    }
 }
 
 static void udpServer(fwk::System* system, uint16_t port) {
-  int i = 0;
+    int i = 0;
 
-  try {
-    fwk::UdpServer& server = fwk::NetworkManager::get().getUDP().createServer(port);
+    try {
+        fwk::UdpServer& server = fwk::NetworkManager::get().getUDP().createServer(port);
 
-    // on accept new socket callback
-    server.events.onNewClient.subscribe([] (fwk::UdpSocketClient*) {
-      INFO("New client connected");
-    }, &i);
+        // on accept new socket callback
+        server.events.onNewClient.subscribe([] (fwk::UdpSocketClient*) {
+            INFO("New client connected");
+        }, &i);
 
-    // on received data callback
-    server.events.onReceivedData.subscribe([] (fwk::UdpSocketClient*) {
-      INFO("Received data");
-    }, &i);
+        // on received data callback
+        server.events.onReceivedData.subscribe([] (fwk::UdpSocketClient*) {
+            INFO("Received data");
+        }, &i);
 
-    // on client closed callback
-    server.events.onClientClosed.subscribe([] (fwk::UdpSocketClient*) {
-      INFO("Client closed");
-    }, &i);
+        // on client closed callback
+        server.events.onClientClosed.subscribe([] (fwk::UdpSocketClient*) {
+            INFO("Client closed");
+        }, &i);
 
-    // on server closed callback
-    server.events.onClosed.subscribe([] (fwk::UdpSocketServer*) {
-      INFO("Server closed");
-    }, &i);
+        // on server closed callback
+        server.events.onClosed.subscribe([] (fwk::UdpSocketServer*) {
+            INFO("Server closed");
+        }, &i);
 
-    fwk::NetworkManager::get().getUDP().run(server);
+        fwk::NetworkManager::get().getUDP().run(server);
 
-    system->run();
-  } catch (const fwk::CoreException& e) {
-    CRITICAL(e.what());
-  }
+        system->run();
+    } catch (const fwk::CoreException& e) {
+        CRITICAL(e.what());
+    }
 }
 
 static void udpClient(fwk::System* system, const std::string& hostname, uint16_t port) {
-  try {
-    int i = 0;
+    try {
+        int i = 0;
 
-    fwk::UdpClient& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
+        fwk::UdpClient& client = fwk::NetworkManager::get().getUDP().createClient(hostname, port);
 
-    client.events.onReceivedData.subscribe([] (fwk::UdpSocketStream*) {
-      INFO("Received data");
-    }, &i);
+        client.events.onReceivedData.subscribe([] (fwk::UdpSocketStream*) {
+            INFO("Received data");
+        }, &i);
 
-    client.events.onClosed.subscribe([] (fwk::UdpSocketStream*) {
-      INFO("Connection closed");
-    }, &i);
+        client.events.onClosed.subscribe([] (fwk::UdpSocketStream*) {
+            INFO("Connection closed");
+        }, &i);
 
-    fwk::NetworkManager::get().getUDP().run(client);
+        fwk::NetworkManager::get().getUDP().run(client);
 
-    fwk::NetworkManager::get().getUDP().push(client.socket, (void*)"Hello", 5);
+        fwk::NetworkManager::get().getUDP().push(client.socket, (void*)"Hello", 5);
 
-    system->run();
+        system->run();
 
-  } catch (const fwk::CoreException& e) {
-    CRITICAL(e.what());
-  }
+    } catch (const fwk::CoreException& e) {
+        CRITICAL(e.what());
+    }
 }
 
 static void http(fwk::System* system) {
-  fwk::HttpRequest* request;
-  fwk::HttpConnection* connection = fwk::HttpClient::get().initConnection(
-    "jsonplaceholder.typicode.com",
-    80,
-    fwk::HttpProtocol::HTTP,
-    true);
+    fwk::HttpRequest* request;
+    fwk::HttpConnection* connection = fwk::HttpClient::get().initConnection(
+        "jsonplaceholder.typicode.com",
+        80,
+        fwk::HttpProtocol::HTTP,
+        true);
 
-  request = fwk::HttpRequest::getFromPool();
-  request->init();
-  request->method = "GET";
-  request->url = "/posts";
-  request->success = [] (const fwk::HttpResponse* response) -> void {
-    INFO(fmt::format("Response: {} {} / Size: {}", response->status, response->reason, response->body->getSize()));
-  };
-  request->error = [] (const fwk::HttpResponse* response) -> void {
-    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
-  };
+    request = fwk::HttpRequest::getFromPool();
+    request->init();
+    request->method = "GET";
+    request->url = "/posts";
+    request->success = [] (const fwk::HttpResponse* response) -> void {
+        INFO(fmt::format("Response: {} {} / Size: {}", response->status, response->reason, response->body->getSize()));
+    };
+    request->error = [] (const fwk::HttpResponse* response) -> void {
+        WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    };
 
-  fwk::HttpClient::get().sendRequest(connection, request);
+    fwk::HttpClient::get().sendRequest(connection, request);
 
-  request = fwk::HttpRequest::getFromPool();
-  request->init();
-  request->method = "GET";
-  request->url = "/posts";
-  request->success = [] (const fwk::HttpResponse* response) -> void {
-    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
-  };
-  request->error = [] (const fwk::HttpResponse* response) -> void {
-    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
-  };
+    request = fwk::HttpRequest::getFromPool();
+    request->init();
+    request->method = "GET";
+    request->url = "/posts";
+    request->success = [] (const fwk::HttpResponse* response) -> void {
+        INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    };
+    request->error = [] (const fwk::HttpResponse* response) -> void {
+        WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    };
 
-  fwk::HttpClient::get().sendRequest(connection, request);
+    fwk::HttpClient::get().sendRequest(connection, request);
 
-  request = fwk::HttpRequest::getFromPool();
-  request->init();
-  request->method = "GET";
-  request->url = "/posts";
-  request->success = [] (const fwk::HttpResponse* response) -> void {
-    INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
-  };
-  request->error = [] (const fwk::HttpResponse* response) -> void {
-    WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
-  };
+    request = fwk::HttpRequest::getFromPool();
+    request->init();
+    request->method = "GET";
+    request->url = "/posts";
+    request->success = [] (const fwk::HttpResponse* response) -> void {
+        INFO(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    };
+    request->error = [] (const fwk::HttpResponse* response) -> void {
+        WARNING(fmt::format("Response: {} / Size: {}", response->status, response->body->getSize()));
+    };
 
-  fwk::HttpClient::get().sendRequest(connection, request);
+    fwk::HttpClient::get().sendRequest(connection, request);
 
-  connection->run();
+    connection->run();
 
-  system->run();
+    system->run();
 }
 
 int main(int ac, char ** av) {
-  if ((ac != 2 && ac != 3 && ac != 4) || (std::string(av[1]) != "http" && std::string(av[1]) != "tcp" && std::string(av[1]) != "udp" && std::string(av[1]) != "delayed" && std::string(av[1]) != "periodic" && std::string(av[1]) != "simple")) {
-    std::cerr << "usage: " << av[0] << " \"http\"|\"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
-    return -1;
-  }
-
-  fwk::LoggerManager::get().init("cppframework", fwk::Logger::Level::DEBUG);
-
-  fwk::System* system = new fwk::System();
-  fwk::Signal::get().setCallback(fwk::Signal::Type::INT, [&] (void) -> bool {
-    INFO("Caught SIGINT, exiting.");
-    system->end();
-    return false;
-  });
-
-  std::string protocol = av[1];
-
-  if (protocol == "udp") {
-    system->initUDP();
-    if (ac == 3) {
-      // udp server
-      udpServer(system, StringToUInt16(av[2]));
-    } else if (ac == 4) {
-      // udp client
-      udpClient(system, av[2], StringToUInt16(av[3]));
-    } else {
-      std::cerr << "invalid nb of arguments" << std::endl;
+    if ((ac != 2 && ac != 3 && ac != 4) || (std::string(av[1]) != "http" && std::string(av[1]) != "tcp" && std::string(av[1]) != "udp" && std::string(av[1]) != "delayed" && std::string(av[1]) != "periodic" && std::string(av[1]) != "simple")) {
+        std::cerr << "usage: " << av[0] << " \"http\"|\"tcp\"|\"udp\" HOSTNAME PORT || " << av[0] << " PORT" << std::endl;
+        return -1;
     }
-  } else if (protocol == "tcp") {
-    system->initTCP();
-    if (ac == 3) {
-      // tcp server
-      tcpServer(system, StringToUInt16(av[2]));
-    } else if (ac == 4) {
-      // tcp client
-      tcpClient(system, av[2], StringToUInt16(av[3]));
-    } else {
-      std::cerr << "invalid nb of arguments" << std::endl;
-    }
-  } else if (protocol == "http") {
-    system->initHTTP("test useragent");
-    http(system);
-  } else if (protocol == "delayed") {
-    system->initWorkerThreads(1, true);
-    fwk::WorkerManager::get().addDelayedTask(fwk::SimpleTask::getFromPool([] (void) {
-      INFO("SimpleTask working");
-    }), std::chrono::seconds(2));
-    system->run();
-  } else if (protocol == "periodic") {
-    system->initWorkerThreads(1, true);
-    fwk::WorkerManager::get().addPeriodicTask([] (void) {
-      INFO("Hello");
-    }, nullptr, std::chrono::seconds(5), true);
-    system->run();
-  } else if (protocol == "simple") {
-    fwk::WorkerManager::get().addSimpleTask([] (void) {
-      INFO("SimpleTask :)");
+
+    fwk::LoggerManager::get().init("cppframework", fwk::Logger::Level::DEBUG);
+
+    fwk::System* system = new fwk::System();
+    fwk::Signal::get().setCallback(fwk::Signal::Type::INT, [&] (void) -> bool {
+        INFO("Caught SIGINT, exiting.");
+        system->end();
+        return false;
     });
-    system->run();
-  } else {
-    std::cerr << "unknown protocol" << std::endl;
-  }
 
-  delete system;
-  return 0;
+    std::string protocol = av[1];
+
+    if (protocol == "udp") {
+        system->initUDP();
+        if (ac == 3) {
+            // udp server
+            udpServer(system, StringToUInt16(av[2]));
+        } else if (ac == 4) {
+            // udp client
+            udpClient(system, av[2], StringToUInt16(av[3]));
+        } else {
+            std::cerr << "invalid nb of arguments" << std::endl;
+        }
+    } else if (protocol == "tcp") {
+        system->initTCP();
+        if (ac == 3) {
+            // tcp server
+            tcpServer(system, StringToUInt16(av[2]));
+        } else if (ac == 4) {
+            // tcp client
+            tcpClient(system, av[2], StringToUInt16(av[3]));
+        } else {
+            std::cerr << "invalid nb of arguments" << std::endl;
+        }
+    } else if (protocol == "http") {
+        system->initHTTP("test useragent");
+        http(system);
+    } else if (protocol == "delayed") {
+        system->initWorkerThreads(1, true);
+        fwk::WorkerManager::get().addDelayedTask(fwk::SimpleTask::getFromPool([] (void) {
+            INFO("SimpleTask working");
+        }), std::chrono::seconds(2));
+        system->run();
+    } else if (protocol == "periodic") {
+        system->initWorkerThreads(1, true);
+        fwk::WorkerManager::get().addPeriodicTask([] (void) {
+            INFO("Hello");
+        }, nullptr, std::chrono::seconds(5), true);
+        system->run();
+    } else if (protocol == "simple") {
+        fwk::WorkerManager::get().addSimpleTask([] (void) {
+            INFO("SimpleTask :)");
+        });
+        system->run();
+    } else {
+        std::cerr << "unknown protocol" << std::endl;
+    }
+
+    delete system;
+    return 0;
 }

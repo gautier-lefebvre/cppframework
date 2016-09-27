@@ -3,7 +3,7 @@
 using namespace fwk;
 
 curlxx::Exception::Exception(const std::string& msg) noexcept:
-  ::Exception(msg)
+    ::Exception(msg)
 {}
 
 curlxx::Exception::~Exception() {}

@@ -3,19 +3,19 @@
 using namespace fwk;
 
 PoolNotInitializedException::PoolNotInitializedException(const std::string& msg) noexcept:
-  Exception(msg)
+    Exception(msg)
 {}
 
 PoolNotInitializedException::~PoolNotInitializedException() {}
 
 PoolInvalidArgumentsException::PoolInvalidArgumentsException(const std::string& msg) noexcept:
-  Exception(msg)
+    Exception(msg)
 {}
 
 PoolInvalidArgumentsException::~PoolInvalidArgumentsException() {}
 
 PoolMemoryExhaustedException::PoolMemoryExhaustedException(const std::string& msg) noexcept:
-  Exception(msg)
+    Exception(msg)
 {}
 
 PoolMemoryExhaustedException::~PoolMemoryExhaustedException() {}

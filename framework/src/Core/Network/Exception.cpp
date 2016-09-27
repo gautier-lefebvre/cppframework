@@ -3,7 +3,7 @@
 using namespace fwk;
 
 NetworkException::NetworkException(const std::string& msg) noexcept:
-  CoreException(msg)
+    CoreException(msg)
 {}
 
 NetworkException::~NetworkException(void) {}
