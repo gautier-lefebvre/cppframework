@@ -71,7 +71,9 @@ ATask* WorkerManager::getNextTask(void) {
     this->_pendingTasks.pop_front();
 
     if (task->getKey() && task->_taskIterator != this->_taskQueueIteratorNullValue.cend()) {
-        this->_watchedTasks[task->getKey()].erase(task->_taskIterator);
+        try {
+            this->_watchedTasks.at(task->getKey()).erase(task->_taskIterator);
+        } catch (const std::out_of_range&) {}
     }
 
     return task;
@@ -84,7 +86,9 @@ DelayedTask* WorkerManager::getNextDelayedTask(void) {
     this->_delayedTasks.pop_front();
 
     if (delayedTask->_task->getKey() && delayedTask->_delayedTaskIterator != this->_delayedTaskQueueIteratorNullValue.cend()) {
-        this->_watchedDelayedTasks[delayedTask->_task->getKey()].erase(delayedTask->_delayedTaskIterator);
+        try {
+            this->_watchedDelayedTasks.at(delayedTask->_task->getKey()).erase(delayedTask->_delayedTaskIterator);
+        } catch (const std::out_of_range&) {}
     }
 
     return delayedTask;
