@@ -10,8 +10,6 @@ using namespace fwk;
 WorkerManager::WorkerManager(void):
     Lockable(),
     AEndable(),
-    _taskQueueIteratorNullValue(),
-    _delayedTaskQueueIteratorNullValue(),
     _pendingTasks(),
     _delayedTasks([] (const DelayedTask *a, const DelayedTask *b) -> bool { return *a < *b; }),
     _workers(),
@@ -70,15 +68,8 @@ ATask* WorkerManager::getNextTask(void) {
     ATask* task = this->_pendingTasks.front();
     this->_pendingTasks.pop_front();
 
-    if (task->getKey() && task->_taskIterator != this->_taskQueueIteratorNullValue.cend()) {
-        try {
-            auto& iterators = this->_watchedTasks.at(task->getKey());
-            iterators.erase(task->_taskIterator);
-
-            if (iterators.empty()) {
-                this->_watchedTasks.erase(task->getKey());
-            }
-        } catch (const std::out_of_range&) {}
+    if (task->getKey() && task->_taskIterator != this->_watchedTasks.cend()) {
+        this->_watchedTasks.erase(task->_taskIterator);
     }
 
     return task;
@@ -90,15 +81,8 @@ DelayedTask* WorkerManager::getNextDelayedTask(void) {
     DelayedTask* delayedTask = this->_delayedTasks.front();
     this->_delayedTasks.pop_front();
 
-    if (delayedTask->_task->getKey() && delayedTask->_delayedTaskIterator != this->_delayedTaskQueueIteratorNullValue.cend()) {
-        try {
-            auto &iterators = this->_watchedDelayedTasks.at(delayedTask->_task->getKey());
-            iterators.erase(delayedTask->_delayedTaskIterator);
-
-            if (iterators.empty()) {
-                this->_watchedDelayedTasks.erase(delayedTask->_task->getKey());
-            }
-        } catch (const std::out_of_range&) {}
+    if (delayedTask->_task->getKey() && delayedTask->_delayedTaskIterator != this->_watchedDelayedTasks.cend()) {
+        this->_watchedDelayedTasks.erase(delayedTask->_delayedTaskIterator);
     }
 
     return delayedTask;
@@ -110,11 +94,9 @@ void  WorkerManager::addTask(ATask* task) {
         this->_pendingTasks.push_back(task);
 
         if (task->getKey()) {
-            auto& iterators = this->_watchedTasks[task->getKey()];
-            iterators.push_back(std::prev(this->_pendingTasks.cend()));
-            task->_taskIterator = std::prev(iterators.cend());
+            task->_taskIterator = this->_watchedTasks.emplace(task->getKey(), std::prev(this->_pendingTasks.cend()));
         } else {
-            task->_taskIterator = this->_taskQueueIteratorNullValue.cend();
+            task->_taskIterator = this->_watchedTasks.cend();
         }
 
         this->_pendingTasks.notify();
@@ -128,11 +110,9 @@ void  WorkerManager::addDelayedTask(DelayedTask* delayedTask) {
             this->_delayedTasks.push(delayedTask);
 
             if (delayedTask->_task->getKey()) {
-                auto& iterators = this->_watchedDelayedTasks[delayedTask->_task->getKey()];
-                iterators.push_back(std::prev(this->_delayedTasks.cend()));
-                delayedTask->_delayedTaskIterator = std::prev(iterators.cend());
+                delayedTask->_delayedTaskIterator = this->_watchedDelayedTasks.emplace(delayedTask->_task->getKey(), std::prev(this->_delayedTasks.cend()));
             } else {
-                delayedTask->_delayedTaskIterator = this->_delayedTaskQueueIteratorNullValue.cend();
+                delayedTask->_delayedTaskIterator = this->_watchedDelayedTasks.cend();
             }
 
             this->_delayedTasks.notify();
@@ -183,11 +163,11 @@ void  WorkerManager::addPeriodicTask(PeriodicTask* periodicTask, bool startNow) 
 }
 
 void WorkerManager::purgeTaskQueue(const void* key) {
-    try {
+    {
         SCOPELOCK(&(this->_pendingTasks));
 
-        for (auto& iterator : this->_watchedTasks.at(key)) {
-            ATask* task = *iterator;
+        for (auto it = this->_watchedTasks.find(key) ; it != this->_watchedTasks.end() ; ++it) {
+            ATask* task = *((*it).second);
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
                     SimpleTask* simpleTask = reinterpret_cast<SimpleTask*>(task);
@@ -201,18 +181,18 @@ void WorkerManager::purgeTaskQueue(const void* key) {
                 }
             }
 
-            this->_pendingTasks.erase(iterator);
+            this->_pendingTasks.erase((*it).second);
+            it = this->_watchedTasks.erase(it);
         }
 
-        this->_watchedTasks.erase(key);
         this->_pendingTasks.notify_all();
-    } catch (const std::out_of_range&) {}
+    }
 
-    try {
+    {
         SCOPELOCK(&(this->_delayedTasks));
 
-        for (auto& iterator : this->_watchedDelayedTasks.at(key)) {
-            ATask* task = (*iterator)->_task;
+        for (auto it = this->_watchedDelayedTasks.find(key) ; it != this->_watchedDelayedTasks.end() ; ++it) {
+            ATask* task = (*((*it).second))->_task;
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
                     SimpleTask* simpleTask = reinterpret_cast<SimpleTask*>(task);
@@ -226,11 +206,11 @@ void WorkerManager::purgeTaskQueue(const void* key) {
                 }
             }
 
-            DelayedTask::returnToPool(*iterator);
-            this->_delayedTasks.erase(iterator);
+            DelayedTask::returnToPool(*((*it).second));
+            this->_delayedTasks.erase((*it).second);
+            it = this->_watchedDelayedTasks.erase(it);
         }
 
-        this->_watchedDelayedTasks.erase(key);
         this->_delayedTasks.notify_all();
-    } catch (const std::out_of_range&) {}
+    }
 }

@@ -2,7 +2,7 @@
 #define    __CORE_WORKER_WORKERMANAGER_HH__
 
 #include  <list>
-#include  <unordered_map>
+#include  <map>
 #include  <chrono>
 
 #include  "Library/Collection/OrderedList.hpp"
@@ -25,16 +25,12 @@ namespace fwk {
         typedef TNotifiable<OrderedList<DelayedTask*>>  DelayedTaskQueue; /*!< notifiable queue of DelayedTask. */
 
     private:
-        const std::list<TaskQueue::const_iterator> _taskQueueIteratorNullValue; /*!< this list will stay empty, this is a way to give a valid null iterator to the tasks. */
-        const std::list<DelayedTaskQueue::const_iterator> _delayedTaskQueueIteratorNullValue; /*!< this list will stay empty, this is a way to give a valid null iterator to the delayed tasks. */
-
-    private:
         TaskQueue _pendingTasks; /*!< tasks to execute. */
         DelayedTaskQueue _delayedTasks; /*!< tasks to be executed after a delay. */
         std::vector<WorkerThread*> _workers; /*!< list of workers threads. */
         bool _delayedTasksEnabled; /*!< whether or not the delayed tasks are enabled. */
-        std::unordered_map<const void *, std::list<TaskQueue::const_iterator>> _watchedTasks; /*!< a map linking a key (given when creating a task) to the iterator of the task in the map, to purge. */
-        std::unordered_map<const void *, std::list<DelayedTaskQueue::const_iterator>> _watchedDelayedTasks; /*!< a map linking a key (given when creating a task) to the iterator of the delayed task in the map, to purge. */
+        std::multimap<const void *, TaskQueue::const_iterator> _watchedTasks; /*!< a map linking a key (given when creating a task) to the iterator of the task in the map, to purge. */
+        std::multimap<const void *, DelayedTaskQueue::const_iterator> _watchedDelayedTasks; /*!< a map linking a key (given when creating a task) to the iterator of the delayed task in the map, to purge. */
 
     private:
         /**
