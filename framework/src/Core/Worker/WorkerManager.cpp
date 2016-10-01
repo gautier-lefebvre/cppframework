@@ -1,3 +1,5 @@
+#include  <iterator>
+
 #include  "Library/Tool/Logger.hpp"
 #include  "Core/Worker/WorkerManager.hh"
 #include  "Core/Worker/DelayedTasksThread.hh"
@@ -8,10 +10,14 @@ using namespace fwk;
 WorkerManager::WorkerManager(void):
     Lockable(),
     AEndable(),
+    _taskQueueIteratorNullValue(),
+    _delayedTaskQueueIteratorNullValue(),
     _pendingTasks(),
     _delayedTasks([] (const DelayedTask *a, const DelayedTask *b) -> bool { return *a < *b; }),
     _workers(),
-    _delayedTasksEnabled(false)
+    _delayedTasksEnabled(false),
+    _watchedTasks(),
+    _watchedDelayedTasks()
 {}
 
 WorkerManager::~WorkerManager(void) {
@@ -58,10 +64,45 @@ WorkerManager::DelayedTaskQueue&  WorkerManager::getDelayedTaskQueue(void) {
     return this->_delayedTasks;
 }
 
+ATask* WorkerManager::getNextTask(void) {
+    if (this->_pendingTasks.empty()) { return nullptr; }
+
+    ATask* task = this->_pendingTasks.front();
+    this->_pendingTasks.pop_front();
+
+    if (task->getKey() && task->_taskIterator != this->_taskQueueIteratorNullValue.cend()) {
+        this->_watchedTasks[task->getKey()].erase(task->_taskIterator);
+    }
+
+    return task;
+}
+
+DelayedTask* WorkerManager::getNextDelayedTask(void) {
+    if (this->_delayedTasks.empty()) { return nullptr; }
+
+    DelayedTask* delayedTask = this->_delayedTasks.front();
+    this->_delayedTasks.pop_front();
+
+    if (delayedTask->_task->getKey() && delayedTask->_delayedTaskIterator != this->_delayedTaskQueueIteratorNullValue.cend()) {
+        this->_watchedDelayedTasks[delayedTask->_task->getKey()].erase(delayedTask->_delayedTaskIterator);
+    }
+
+    return delayedTask;
+}
+
 void  WorkerManager::addTask(ATask* task) {
     if (task != nullptr) {
         SCOPELOCK(&(this->_pendingTasks));
         this->_pendingTasks.push_back(task);
+
+        if (task->getKey()) {
+            auto& iterators = this->_watchedTasks[task->getKey()];
+            iterators.push_back(std::prev(this->_pendingTasks.cend()));
+            task->_taskIterator = std::prev(iterators.cend());
+        } else {
+            task->_taskIterator = this->_taskQueueIteratorNullValue.cend();
+        }
+
         this->_pendingTasks.notify();
     }
 }
@@ -71,6 +112,15 @@ void  WorkerManager::addDelayedTask(DelayedTask* delayedTask) {
         if (delayedTask != nullptr) {
             SCOPELOCK(&(this->_delayedTasks));
             this->_delayedTasks.push(delayedTask);
+
+            if (delayedTask->_task->getKey()) {
+                auto& iterators = this->_watchedDelayedTasks[delayedTask->_task->getKey()];
+                iterators.push_back(std::prev(this->_delayedTasks.cend()));
+                delayedTask->_delayedTaskIterator = std::prev(iterators.cend());
+            } else {
+                delayedTask->_delayedTaskIterator = this->_delayedTaskQueueIteratorNullValue.cend();
+            }
+
             this->_delayedTasks.notify();
         }
     } else {
@@ -118,43 +168,55 @@ void  WorkerManager::addPeriodicTask(PeriodicTask* periodicTask, bool startNow) 
     }
 }
 
-void WorkerManager::purgeTaskQueue(const void*) {
-    // {
-    //     SCOPELOCK(&(this->_pendingTasks));
-    //     for (auto it = this->_pendingTasks.begin() ; it != this->_pendingTasks.end() ; ++it) {
-    //         if ((*it)->getSource() == ATask::Source::EVENT) {
-    //             EventTask* task = reinterpret_cast<EventTask*>(*it);
-    //             if (task) {
-    //                 if (task->_key == key) {
-    //                     EventTask::returnToPool(task);
-    //                     it = this->_pendingTasks.erase(it);
-    //                 }
-    //             } else {
-    //                 CRITICAL("Could not reinterpret_cast an EventTask");
-    //             }
-    //         }
-    //     }
+void WorkerManager::purgeTaskQueue(const void* key) {
+    try {
+        SCOPELOCK(&(this->_pendingTasks));
 
-    //     this->_pendingTasks.notify_all();
-    // }
+        for (auto& iterator : this->_watchedTasks.at(key)) {
+            ATask* task = *iterator;
+            switch (task->getSource()) {
+                case ATask::Source::SIMPLE: {
+                    SimpleTask* simpleTask = reinterpret_cast<SimpleTask*>(task);
+                    SimpleTask::returnToPool(simpleTask);
+                    break;
+                }
+                case ATask::Source::PERIODIC_TASK: {
+                    PeriodicTask* periodicTask = reinterpret_cast<PeriodicTask*>(task);
+                    PeriodicTask::returnToPool(periodicTask);
+                    break;
+                }
+            }
 
-    // {
-    //     SCOPELOCK(&(this->_delayedTasks));
-    //     for (auto it = this->_delayedTasks.begin() ; it != this->_delayedTasks.end() ; ++it) {
-    //         if ((*it)->_task->getSource() == ATask::Source::EVENT) {
-    //             EventTask* task = reinterpret_cast<EventTask*>((*it)->_task);
-    //             if (task) {
-    //                 if (task->_key == key) {
-    //                     EventTask::returnToPool(task);
-    //                     DelayedTask::returnToPool((*it));
-    //                     it = this->_delayedTasks.erase(it);
-    //                 }
-    //             } else {
-    //                 CRITICAL("Could not reinterpret_cast an EventTask");
-    //             }
-    //         }
-    //     }
+            this->_pendingTasks.erase(iterator);
+        }
 
-    //     this->_delayedTasks.notify_all();
-    // }
+        this->_watchedTasks.erase(key);
+        this->_pendingTasks.notify_all();
+    } catch (const std::out_of_range&) {}
+
+    try {
+        SCOPELOCK(&(this->_delayedTasks));
+
+        for (auto& iterator : this->_watchedDelayedTasks.at(key)) {
+            ATask* task = (*iterator)->_task;
+            switch (task->getSource()) {
+                case ATask::Source::SIMPLE: {
+                    SimpleTask* simpleTask = reinterpret_cast<SimpleTask*>(task);
+                    SimpleTask::returnToPool(simpleTask);
+                    break;
+                }
+                case ATask::Source::PERIODIC_TASK: {
+                    PeriodicTask* periodicTask = reinterpret_cast<PeriodicTask*>(task);
+                    PeriodicTask::returnToPool(periodicTask);
+                    break;
+                }
+            }
+
+            DelayedTask::returnToPool(*iterator);
+            this->_delayedTasks.erase(iterator);
+        }
+
+        this->_watchedDelayedTasks.erase(key);
+        this->_delayedTasks.notify_all();
+    } catch (const std::out_of_range&) {}
 }

@@ -8,10 +8,15 @@ using namespace fwk;
 
 ATask::ATask(ATask::Source source):
     _source(source),
-    _key(nullptr)
+    _key(nullptr),
+    _taskIterator()
 {}
 
 ATask::~ATask(void) {}
+
+void ATask::reinit(void) {
+    this->_key = nullptr;
+}
 
 ATask::Source ATask::getSource(void) const {
     return this->_source;
@@ -37,7 +42,7 @@ SimpleTask::~SimpleTask(void) {
 }
 
 void  SimpleTask::reinit(void) {
-    this->_key = nullptr;
+    this->ATask::reinit();
     this->_callback = nullptr;
     this->_cleanup = nullptr;
 }
@@ -72,7 +77,7 @@ PeriodicTask::~PeriodicTask(void) {
 }
 
 void  PeriodicTask::reinit(void) {
-    this->_key = nullptr;
+    this->ATask::reinit();
     this->_callback = nullptr;
     this->_cleanup = nullptr;
     this->_off = true;

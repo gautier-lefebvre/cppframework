@@ -52,8 +52,8 @@ void  DelayedTasksThread::routine(void) const {
                 if (delayedTaskQueue.wait_until(delayedTaskQueue.front()->_timePoint) == std::cv_status::timeout) {
                     if (this->isEnding()) { break; }
                     if (!delayedTaskQueue.empty()) {
-                        if ((delayedTask = delayedTaskQueue.front())->_timePoint <= std::chrono::steady_clock::now()) {
-                            delayedTaskQueue.pop_front();
+                        if (delayedTaskQueue.front()->_timePoint <= std::chrono::steady_clock::now()) {
+                            delayedTask = WorkerManager::get().getNextDelayedTask();
                         } else {
                             delayedTask = nullptr;
                         }

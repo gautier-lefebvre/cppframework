@@ -1,10 +1,13 @@
 #ifndef    __CORE_WORKER_TASK_HH__
 #define    __CORE_WORKER_TASK_HH__
 
+#include  <list>
 #include  <chrono>
 #include  <functional>
 
+#include  "Library/Collection/OrderedList.hpp"
 #include  "Library/Factory/APooled.hpp"
+#include  "Library/Threading/Notifiable.hpp"
 #include  "Core/Network/Http/HttpResponse.hh"
 
 namespace fwk {
@@ -30,6 +33,9 @@ namespace fwk {
         const void* _key; /*!< the key used to purge. */
 
     public:
+        std::list<TNotifiable<std::list<ATask*>>::const_iterator>::const_iterator _taskIterator; /*!< if the key is not null, this is the iterator to the task in the task queue. */
+
+    public:
         /**
          *  \brief Constructor of ATask.
          *  \param source the task type.
@@ -40,6 +46,12 @@ namespace fwk {
          *  \brief Destructor of ATask.
          */
         virtual ~ATask(void);
+
+    public:
+        /**
+         *  \brief Reinits the task by setting the key and the iterator to null values.
+         */
+        void reinit(void);
 
     public:
         /**
@@ -148,6 +160,7 @@ namespace fwk {
     public:
         ATask*  _task; /*!< the task to be executed after the delay. */
         std::chrono::steady_clock::time_point  _timePoint; /*!< the timepoint when the task must be added to the tasks queue. */
+        std::list<TNotifiable<OrderedList<DelayedTask*>>::const_iterator>::const_iterator _delayedTaskIterator; /*!< the iterator to the delayed task in the map. */
 
     public:
         /**

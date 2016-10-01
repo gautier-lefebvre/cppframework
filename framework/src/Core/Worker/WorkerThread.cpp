@@ -34,8 +34,7 @@ void  WorkerThread::cleanup(void) {
     WorkerHandler handler;
 
     while (!taskQueue.empty()) {
-        task = taskQueue.front();
-        taskQueue.pop_front();
+        task = WorkerManager::get().getNextTask();
 
         try {
             handler = WorkerThread::TaskHandlerMap.at(task->getSource());
@@ -48,8 +47,7 @@ void  WorkerThread::cleanup(void) {
     }
 
     while (!delayedTaskQueue.empty()) {
-        delayedTask = delayedTaskQueue.front();
-        delayedTaskQueue.pop_front();
+        delayedTask = WorkerManager::get().getNextDelayedTask();
 
         try {
             handler = WorkerThread::TaskHandlerMap.at(delayedTask->_task->getSource());
@@ -101,8 +99,7 @@ void  WorkerThread::routine(void) {
             if (taskQueue.empty()) {
                 taskQueue.wait();
             } else {
-                task = taskQueue.front();
-                taskQueue.pop_front();
+                task = WorkerManager::get().getNextTask();
             }
         }
 

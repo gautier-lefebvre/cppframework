@@ -192,7 +192,6 @@ HttpResponse* HttpConnection::exec(const HttpRequest *request) const {
         curlxx::EasyHandle::returnToPool(handle);
         throw NetworkException(e.what());
     }
-
 }
 
 void HttpConnection::setResponse(HttpRequest* request, HttpResponse* response) const {
