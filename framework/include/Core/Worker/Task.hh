@@ -20,7 +20,6 @@ namespace fwk {
          */
         enum class Source {
             SIMPLE, /*!< SimpleTask */
-            HTTP_CALLBACK, /*!< HttpTask */
             PERIODIC_TASK /*!< PeriodicTask */
         };
 
@@ -95,43 +94,6 @@ namespace fwk {
          *  \param cleanup the callback to be used to clean resources. Called when the tasks queue is being cleared.
          */
         void  init(const void* key, const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
-    };
-
-    /**
-     *  \class HttpTask Core/Worker/Task.hh
-     *  \brief A task created after a HTTP response has been received.
-     */
-    class HttpTask :public ATask, public APooled<HttpTask> {
-    public:
-        std::function<void (const HttpResponse*)> _callback; /*!< the callback function to call with the response. */
-        std::function<void (void)> _cleanup; /*!< the method used to clean resources used with the request. */
-        HttpResponse* _response; /*!< the response received. */
-
-    public:
-        /**
-         *  \brief Constructor of HttpTask.
-         */
-        HttpTask(void);
-
-        /**
-         *  \brief Destructor of HttpTask.
-         */
-        virtual ~HttpTask(void);
-
-    public:
-        /**
-         *  \brief Sets the attributes to their null values.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the callback function, the cleanup function and the HTTP response.
-         *  \param callback the callback method to call.
-         *  \param cleanup the cleanup method used to clean resources used in the request. It is only called when the tasks queue is being cleared, so never after the callback method.
-         *  \param response the HTTP response received.
-         */
-        void  init(const std::function<void (const HttpResponse*)>& callback, const std::function<void (void)>& cleanup, HttpResponse* response);
     };
 
     /**

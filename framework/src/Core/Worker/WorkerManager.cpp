@@ -89,13 +89,6 @@ void  WorkerManager::addSimpleTask(const void* key, const std::function<void (vo
     this->addTask(simpleTask);
 }
 
-void  WorkerManager::addHttpTask(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {
-    if (resp != nullptr) {
-        HttpTask* httpTask = HttpTask::getFromPool(cb, cl, resp);
-        this->addTask(httpTask);
-    }
-}
-
 void  WorkerManager::addDelayedTask(ATask* task, const std::chrono::steady_clock::time_point& timepoint) {
     if (task != nullptr) {
         DelayedTask* delayedTask = DelayedTask::getFromPool(task, timepoint);

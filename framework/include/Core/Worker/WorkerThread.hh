@@ -69,14 +69,6 @@ namespace fwk {
         static void  executeSimpleTask(ATask* task, bool exec = true);
 
         /**
-         *  \brief Executes a HttpTask task.
-         *  \throw std::exception whatever exception the HttpTask throws.
-         *  \param task pointer to the HttpTask.
-         *  \param exec true if the task must be executed, or only cleaned if necessary.
-         */
-        static void  executeHttpTask(ATask* task, bool exec = true);
-
-        /**
          *  \brief Executes a PeriodicTask task.
          *  \throw std::exception whatever exception the PeriodicTask throws.
          *  \param task pointer to the PeriodicTask.

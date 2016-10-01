@@ -55,34 +55,6 @@ void  SimpleTask::init(const void* key, const std::function<void (void)>& cb, co
 }
 
 /**
- *  HttpTask
- */
-
-HttpTask::HttpTask(void):
-    ATask(ATask::Source::HTTP_CALLBACK),
-    APooled<HttpTask>(),
-    _callback(nullptr),
-    _cleanup(nullptr),
-    _response(nullptr)
-{}
-
-HttpTask::~HttpTask(void) {
-    this->reinit();
-}
-
-void  HttpTask::reinit(void) {
-    this->_callback = nullptr;
-    this->_cleanup = nullptr;
-    this->_response = nullptr;
-}
-
-void  HttpTask::init(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {
-    this->_callback = cb;
-    this->_cleanup = cl;
-    this->_response = resp;
-}
-
-/**
  *  PeriodicTask
  */
 

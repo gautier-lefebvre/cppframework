@@ -10,7 +10,6 @@ using namespace fwk;
 
 const std::map<ATask::Source, WorkerThread::WorkerHandler> WorkerThread::TaskHandlerMap = {
     {ATask::Source::SIMPLE, &WorkerThread::executeSimpleTask},
-    {ATask::Source::HTTP_CALLBACK, &WorkerThread::executeHttpTask},
     {ATask::Source::PERIODIC_TASK, &WorkerThread::executePeriodicTask}
 };
 
@@ -125,7 +124,9 @@ void  WorkerThread::executeSimpleTask(ATask* task, bool exec) {
     SimpleTask *simpleTask = reinterpret_cast<SimpleTask*>(task);
 
     if (simpleTask) {
+        // this boolean is used to only call the cleanup callback if it wasn't this callback that threw the exception.
         bool cleaned = false;
+
         try {
             try {
                 if (exec) {
@@ -153,39 +154,6 @@ void  WorkerThread::executeSimpleTask(ATask* task, bool exec) {
         SimpleTask::returnToPool(simpleTask);
     } else {
         CRITICAL("Can't reinterpret_cast a SimpleTask");
-    }
-}
-
-void  WorkerThread::executeHttpTask(ATask* task, bool exec) {
-    HttpTask *httpTask = reinterpret_cast<HttpTask*>(task);
-
-    if (httpTask) {
-        bool cleaned = false;
-
-        try {
-            try {
-                if (exec && httpTask->_callback) {
-                    httpTask->_callback(httpTask->_response);
-                }
-
-                if (httpTask->_cleanup) {
-                    cleaned = true;
-                    httpTask->_cleanup();
-                }
-            } catch (const std::exception&) {
-                if (httpTask->_cleanup && !cleaned) {
-                    httpTask->_cleanup();
-                }
-
-                throw;
-            }
-        } catch (const std::exception&) {
-            HttpResponse::returnToPool(httpTask->_response);
-            HttpTask::returnToPool(httpTask);
-            throw;
-        }
-    } else {
-        CRITICAL("Can't reinterpret_cast an HTTPTask");
     }
 }
 

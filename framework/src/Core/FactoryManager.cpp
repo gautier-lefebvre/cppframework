@@ -42,7 +42,6 @@ void FactoryManager::init(void) {
 
         // -- Tasks
         SimpleTask::initPool(40, 20, "SimpleTask");
-        HttpTask::initPool(20, 10, "HttpTask");
         PeriodicTask::initPool(20, 10, "PeriodicTask");
         DelayedTask::initPool(40, 20, "DelayedTask");
     }
@@ -72,7 +71,6 @@ void FactoryManager::end(void) {
 
         // -- Tasks
         SimpleTask::destroyPool();
-        HttpTask::destroyPool();
         PeriodicTask::destroyPool();
         DelayedTask::destroyPool();
     }

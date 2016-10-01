@@ -111,14 +111,6 @@ namespace fwk {
         void  addSimpleTask(const void* key, const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
 
         /**
-         *  \brief Adds an HttpTask to the task queue.
-         *  \param callback the function to call with the response.
-         *  \param cleanup the cleanup function.
-         *  \param response the HTTP response.
-         */
-        void  addHttpTask(const std::function<void (const HttpResponse*)>& callback, const std::function<void (void)>& cleanup, HttpResponse* response);
-
-        /**
          *  \brief Adds a DelayedTask to the delayed task queue.
          *  \param task the task to be executed at the specific time point.
          *  \param tp the timepoint at which the task must be executed.
