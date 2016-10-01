@@ -95,25 +95,20 @@ namespace fwk {
 
         /**
          *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
-         *  Inits it with the callback funtion.
+         *  Inits it with the callback function.
+         *  \param key the key used to purge the task queue.
          *  \param callback the callback of the SimpleTask object.
          */
-        void  addSimpleTask(const std::function<void (void)>& callback);
+        void  addSimpleTask(const void* key, const std::function<void (void)>& callback);
 
         /**
          *  \brief Gets a SimpleTask from the pool and adds it to the task queue.
          *  Inits it with the callback and cleanup functions.
+         *  \param key the key used to purge the task queue.
          *  \param callback the callback function of the SimpleTask object.
          *  \param cleanup the cleanup function of the SimpleTask object.
          */
-        void  addSimpleTask(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
-
-        /**
-         *  \brief Adds an EventTask to the task queue. You should use event->fireSync(...) or event->fireAsync() instead of this method.
-         *  \param key the key used to purge. The easiest way is to send 'this' from the event.
-         *  \param callback the function to call when the event is fired.
-         */
-        void  addEventTask(const void * key, const std::function<void (void)>& callback);
+        void  addSimpleTask(const void* key, const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
 
         /**
          *  \brief Adds an HttpTask to the task queue.
@@ -139,12 +134,13 @@ namespace fwk {
 
         /**
          *  \brief Adds a PeriodicTask to the task queue.
+         *  \param key the key used to purge the task queue.
          *  \param callback the function to call at regular interval.
          *  \param cleanup the function to call after the periodic task has been canceled.
          *  \param duration the duration between 2 calls of the callback.
          *  \param startNow true if the task must be first executed right away, false if the task must be first executed after the specified duration.
          */
-        void  addPeriodicTask(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& duration, bool startNow = true);
+        void  addPeriodicTask(const void* key, const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& duration, bool startNow = true);
 
         /**
          *  \brief Adds a PeriodicTask to the task queue.
@@ -155,10 +151,10 @@ namespace fwk {
 
     public:
         /**
-         *  \brief Removes all EventTasks added with the given key.
-         *  \param key the key given in addEventTask.
+         *  \brief Removes all Tasks added with the given key.
+         *  \param key the key given in addSimpleTask.
          */
-        void purgeEventTasks(const void *key);
+        void purgeTaskQueue(const void *key);
     };
 }
 

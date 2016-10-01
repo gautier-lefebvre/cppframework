@@ -79,19 +79,14 @@ void  WorkerManager::addDelayedTask(DelayedTask* delayedTask) {
     }
 }
 
-void  WorkerManager::addSimpleTask(const std::function<void (void)>& cb) {
-    SimpleTask *simpleTask = SimpleTask::getFromPool(cb);
+void  WorkerManager::addSimpleTask(const void* key, const std::function<void (void)>& cb) {
+    SimpleTask *simpleTask = SimpleTask::getFromPool(key, cb);
     this->addTask(simpleTask);
 }
 
-void  WorkerManager::addSimpleTask(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
-    SimpleTask *simpleTask = SimpleTask::getFromPool(cb, cl);
+void  WorkerManager::addSimpleTask(const void* key, const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+    SimpleTask *simpleTask = SimpleTask::getFromPool(key, cb, cl);
     this->addTask(simpleTask);
-}
-
-void  WorkerManager::addEventTask(const void* key, const std::function<void (void)>& callback) {
-    EventTask* eventTask = EventTask::getFromPool(key, callback);
-    this->addTask(eventTask);
 }
 
 void  WorkerManager::addHttpTask(const std::function<void (const HttpResponse*)>& cb, const std::function<void (void)>& cl, HttpResponse* resp) {
@@ -115,8 +110,8 @@ void  WorkerManager::addDelayedTask(ATask* task, const std::chrono::steady_clock
     }
 }
 
-void  WorkerManager::addPeriodicTask(const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval, bool startNow) {
-    PeriodicTask* periodicTask = PeriodicTask::getFromPool(callback, clean, interval);
+void  WorkerManager::addPeriodicTask(const void* key, const std::function<void(void)>& callback, const std::function<void(void)>& clean, const std::chrono::steady_clock::duration& interval, bool startNow) {
+    PeriodicTask* periodicTask = PeriodicTask::getFromPool(key, callback, clean, interval);
     this->addPeriodicTask(periodicTask, startNow);
 }
 
@@ -130,43 +125,43 @@ void  WorkerManager::addPeriodicTask(PeriodicTask* periodicTask, bool startNow) 
     }
 }
 
-void WorkerManager::purgeEventTasks(const void* key) {
-    {
-        SCOPELOCK(&(this->_pendingTasks));
-        for (auto it = this->_pendingTasks.begin() ; it != this->_pendingTasks.end() ; ++it) {
-            if ((*it)->getSource() == ATask::Source::EVENT) {
-                EventTask* task = reinterpret_cast<EventTask*>(*it);
-                if (task) {
-                    if (task->_key == key) {
-                        EventTask::returnToPool(task);
-                        it = this->_pendingTasks.erase(it);
-                    }
-                } else {
-                    CRITICAL("Could not reinterpret_cast an EventTask");
-                }
-            }
-        }
+void WorkerManager::purgeTaskQueue(const void*) {
+    // {
+    //     SCOPELOCK(&(this->_pendingTasks));
+    //     for (auto it = this->_pendingTasks.begin() ; it != this->_pendingTasks.end() ; ++it) {
+    //         if ((*it)->getSource() == ATask::Source::EVENT) {
+    //             EventTask* task = reinterpret_cast<EventTask*>(*it);
+    //             if (task) {
+    //                 if (task->_key == key) {
+    //                     EventTask::returnToPool(task);
+    //                     it = this->_pendingTasks.erase(it);
+    //                 }
+    //             } else {
+    //                 CRITICAL("Could not reinterpret_cast an EventTask");
+    //             }
+    //         }
+    //     }
 
-        this->_pendingTasks.notify_all();
-    }
+    //     this->_pendingTasks.notify_all();
+    // }
 
-    {
-        SCOPELOCK(&(this->_delayedTasks));
-        for (auto it = this->_delayedTasks.begin() ; it != this->_delayedTasks.end() ; ++it) {
-            if ((*it)->_task->getSource() == ATask::Source::EVENT) {
-                EventTask* task = reinterpret_cast<EventTask*>((*it)->_task);
-                if (task) {
-                    if (task->_key == key) {
-                        EventTask::returnToPool(task);
-                        DelayedTask::returnToPool((*it));
-                        it = this->_delayedTasks.erase(it);
-                    }
-                } else {
-                    CRITICAL("Could not reinterpret_cast an EventTask");
-                }
-            }
-        }
+    // {
+    //     SCOPELOCK(&(this->_delayedTasks));
+    //     for (auto it = this->_delayedTasks.begin() ; it != this->_delayedTasks.end() ; ++it) {
+    //         if ((*it)->_task->getSource() == ATask::Source::EVENT) {
+    //             EventTask* task = reinterpret_cast<EventTask*>((*it)->_task);
+    //             if (task) {
+    //                 if (task->_key == key) {
+    //                     EventTask::returnToPool(task);
+    //                     DelayedTask::returnToPool((*it));
+    //                     it = this->_delayedTasks.erase(it);
+    //                 }
+    //             } else {
+    //                 CRITICAL("Could not reinterpret_cast an EventTask");
+    //             }
+    //         }
+    //     }
 
-        this->_delayedTasks.notify_all();
-    }
+    //     this->_delayedTasks.notify_all();
+    // }
 }

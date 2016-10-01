@@ -20,13 +20,15 @@ namespace fwk {
          */
         enum class Source {
             SIMPLE, /*!< SimpleTask */
-            EVENT, /*!< EventTask */
             HTTP_CALLBACK, /*!< HttpTask */
             PERIODIC_TASK /*!< PeriodicTask */
         };
 
     private:
         Source  _source; /*!< the type of task. */
+
+    protected:
+        const void* _key; /*!< the key used to purge. */
 
     public:
         /**
@@ -45,6 +47,11 @@ namespace fwk {
          *  \return the type of task.
          */
         Source  getSource(void) const;
+
+        /**
+         *  \return the key used to purge the task queue.
+         */
+        const void* getKey(void) const;
     };
 
     /**
@@ -76,51 +83,18 @@ namespace fwk {
     public:
         /**
          *  \brief Sets the callback. Sets the cleanup method to nullptr.
+         *  \param key the key used to purge the task queue.
          *  \param callback the callback to be executed by a worker thread.
          */
-        void  init(const std::function<void (void)>& callback);
+        void  init(const void* key, const std::function<void (void)>& callback);
 
         /**
          *  \brief Sets the callback and cleanup method.
+         *  \param key the key used to purge the task queue.
          *  \param callback the callback to be executed by a worker thread.
          *  \param cleanup the callback to be used to clean resources. Called when the tasks queue is being cleared.
          */
-        void  init(const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
-    };
-
-    /**
-     *  \class EventTask Core/Worker/Task.hh
-     *  \brief A task created when an event is fired.
-     */
-    class EventTask :public ATask, public APooled<EventTask> {
-    public:
-        const void* _key; /*!< the key used to purge. */
-        std::function<void (void)> _callback; /*!< the callback (bound with event arguments). */
-
-    public:
-        /**
-         *  \brief Constructor of EventTask.
-         */
-        EventTask(void);
-
-        /**
-         *  \brief Destructor of EventTask.
-         */
-        virtual ~EventTask(void);
-
-    public:
-        /**
-         *  brief Sets attributes to null values.
-         */
-        virtual void  reinit(void);
-
-    public:
-        /**
-         *  \brief Sets the event and its callback.
-         *  \param key the key used to purge.
-         *  \param callback the method to call when the event is executed.
-         */
-        void  init(const void* key, const std::function<void (void)>& callback);
+        void  init(const void* key, const std::function<void (void)>& callback, const std::function<void (void)>& cleanup);
     };
 
     /**
@@ -191,11 +165,12 @@ namespace fwk {
     public:
         /**
          *  \brief Sets the callback function, cleanup function and interval duration.
+         *  \param key the key used to purge the task queue.
          *  \param callback the function to call at regular interval.
          *  \param cleanup the function to call when the periodic task is canceled.
          *  \param interval the interval between 2 executions of the task.
          */
-        void  init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval);
+        void  init(const void* key, const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval);
 
         /**
          *  \brief The next execution of the task will call the cleanup function instead, and the task will be removed.

@@ -7,13 +7,18 @@ using namespace fwk;
  */
 
 ATask::ATask(ATask::Source source):
-    _source(source)
+    _source(source),
+    _key(nullptr)
 {}
 
 ATask::~ATask(void) {}
 
 ATask::Source ATask::getSource(void) const {
     return this->_source;
+}
+
+const void* ATask::getKey(void) const {
+    return this->_key;
 }
 
 /**
@@ -32,43 +37,21 @@ SimpleTask::~SimpleTask(void) {
 }
 
 void  SimpleTask::reinit(void) {
-    this->_callback = nullptr;
-    this->_cleanup = nullptr;
-}
-
-void  SimpleTask::init(const std::function<void (void)>& cb) {
-    this->_callback = cb;
-    this->_cleanup = nullptr;
-}
-
-void  SimpleTask::init(const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
-    this->_callback = cb;
-    this->_cleanup = cl;
-}
-
-/**
- *  EventTask
- */
-
-EventTask::EventTask(void):
-    ATask(ATask::Source::EVENT),
-    APooled<EventTask>(),
-    _key(nullptr),
-    _callback(nullptr)
-{}
-
-EventTask::~EventTask(void) {
-    this->reinit();
-}
-
-void  EventTask::reinit(void) {
     this->_key = nullptr;
     this->_callback = nullptr;
+    this->_cleanup = nullptr;
 }
 
-void  EventTask::init(const void* key, const std::function<void (void)>& callback) {
+void  SimpleTask::init(const void* key, const std::function<void (void)>& cb) {
     this->_key = key;
-    this->_callback = callback;
+    this->_callback = cb;
+    this->_cleanup = nullptr;
+}
+
+void  SimpleTask::init(const void* key, const std::function<void (void)>& cb, const std::function<void (void)>& cl) {
+    this->_key = key;
+    this->_callback = cb;
+    this->_cleanup = cl;
 }
 
 /**
@@ -117,12 +100,14 @@ PeriodicTask::~PeriodicTask(void) {
 }
 
 void  PeriodicTask::reinit(void) {
+    this->_key = nullptr;
     this->_callback = nullptr;
     this->_cleanup = nullptr;
     this->_off = true;
 }
 
-void  PeriodicTask::init(const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval) {
+void  PeriodicTask::init(const void* key, const std::function<void(void)>& callback, const std::function<void(void)>& cleanup, const std::chrono::steady_clock::duration& interval) {
+    this->_key = key;
     this->_callback = callback;
     this->_cleanup = cleanup;
     this->_interval = interval;

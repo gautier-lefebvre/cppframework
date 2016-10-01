@@ -185,6 +185,8 @@ int main(int ac, char ** av) {
 
     std::string protocol = av[1];
 
+    int key = 0;
+
     if (protocol == "udp") {
         system->initUDP();
         if (ac == 3) {
@@ -212,18 +214,18 @@ int main(int ac, char ** av) {
         http(system);
     } else if (protocol == "delayed") {
         system->initWorkerThreads(1, true);
-        fwk::WorkerManager::get().addDelayedTask(fwk::SimpleTask::getFromPool([] (void) {
+        fwk::WorkerManager::get().addDelayedTask(fwk::SimpleTask::getFromPool(&key, [] (void) {
             INFO("SimpleTask working");
         }), std::chrono::seconds(2));
         system->run();
     } else if (protocol == "periodic") {
         system->initWorkerThreads(1, true);
-        fwk::WorkerManager::get().addPeriodicTask([] (void) {
+        fwk::WorkerManager::get().addPeriodicTask(&key, [] (void) {
             INFO("Hello");
         }, nullptr, std::chrono::seconds(5), true);
         system->run();
     } else if (protocol == "simple") {
-        fwk::WorkerManager::get().addSimpleTask([] (void) {
+        fwk::WorkerManager::get().addSimpleTask(&key, [] (void) {
             INFO("SimpleTask :)");
         });
         system->run();

@@ -38,7 +38,7 @@ namespace fwk {
         /**
          *  \brief Creates the callback by wrapping the arguments with a lamba and capturing them.
          *  \param args the arguments passed to the subscribers of the event when it is fired.
-         *  \returns the callback to give an EventTask
+         *  \returns the callback to give to a Task
          */
         std::function<void (void)> wrapArguments(Args&&... args) {
             return [this, &args...] (void) -> void {
@@ -48,13 +48,13 @@ namespace fwk {
 
     public:
         /**
-         *  \brief Adds an EventTask to the task queue. The event will be executed asynchronously.
+         *  \brief Adds a SimpleTask to the task queue. The event will be executed asynchronously.
          *  \param args the arguments passed to the subscribers of the event.
          */
         void  fireAsync(Args... args) {
             SCOPELOCK(this);
         	if (this->_subscribers.empty()) { return ; }
-            WorkerManager::get().addEventTask(this, this->wrapArguments(std::forward<Args>(args)...));
+            WorkerManager::get().addSimpleTask(this, this->wrapArguments(std::forward<Args>(args)...));
         }
 
         /**
@@ -65,14 +65,14 @@ namespace fwk {
         	SCOPELOCK(this);
         	if (this->_subscribers.empty()) { return ; }
 
-            EventTask* eventTask = nullptr;
+            SimpleTask* simpleTask = nullptr;
 
             try {
-                eventTask = EventTask::getFromPool(this, this->wrapArguments(std::forward<Args>(args)...));
-                WorkerThread::executeEventTask(eventTask, true);
+                simpleTask = SimpleTask::getFromPool(this, this->wrapArguments(std::forward<Args>(args)...));
+                WorkerThread::executeSimpleTask(simpleTask, true);
             } catch (const std::exception& e) {
                 CRITICAL(e.what());
-                EventTask::returnToPool(eventTask);
+                SimpleTask::returnToPool(simpleTask);
             }
         }
 
@@ -100,14 +100,22 @@ namespace fwk {
          */
         void purgeTaskQueue() {
             SCOPELOCK(this);
-            WorkerManager::get().purgeEventTasks(this);
+            WorkerManager::get().purgeTaskQueue(this);
+        }
+
+        /**
+         *  \brief Reinits this event. Clears the list of all subscribers. Purges the task queue of all tasks for this event.
+         */
+        void reinit() {
+            SCOPELOCK(this);
+            this->_subscribers.clear();
+            this->purgeTaskQueue();
         }
 
     public:
         /**
          *  \brief Calls every callbacks. Must only be called by the worker threads.
          *  If you cant to fire an event, use fireSync or fireAsync.
-         *  \param eventTaskTimePoint the timepoint when the EventTask was created. If this timepoint is different than this->lastOutOfPoolTimePoint(), then the EventTask must not be executed.
          *  \param args the arguments to pass to the callbacks.
          */
         void  exec(Args&&... args) {

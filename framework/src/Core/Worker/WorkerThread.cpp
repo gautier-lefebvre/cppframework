@@ -10,7 +10,6 @@ using namespace fwk;
 
 const std::map<ATask::Source, WorkerThread::WorkerHandler> WorkerThread::TaskHandlerMap = {
     {ATask::Source::SIMPLE, &WorkerThread::executeSimpleTask},
-    {ATask::Source::EVENT, &WorkerThread::executeEventTask},
     {ATask::Source::HTTP_CALLBACK, &WorkerThread::executeHttpTask},
     {ATask::Source::PERIODIC_TASK, &WorkerThread::executePeriodicTask}
 };
@@ -126,15 +125,25 @@ void  WorkerThread::executeSimpleTask(ATask* task, bool exec) {
     SimpleTask *simpleTask = reinterpret_cast<SimpleTask*>(task);
 
     if (simpleTask) {
+        bool cleaned = false;
         try {
-            if (exec) {
-                if (simpleTask->_callback) {
-                    simpleTask->_callback();
+            try {
+                if (exec) {
+                    if (simpleTask->_callback) {
+                        simpleTask->_callback();
+                    }
                 }
-            } else {
+
                 if (simpleTask->_cleanup) {
+                    cleaned = true;
                     simpleTask->_cleanup();
                 }
+            } catch (const std::exception&) {
+                if (simpleTask->_cleanup && !cleaned) {
+                    simpleTask->_cleanup();
+                }
+
+                throw;
             }
         } catch (const std::exception&) {
             SimpleTask::returnToPool(simpleTask);
@@ -143,29 +152,7 @@ void  WorkerThread::executeSimpleTask(ATask* task, bool exec) {
 
         SimpleTask::returnToPool(simpleTask);
     } else {
-        CRITICAL("Cant reinterpret_cast a SimpleTask");
-    }
-}
-
-void  WorkerThread::executeEventTask(ATask* task, bool exec) {
-    EventTask *eventTask = reinterpret_cast<EventTask*>(task);
-
-    if (eventTask) {
-        try {
-            // call every subscriber.
-            if (exec) {
-                eventTask->_callback();
-            }
-
-            EventTask::returnToPool(eventTask);
-
-        } catch (const std::exception&) {
-            EventTask::returnToPool(eventTask);
-            throw;
-        }
-
-    } else {
-        CRITICAL("Cant reinterpret_cast an EventTask");
+        CRITICAL("Can't reinterpret_cast a SimpleTask");
     }
 }
 
@@ -173,19 +160,32 @@ void  WorkerThread::executeHttpTask(ATask* task, bool exec) {
     HttpTask *httpTask = reinterpret_cast<HttpTask*>(task);
 
     if (httpTask) {
-        if (exec) {
-            if (httpTask->_callback) {
-                httpTask->_callback(httpTask->_response);
+        bool cleaned = false;
+
+        try {
+            try {
+                if (exec && httpTask->_callback) {
+                    httpTask->_callback(httpTask->_response);
+                }
+
+                if (httpTask->_cleanup) {
+                    cleaned = true;
+                    httpTask->_cleanup();
+                }
+            } catch (const std::exception&) {
+                if (httpTask->_cleanup && !cleaned) {
+                    httpTask->_cleanup();
+                }
+
+                throw;
             }
-        } else {
-            if (httpTask->_cleanup) {
-                httpTask->_cleanup();
-            }
+        } catch (const std::exception&) {
+            HttpResponse::returnToPool(httpTask->_response);
+            HttpTask::returnToPool(httpTask);
+            throw;
         }
-        HttpResponse::returnToPool(httpTask->_response);
-        HttpTask::returnToPool(httpTask);
     } else {
-        CRITICAL("Cant reinterpret_cast an HTTPTask");
+        CRITICAL("Can't reinterpret_cast an HTTPTask");
     }
 }
 
@@ -209,6 +209,6 @@ void  WorkerThread::executePeriodicTask(ATask* task, bool exec) {
             WorkerManager::get().addPeriodicTask(periodicTask, false);
         }
     } else {
-        CRITICAL("Cant reinterpret_cast a PeriodicTask");
+        CRITICAL("Can't reinterpret_cast a PeriodicTask");
     }
 }
