@@ -8,7 +8,7 @@
 #include  "Library/Property/AEndable.hh"
 #include  "Library/Threading/Lockable.hpp"
 #include  "Library/Threading/Notifiable.hpp"
-#include  "Core/Network/Http/HttpRequest.hh"
+#include  "Core/Network/Http/HttpRequest.hpp"
 #include  "Core/Network/Http/HttpProtocol.hh"
 
 namespace fwk {

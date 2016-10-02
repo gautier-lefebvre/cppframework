@@ -1,4 +1,4 @@
-#include  "Core/Network/Http/HttpRequest.hh"
+#include  "Core/Network/Http/HttpRequest.hpp"
 
 using namespace fwk;
 
@@ -7,6 +7,7 @@ HttpRequest::HttpRequest(void):
     APooled<HttpRequest>(),
     method(""),
     url(""),
+    queryString(),
     success(nullptr),
     error(nullptr),
     clean(nullptr),
@@ -24,6 +25,7 @@ void  HttpRequest::reinit(void) {
     this->AHttpMessage::reinit();
     this->method = "";
     this->url = "";
+    this->queryString.clear();
     this->success = nullptr;
     this->error = nullptr;
     this->clean = nullptr;
@@ -53,4 +55,8 @@ void HttpRequest::wake(HttpResponse *response) {
     this->asynchronous.response = response;
     this->asynchronous.isValid = (response != nullptr);
     this->asynchronous.lock.notify();
+}
+
+void HttpRequest::appendToQueryString(const std::string& key, const std::string &value) {
+    this->queryString.emplace_back(key, value);
 }

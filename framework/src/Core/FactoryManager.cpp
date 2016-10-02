@@ -1,6 +1,6 @@
 #include  "Library/Collection/ByteArray.hpp"
 #include  "Library/Network/CURL/EasyHandle.hh"
-#include  "Core/Network/Http/HttpRequest.hh"
+#include  "Core/Network/Http/HttpRequest.hpp"
 #include  "Core/Network/Http/HttpResponse.hh"
 #include  "Core/Network/Tcp/TcpManager.hh"
 #include  "Core/Network/Udp/UdpManager.hh"

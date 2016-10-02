@@ -4,6 +4,8 @@
 #include  <curl/curl.h>
 #include  <string>
 #include  <map>
+#include  <list>
+#include  <utility>
 
 #include  "Library/Collection/BidiMap.hpp"
 #include  "Library/Factory/APooled.hpp"
@@ -92,6 +94,26 @@ namespace fwk {
              *  \throw curlxx::Exception if the underlying function failed.
              */
             void  perform(void) const;
+
+            /**
+             *  \brief URL encode the string.
+             *  \param str the string to escape.
+             *  \throw curlx::Exception if the underlying function failed.
+             */
+            char*  urlEscape(const std::string& str) const;
+
+            /**
+             *  \brief Frees the pointer gotten from a curl call.
+             *  \param ptr the pointer to free.
+             */
+            void free(char* ptr) const;
+
+            /**
+             *  \brief Generates the query string by escaping keys and values.
+             *  \throw curlxx::Exception if the underlying function failed.
+             *  \param fields the fields of the query string.
+             */
+            std::string  generateQueryString(const std::list<std::pair<std::string, std::string>>& fields) const;
 
             /**
              *  \brief Gets the status code of the response (200...).

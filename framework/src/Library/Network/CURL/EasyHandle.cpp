@@ -83,20 +83,47 @@ void curlxx::EasyHandle::appendHeader(const std::string& header, const std::stri
     this->_headers = tmp;
 }
 
-void curlxx::EasyHandle::setHeaders(const std::map<std::string, std::string>& headers) {
-    for (auto& it : headers) {
-        this->appendHeader(it.first, it.second);
-    }
-
-    this->setOpt(CURLOPT_HTTPHEADER, this->_headers);
-}
-
 void curlxx::EasyHandle::perform(void) const {
     CURLcode ret;
 
     if ((ret = curl_easy_perform(this->_handle)) != CURLE_OK) {
         throw curlxx::Exception(fmt::format("curl_easy_perform failed: {0}", curl_easy_strerror(ret)));
     }
+}
+
+char* curlxx::EasyHandle::urlEscape(const std::string& str) const {
+    char* escaped;
+
+    if ((escaped = curl_easy_escape(this->_handle, str.c_str(), str.length())) == NULL) {
+        throw curlxx::Exception("curl_easy_escape failed");
+    }
+
+    return escaped;
+}
+
+void curlxx::EasyHandle::free(char* ptr) const {
+    curl_free(ptr);
+}
+
+std::string curlxx::EasyHandle::generateQueryString(const std::list<std::pair<std::string, std::string>>& fields) const {
+    char* tmp;
+    std::string queryString;
+
+    for (auto& pair : fields) {
+        if (!queryString.empty()) {
+            queryString += "&";
+        }
+
+        tmp = this->urlEscape(pair.first);
+        queryString += tmp;
+        this->free(tmp);
+
+        tmp = this->urlEscape(pair.second);
+        queryString += tmp;
+        this->free(tmp);
+    }
+
+    return queryString;
 }
 
 uint32_t curlxx::EasyHandle::getStatus(void) const {
@@ -108,6 +135,14 @@ uint32_t curlxx::EasyHandle::getStatus(void) const {
     }
 
     return static_cast<uint32_t>(status);
+}
+
+void curlxx::EasyHandle::setHeaders(const std::map<std::string, std::string>& headers) {
+    for (auto& it : headers) {
+        this->appendHeader(it.first, it.second);
+    }
+
+    this->setOpt(CURLOPT_HTTPHEADER, this->_headers);
 }
 
 void curlxx::EasyHandle::cleanup(void) {

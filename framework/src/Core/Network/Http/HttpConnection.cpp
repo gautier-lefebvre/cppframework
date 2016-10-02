@@ -137,7 +137,7 @@ void HttpConnection::prepareHandle(curlxx::EasyHandle* handle, const HttpRequest
         handle->init();
 
         handle->setUserAgent(this->_userAgent);
-        handle->setURL(HttpProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url);
+        handle->setURL(HttpProtocolToString.key.at(this->_protocol) + "://" + this->_host + request->url + (!request->queryString.empty() ? "?" + handle->generateQueryString(request->queryString) : ""));
         handle->setPort(this->_port);
         handle->setMethod(request->method);
         handle->setHeaders(request->headers);
