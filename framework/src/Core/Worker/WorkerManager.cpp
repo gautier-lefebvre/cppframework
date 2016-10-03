@@ -166,7 +166,7 @@ void WorkerManager::purgeTaskQueue(const void* key) {
     {
         SCOPELOCK(&(this->_pendingTasks));
 
-        for (auto it = this->_watchedTasks.find(key) ; it != this->_watchedTasks.end() ; ++it) {
+        while ((auto it = this->_watchedTasks.find(key)) != this->_watchedTasks.end()) {
             ATask* task = *((*it).second);
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
@@ -182,7 +182,7 @@ void WorkerManager::purgeTaskQueue(const void* key) {
             }
 
             this->_pendingTasks.erase((*it).second);
-            it = this->_watchedTasks.erase(it);
+            this->_watchedTasks.erase(it);
         }
 
         this->_pendingTasks.notify_all();
@@ -191,7 +191,7 @@ void WorkerManager::purgeTaskQueue(const void* key) {
     {
         SCOPELOCK(&(this->_delayedTasks));
 
-        for (auto it = this->_watchedDelayedTasks.find(key) ; it != this->_watchedDelayedTasks.end() ; ++it) {
+        while ((auto it = this->_watchedDelayedTasks.find(key)) != this->_watchedDelayedTasks.end()) {
             ATask* task = (*((*it).second))->_task;
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
@@ -208,7 +208,7 @@ void WorkerManager::purgeTaskQueue(const void* key) {
 
             DelayedTask::returnToPool(*((*it).second));
             this->_delayedTasks.erase((*it).second);
-            it = this->_watchedDelayedTasks.erase(it);
+            this->_watchedDelayedTasks.erase(it);
         }
 
         this->_delayedTasks.notify_all();
