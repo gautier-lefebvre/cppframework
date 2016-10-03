@@ -166,7 +166,8 @@ void WorkerManager::purgeTaskQueue(const void* key) {
     {
         SCOPELOCK(&(this->_pendingTasks));
 
-        while ((auto it = this->_watchedTasks.find(key)) != this->_watchedTasks.end()) {
+        std::multimap<const void *, WorkerManager::TaskQueue::const_iterator>::iterator it;
+        while ((it = this->_watchedTasks.find(key)) != this->_watchedTasks.end()) {
             ATask* task = *((*it).second);
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
@@ -191,7 +192,8 @@ void WorkerManager::purgeTaskQueue(const void* key) {
     {
         SCOPELOCK(&(this->_delayedTasks));
 
-        while ((auto it = this->_watchedDelayedTasks.find(key)) != this->_watchedDelayedTasks.end()) {
+        std::multimap<const void *, WorkerManager::DelayedTaskQueue::const_iterator>::iterator it;
+        while ((it = this->_watchedDelayedTasks.find(key)) != this->_watchedDelayedTasks.end()) {
             ATask* task = (*((*it).second))->_task;
             switch (task->getSource()) {
                 case ATask::Source::SIMPLE: {
